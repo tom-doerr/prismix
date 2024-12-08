@@ -60,28 +60,34 @@ class IterativeProgrammer(dspy.Module):
             )
 
     def forward(self, command: str) -> CodeResult:
-        # Generate initial specification
+        print("1. Generating program specification...")
         spec = self.spec_generator(command=command)
+        print(f"Requirements: {spec.requirements}")
+        print(f"Approach: {spec.approach}\n")
         
         # Track previous attempts
         previous_attempt = ""  # Changed from dict to string
         
         # Iterative improvement loop
         for i in range(self.max_iterations):
-            # Generate code
+            print(f"Iteration {i+1}/{self.max_iterations}")
+            print("------------------------")
+            print("2. Generating implementation...")
             implementation = self.code_generator(
                 requirements=spec.requirements,
                 approach=spec.approach,
                 previous_attempt=previous_attempt
             )
             
-            # Execute code
+            print("3. Testing implementation...")
             result = self.execute_code(implementation.code)
             
             if result.success:
+                print("Success! Implementation passed testing.\n")
                 return result
                 
-            # If failed, review and improve
+            print(f"Test failed: {result.error}")
+            print("4. Reviewing and improving code...")
             review = self.code_reviewer(
                 code=implementation.code,
                 error=result.error

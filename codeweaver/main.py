@@ -4,12 +4,13 @@ from codeweaver.core.iterative_programmer import setup_agent
 
 def execute_instruction(instruction: str):
     """Execute the given instruction using AI."""
-    print(f"Executing instruction: {instruction}")
+    print(f"Executing instruction: {instruction}\n")
     
-    # Initialize the AI agent
+    print("Initializing AI agent...")
     agent = setup_agent()
     
-    # Generate code using the agent
+    print("Generating code...")
+    print("-----------------")
     result = agent.forward(instruction)
     
     # Create output directory if it doesn't exist
