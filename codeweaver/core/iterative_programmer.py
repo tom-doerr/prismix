@@ -37,19 +37,58 @@ class IterativeProgrammer(dspy.Module):
         self.code_reviewer = dspy.ChainOfThought(CodeReview)
         self.max_iterations = 3
 
+    def is_code_safe(self, code: str) -> tuple[bool, str]:
+        """Check if code is safe to execute"""
+        dangerous_terms = [
+            "os.system", "subprocess", "eval(", "exec(", 
+            "import os", "import subprocess", "open(", 
+            "__import__", "globals()", "locals()"
+        ]
+        
+        for term in dangerous_terms:
+            if term in code:
+                return False, f"Potentially unsafe code detected: {term}"
+        
+        return True, ""
+
     def execute_code(self, code: str) -> CodeResult:
         """Execute the generated code and return results"""
+        # First check if code is safe
+        is_safe, safety_msg = self.is_code_safe(code)
+        if not is_safe:
+            return CodeResult(
+                code=code,
+                success=False,
+                output="",
+                error=f"Safety check failed: {safety_msg}"
+            )
+            
         try:
             # Set up isolated execution environment
             local_vars = {}
-            exec(code, {}, local_vars)
-            # Test basic functionality
-            test_input = 5
-            result = local_vars['factorial'](test_input)
+            exec(code, {"__builtins__": {"print": print}}, local_vars)
+            
+            # Get the main function from the generated code
+            main_func = None
+            for name, obj in local_vars.items():
+                if callable(obj):
+                    main_func = obj
+                    break
+            
+            if main_func is None:
+                return CodeResult(
+                    code=code,
+                    success=False,
+                    output="",
+                    error="No callable function found in generated code"
+                )
+            
+            # Test the function
+            result = main_func()
             return CodeResult(
                 code=code,
                 success=True, 
-                output=f"Code executed successfully. Test factorial({test_input}) = {result}"
+                output=f"Code executed successfully. Result: {result}"
             )
         except Exception as e:
             return CodeResult(
