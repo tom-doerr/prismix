@@ -2,7 +2,7 @@
 name = "codeweaver"
 version = "0.1.0-dev"
 description = "An AI-powered iterative code generation tool"
-authors = ["Your Name <your.email@example.com>", "Tom Dörr <tomdoerr96@gmail.com>"]
+authors = ["Tom Dörr <tomdoerr96@gmail.com>"]
 readme = "README.md"
 packages = [{include = "codeweaver"}]
 
