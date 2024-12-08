@@ -6,6 +6,9 @@ authors = ["Tom Dörr <tomdoerr96@gmail.com>"]
 readme = "README.md"
 packages = [{include = "codeweaver"}]
 
+[tool.poetry.scripts]
+codeweaver = "codeweaver.main:main"
+
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
 dspy-ai = "^2.5.0"
