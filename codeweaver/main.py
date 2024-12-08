@@ -16,8 +16,14 @@ def execute_instruction(instruction: str):
     # Create output directory if it doesn't exist
     os.makedirs("output", exist_ok=True)
     
+    # Extract function name from the code
+    import re
+    function_match = re.search(r'def\s+(\w+)', result.code)
+    function_name = function_match.group(1) if function_match else "generated_code"
+    
     # Save the generated code to a file
-    output_file = "output/generated_code.py"
+    output_file = f"output/{function_name}.py"
+    os.makedirs("output", exist_ok=True)
     with open(output_file, "w") as f:
         f.write(result.code)
     
