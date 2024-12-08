@@ -34,6 +34,7 @@ def execute_instruction(instruction: str):
         print("Error:", result.error)
     if result.output:
         print("\nExecution Output:", result.output)
+    print("\nSafety Check:", "PASSED" if result.success else "FAILED")
     print("\nGenerated code saved to:", output_file)
     print("\nContents:")
     print("----------")
