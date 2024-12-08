@@ -32,7 +32,8 @@ def execute_instruction(instruction: str):
     print("Success:", result.success)
     if result.error:
         print("Error:", result.error)
-    print("\nOutput:", result.output)
+    if result.output:
+        print("\nExecution Output:", result.output)
     print("\nGenerated code saved to:", output_file)
     print("\nContents:")
     print("----------")

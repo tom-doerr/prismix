@@ -131,7 +131,21 @@ class IterativeProgrammer(dspy.Module):
                 previous_attempt=previous_attempt
             )
             
-            print("3. Testing implementation...")
+            print("3. Running safety check...")
+            is_safe, safety_msg = self.is_code_safe(implementation.code)
+            print(f"Safety check result: {'PASSED' if is_safe else 'FAILED'}")
+            print(f"Safety analysis: {safety_msg}\n")
+
+            if not is_safe:
+                print("Code generation failed due to safety concerns.")
+                return CodeResult(
+                    code=implementation.code,
+                    success=False,
+                    output="",
+                    error=f"Safety check failed: {safety_msg}"
+                )
+
+            print("4. Testing implementation...")
             result = self.execute_code(implementation.code)
             
             if result.success:
