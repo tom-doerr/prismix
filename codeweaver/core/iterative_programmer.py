@@ -64,9 +64,20 @@ class IterativeProgrammer(dspy.Module):
             )
             
         try:
-            # Set up isolated execution environment
+            # Set up isolated execution environment with necessary builtins
+            safe_builtins = {
+                "print": print,
+                "isinstance": isinstance,
+                "range": range,
+                "int": int,
+                "str": str,
+                "bool": bool,
+                "len": len,
+                "ValueError": ValueError,
+                "TypeError": TypeError
+            }
             local_vars = {}
-            exec(code, {"__builtins__": {"print": print}}, local_vars)
+            exec(code, {"__builtins__": safe_builtins}, local_vars)
             
             # Get the main function from the generated code
             main_func = None
