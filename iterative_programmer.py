@@ -61,7 +61,7 @@ class IterativeProgrammer(dspy.Module):
         spec = self.spec_generator(command=command)
         
         # Track previous attempts
-        previous_attempt = {"code": "", "error": ""}
+        previous_attempt = ""  # Changed from dict to string
         
         # Iterative improvement loop
         for i in range(self.max_iterations):
@@ -99,7 +99,7 @@ class IterativeProgrammer(dspy.Module):
 
 def setup_agent():
     # Configure LM
-    lm = dspy.OpenAI(
+    lm = dspy.LM(
         model="gpt-4o-mini",
         max_tokens=2000
     )
