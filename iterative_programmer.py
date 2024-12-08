@@ -100,7 +100,7 @@ class IterativeProgrammer(dspy.Module):
 def setup_agent():
     # Configure LM
     lm = dspy.OpenAI(
-        model="gpt-4",
+        model="gpt-4-mini",
         max_tokens=2000
     )
     dspy.configure(lm=lm)
