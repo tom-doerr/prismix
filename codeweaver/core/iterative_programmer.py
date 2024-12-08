@@ -174,9 +174,9 @@ class IterativeProgrammer(dspy.Module):
 
 class CodeSafetyCheck(dspy.Signature):
     """Analyze code for potential security risks"""
-    code = dspy.InputField()
-    is_safe = dspy.OutputField(desc="Boolean indicating if code is safe")
-    safety_message = dspy.OutputField(desc="Explanation of safety concerns if any")
+    code: str = dspy.InputField()
+    is_safe: bool = dspy.OutputField(desc="Boolean indicating if code is safe")
+    safety_message: str = dspy.OutputField(desc="Explanation of safety concerns if any")
 
 def setup_agent():
     # Configure LM
