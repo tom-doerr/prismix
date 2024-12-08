@@ -1,5 +1,5 @@
 import pytest
-from iterative_programmer import setup_agent, CodeResult
+from codeweaver.core.iterative_programmer import setup_agent, CodeResult
 
 def test_factorial_basic():
     programmer = setup_agent()

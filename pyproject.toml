@@ -21,3 +21,29 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+[tool.poetry]
+name = "codeweaver"
+version = "0.1.0-dev"
+description = "An AI-powered iterative code generation tool"
+authors = ["Your Name <your.email@example.com>"]
+readme = "README.md"
+packages = [{include = "codeweaver"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+dspy-ai = "^2.5.0"
+pytest = "^8.3.3"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+pytest-cov = "^6.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]

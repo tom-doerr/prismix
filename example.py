@@ -1,4 +1,4 @@
-from iterative_programmer import setup_agent
+from codeweaver.core.iterative_programmer import setup_agent
 
 def main():
     programmer = setup_agent()
