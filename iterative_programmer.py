@@ -43,10 +43,13 @@ class IterativeProgrammer(dspy.Module):
             # Set up isolated execution environment
             local_vars = {}
             exec(code, {}, local_vars)
+            # Test basic functionality
+            test_input = 5
+            result = local_vars['factorial'](test_input)
             return CodeResult(
                 code=code,
                 success=True, 
-                output="Code executed successfully"
+                output=f"Code executed successfully. Test factorial({test_input}) = {result}"
             )
         except Exception as e:
             return CodeResult(
