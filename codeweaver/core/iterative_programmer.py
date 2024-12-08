@@ -83,13 +83,23 @@ class IterativeProgrammer(dspy.Module):
                     error="No callable function found in generated code"
                 )
             
-            # Test the function
-            result = main_func()
-            return CodeResult(
-                code=code,
-                success=True, 
-                output=f"Code executed successfully. Result: {result}"
-            )
+            # Test the function with a sample input
+            try:
+                # Try with a simple test case (5)
+                result = main_func(5)
+                return CodeResult(
+                    code=code,
+                    success=True, 
+                    output=f"Code executed successfully. Test {main_func.__name__}(5) = {result}"
+                )
+            except TypeError as e:
+                # If the function requires different arguments, return error
+                return CodeResult(
+                    code=code,
+                    success=False,
+                    output="",
+                    error=f"Function execution failed: {str(e)}"
+                )
         except Exception as e:
             return CodeResult(
                 code=code,
