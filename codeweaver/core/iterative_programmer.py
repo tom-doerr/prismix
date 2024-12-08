@@ -35,21 +35,19 @@ class IterativeProgrammer(dspy.Module):
         self.spec_generator = dspy.ChainOfThought(ProgramSpec)
         self.code_generator = dspy.ChainOfThought(CodeImplementation) 
         self.code_reviewer = dspy.ChainOfThought(CodeReview)
+        self.safety_checker = dspy.ChainOfThought(CodeSafetyCheck)
         self.max_iterations = 3
 
     def is_code_safe(self, code: str) -> tuple[bool, str]:
-        """Check if code is safe to execute"""
-        dangerous_terms = [
-            "os.system", "subprocess", "eval(", "exec(", 
-            "import os", "import subprocess", "open(", 
-            "__import__", "globals()", "locals()"
-        ]
-        
-        for term in dangerous_terms:
-            if term in code:
-                return False, f"Potentially unsafe code detected: {term}"
-        
-        return True, ""
+        """Check if code is safe to execute using LLM"""
+        safety_check = self.safety_checker(code=code)
+        return safety_check.is_safe, safety_check.safety_message
+
+class CodeSafetyCheck(dspy.Signature):
+    """Analyze code for potential security risks"""
+    code = dspy.InputField()
+    is_safe = dspy.OutputField(desc="Boolean indicating if code is safe")
+    safety_message = dspy.OutputField(desc="Explanation of safety concerns if any")
 
     def execute_code(self, code: str) -> CodeResult:
         """Execute the generated code and return results"""
