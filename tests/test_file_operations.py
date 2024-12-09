@@ -157,10 +157,11 @@ def test_multiple_edit_modes(test_file):
     
     # Check final content structure
     lines = new_content.splitlines()
-    assert len(lines) == 3
+    assert len(lines) == 4
     assert lines[0] == "modified line 1"
     assert lines[1] == "line 2"
     assert lines[2] == "new line"
+    assert lines[3] == "line 3"
 
 def test_edit_line_numbers(test_file):
     """Test line number adjustments after edits"""
@@ -191,7 +192,7 @@ def test_edit_boundary_conditions(test_file):
     edits = [("replace", 0, "invalid"), ("replace", 999, "invalid")]
     new_content, changes = editor._apply_line_edits(content, edits)
     assert new_content == content  # Should not modify content
-    assert any("Failed to apply" in change for change in changes)
+    assert all("Failed to apply" in change for change in changes)
     
     # Test empty content
     new_content, changes = editor._apply_line_edits("", [("insert", 1, "new line")])
@@ -211,21 +212,21 @@ def test_edit_format_handling(test_file):
     new_content, changes = editor._apply_line_edits(content, string_edits)
     assert "modified line 1" in new_content
     assert len(changes) == 1
-    assert "Replaced line 1" in changes[0]
+    assert "Replaced line 1: 'line 1' -> 'modified line 1'" in changes[0]
     
     # Test tuple format with explicit mode
     tuple_edits = [("REPLACE", 1, "modified again")]
     new_content, changes = editor._apply_line_edits(content, tuple_edits)
     assert "modified again" in new_content
     assert len(changes) == 1
-    assert "Line 1: 'line 1' -> 'modified again'" in changes[0]
+    assert "Replaced line 1: 'line 1' -> 'modified again'" in changes[0]
     
     # Test tuple format without mode (should default to REPLACE)
     simple_edits = [(1, "simple modification")]
     new_content, changes = editor._apply_line_edits(content, simple_edits)
     assert "simple modification" in new_content
     assert len(changes) == 1
-    assert "Line 1: 'line 1' -> 'simple modification'" in changes[0]
+    assert "Replaced line 1: 'line 1' -> 'simple modification'" in changes[0]
 
 def test_concurrent_edits():
     """Test multiple edits happening at the same line"""
@@ -240,8 +241,8 @@ def test_concurrent_edits():
     new_content, changes = editor._apply_line_edits(content, edits)
     assert "second change" in new_content
     assert len(changes) == 2
-    assert "Replaced line 2" in changes[0]
-    assert "Line 2: 'first change' -> 'second change'" in changes[1]
+    assert "Replaced line 2: 'line 2' -> 'first change'" in changes[0]
+    assert "Replaced line 2: 'first change' -> 'second change'" in changes[1]
 
 def test_edit_chain_effects():
     """Test how edits affect subsequent operations"""
@@ -259,7 +260,7 @@ def test_edit_chain_effects():
     assert len(lines) == 4
     assert lines[0] == "line 1"
     assert lines[1] == "new line"
-    assert lines[2] == "modified line"
+    assert lines[2] == "line 3"
     assert lines[3] == "line 4"
     assert len(changes) == 3
 

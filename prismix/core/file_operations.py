@@ -130,6 +130,16 @@ class FileEditor:
                     elif mode == "DELETE" and 1 <= line_num <= len(lines):
                         old_text = lines.pop(line_num - 1)
                         changes.append(f"Deleted line {line_num}: '{old_text}'")
+                        # Adjust line numbers for subsequent edits
+                        for j in range(len(edit_lines)):
+                            if j > edit_lines.index(edit):
+                                parts_j = edit_lines[j].split('|', 1)
+                                mode_line_j = parts_j[0].strip().split()
+                                if len(mode_line_j) >= 2:
+                                    line_num_j = int(mode_line_j[1])
+                                    if line_num_j > line_num:
+                                        mode_line_j[1] = str(line_num_j - 1)
+                                        edit_lines[j] = ' '.join(mode_line_j) + '|' + parts_j[1]
                 except (ValueError, IndexError) as e:
                     changes.append(f"Failed to apply edit: Invalid line number {line_num}")
                     continue
