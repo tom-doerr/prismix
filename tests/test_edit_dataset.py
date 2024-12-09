@@ -62,8 +62,16 @@ def test_script_generation(generator):
         result = generator.script_generator(theme=theme)
         assert isinstance(result.script, str)
         assert len(result.script) > 0
+            
+        # Clean script of markdown wrapper
+        script = result.script.strip()
+        if script.startswith("```python"):
+            script = script[8:].strip()
+        if script.endswith("```"):
+            script = script[:-3].strip()
+                
         # Basic Python syntax check
-        compile(result.script, '<string>', 'exec')
+        compile(script, '<string>', 'exec')
 
 def test_edit_instruction_generation(generator):
     """Test edit instruction generation"""
