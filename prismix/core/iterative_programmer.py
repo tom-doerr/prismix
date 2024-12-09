@@ -37,9 +37,18 @@ class IterativeProgrammer(dspy.Module):
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
         """Generate and execute code or edit files based on the command"""
         # Check if this is a file editing command
-        if command.startswith("edit "):
+        if command.startswith("edit"):
+            command = command.strip()
+            if command == "edit":
+                return FileContext(
+                    filepath="",
+                    content="",
+                    changes=[],
+                    error="Invalid edit command. Use: edit <filepath> <instruction>"
+                )
+            
             # Extract filepath and instruction
-            parts = command[5:].strip().split(" ", 1)
+            parts = command[4:].strip().split(" ", 1)
             if not parts or len(parts) != 2:
                 return FileContext(
                     filepath="",
