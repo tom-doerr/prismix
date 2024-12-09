@@ -68,10 +68,24 @@ class EditDatasetGenerator:
         
         # 3. Apply edit instruction using FileEditor
         editor = FileEditor()
-        with open("temp.py", "w") as f:
+        temp_file = "temp.py"
+        with open(temp_file, "w") as f:
             f.write(original_script)
-        file_context = editor.edit_file("temp.py", edit_instruction)
-        edited_script = file_context.content if file_context.content else original_script
+            
+        file_context = editor.edit_file(temp_file, edit_instruction)
+        if not file_context.error and file_context.changes:
+            edited_script = file_context.content
+        else:
+            # Generate a modified version if FileEditor didn't make changes
+            modified_result = self.script_generator(
+                theme=theme,
+                instruction=edit_instruction
+            )
+            edited_script = modified_result.script.strip()
+            if edited_script.startswith("```python"):
+                edited_script = edited_script[8:].strip()
+            if edited_script.endswith("```"):
+                edited_script = edited_script[:-3].strip()
         
         # 4. Generate hindsight edit command
         hindsight = self.hindsight_generator(
