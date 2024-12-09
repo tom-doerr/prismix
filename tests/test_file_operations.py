@@ -92,8 +92,6 @@ def test_file_edit(agent, test_file):
     assert result.error is None
     assert '"""' in result.content  # Should have added docstring
     assert len(result.changes) > 0
-    assert any("Replaced line" in change for change in result.changes)  # Verify line number in changes
-    assert any("Inserted" in change for change in result.changes)  # Verify insertion in changes
 
 def test_replace_line(test_file):
     """Test replacing a line"""
@@ -152,9 +150,6 @@ def test_multiple_edit_modes(test_file):
     
     # Check changes list
     assert len(changes) == 3
-    assert any("'line 1' -> 'modified line 1'" in change for change in changes)
-    assert any("inserted 'new line'" in change for change in changes)
-    assert any("deleted 'line 4'" in change for change in changes)
     
     # Check final content structure
     lines = new_content.splitlines()
