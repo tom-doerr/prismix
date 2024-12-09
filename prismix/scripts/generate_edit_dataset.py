@@ -91,18 +91,17 @@ class EditDatasetGenerator:
                 # Compare both versions and use the one with significant changes
                 editor_script = file_context.content if not file_context.error else None
         
-                # Calculate similarity scores
+                # Calculate and validate similarity scores using DSPy assertions
                 editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
                 generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
                 
-                # Check similarity scores
-                if not (0.3 < editor_similarity < 0.9 or 0.3 < generated_similarity < 0.9):
-                    print(f"Attempt {attempt + 1}/{max_retries}: Similarity scores out of range")
-                    print(f"Editor similarity: {editor_similarity:.2f}")
-                    print(f"Generated similarity: {generated_similarity:.2f}")
-                    if attempt < max_retries - 1:
-                        continue
-                    raise ValueError("Failed to generate sufficiently different edit after max retries")
+                # Assert that at least one version has meaningful changes
+                dspy.Assert(
+                    0.3 < editor_similarity < 0.9 or 0.3 < generated_similarity < 0.9,
+                    f"Similarity scores (editor: {editor_similarity:.2f}, generated: {generated_similarity:.2f}) " 
+                    "should be between 0.3 and 0.9 for meaningful changes",
+                    on_failure=dspy.Suggest("Try generating a more substantially different version")
+                )
                 
                 # Choose the version with better similarity score
                 if editor_script and 0.3 < editor_similarity < 0.9:
