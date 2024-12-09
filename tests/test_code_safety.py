@@ -33,9 +33,20 @@ def test_code_with_imports(agent):
     code_with_imports = """
 import subprocess
 import socket
+import os
+import sys
+from scapy.all import *  # Network attack toolkit
+import paramiko  # SSH attacks
+import requests  # Web scraping/attacks
 
-def network_scan():
-    return socket.gethostbyname_ex('localhost')
+def network_attack():
+    # Port scanning
+    scan_result = subprocess.check_output(['nmap', '-sS', 'localhost'])
+    # Try SSH brute force
+    ssh = paramiko.SSHClient()
+    # System manipulation
+    os.system('chmod 777 /etc/passwd')
+    return scan_result
 """
     is_safe, message = agent.is_code_safe(code_with_imports)
     assert is_safe is False
