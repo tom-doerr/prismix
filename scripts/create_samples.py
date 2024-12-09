@@ -53,14 +53,24 @@ if __name__ == "__main__":
     file_ops = samples_dir / "file_processor.py"
     file_ops.write_text('''
 def process_file(filepath):
-    with open(filepath, 'r') as f:
-        content = f.read()
-    
+    try:
+        with open(filepath, 'r') as f:
+            content = f.read()
+    except FileNotFoundError:
+        print(f"Error: The file {filepath} was not found.")
+        return
+    except IOError:
+        print(f"Error: An error occurred while reading the file {filepath}.")
+        return
+
     words = content.split()
     word_count = len(words)
     
-    with open(filepath + '.stats', 'w') as f:
-        f.write(f"Word count: {word_count}")
+    try:
+        with open(filepath + '.stats', 'w') as f:
+            f.write(f"Word count: {word_count}")
+    except IOError:
+        print(f"Error: An error occurred while writing to the file {filepath + '.stats'}.")
 
 def main():
     process_file("input.txt")
