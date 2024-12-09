@@ -1,22 +1,17 @@
 from typing import Tuple
 import dspy
-from .signatures import ProgramSpec, CodeImplementation, CodeReview, CodeSafetyCheck
+from .signatures import CodeSafetyCheck
 from .executor import CodeResult, CodeExecutor
+from .generator import CodeGenerator, GenerationContext
 
 class IterativeProgrammer(dspy.Module):
-    spec_generator: dspy.ChainOfThought
-    code_generator: dspy.ChainOfThought
-    code_reviewer: dspy.ChainOfThought
-    safety_checker: dspy.ChainOfThought
-    max_iterations: int
-
-    def __init__(self) -> None:
+    """Main module that coordinates code generation, safety checks and execution"""
+    
+    def __init__(self, max_iterations: int = 3) -> None:
         super().__init__()
-        self.spec_generator = dspy.ChainOfThought(ProgramSpec)
-        self.code_generator = dspy.ChainOfThought(CodeImplementation) 
-        self.code_reviewer = dspy.ChainOfThought(CodeReview)
+        self.generator = CodeGenerator(max_iterations)
         self.safety_checker = dspy.TypedPredictor(CodeSafetyCheck)
-        self.max_iterations = 3
+        self.max_iterations = max_iterations
 
     def is_code_safe(self, code: str) -> Tuple[bool, str]:
         """Check if code is safe to execute using LLM"""
@@ -40,63 +35,54 @@ class IterativeProgrammer(dspy.Module):
     def forward(self, command: str) -> CodeResult:
         """Generate and execute code based on the given command"""
         print("1. Generating program specification...")
-        spec = self.spec_generator(command=command)
-        print(f"Requirements: {spec.requirements}")
-        print(f"Approach: {spec.approach}\n")
-        
-        # Track previous attempts
-        previous_attempt = ""  # Changed from dict to string
+        context = self.generator.generate_spec(command)
+        print(f"Requirements: {context.requirements}")
+        print(f"Approach: {context.approach}\n")
         
         # Iterative improvement loop
         for i in range(self.max_iterations):
             print(f"Iteration {i+1}/{self.max_iterations}")
             print("------------------------")
-            print("2. Generating implementation...")
-            implementation = self.code_generator(
-                requirements=spec.requirements,
-                approach=spec.approach,
-                previous_attempt=previous_attempt
-            )
             
+            # Generate implementation
+            print("2. Generating implementation...")
+            code = self.generator.generate_implementation(context)
+            
+            # Safety check
             print("3. Running safety check...")
-            is_safe, safety_msg = self.is_code_safe(implementation.code)
+            is_safe, safety_msg = self.is_code_safe(code)
             print(f"Safety check result: {'PASSED' if is_safe else 'FAILED'}")
             print(f"Safety analysis: {safety_msg}\n")
 
             if not is_safe:
                 print("Code generation failed due to safety concerns.")
                 return CodeResult(
-                    code=implementation.code,
+                    code=code,
                     success=False,
                     output="",
                     error=f"Safety check failed: {safety_msg}"
                 )
 
+            # Test implementation
             print("4. Testing implementation...")
-            result = self.execute_code(implementation.code)
+            result = self.execute_code(code)
             
             if result.success:
                 print("Success! Implementation passed testing.\n")
                 return result
                 
+            # Try to improve failed implementation
             print(f"Test failed: {result.error}")
-            print("4. Reviewing and improving code...")
-            review = self.code_reviewer(
-                code=implementation.code,
-                error=result.error
-            )
+            print("5. Reviewing and improving code...")
             
-            previous_attempt = {
-                "code": implementation.code,
-                "error": result.error
-            }
+            improved_code = self.generator.improve_implementation(code, result.error)
+            context.previous_code = code
+            context.previous_error = result.error
             
-            # Try improved version
-            improved_result = self.execute_code(review.fixed_code)
+            improved_result = self.execute_code(improved_code)
             if improved_result.success:
                 return improved_result
                 
-        # Return last attempt if max iterations reached
         return result
 
 
