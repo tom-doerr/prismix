@@ -1,8 +1,9 @@
 import sys
 import os
+from typing import NoReturn
 from prismix.core.iterative_programmer import setup_agent
 
-def execute_instruction(instruction: str):
+def execute_instruction(instruction: str) -> None:
     """Execute the given instruction using AI."""
     print(f"Executing instruction: {instruction}\n")
     
@@ -41,7 +42,7 @@ def execute_instruction(instruction: str):
     print(result.code)
     print("----------")
 
-def main():
+def main() -> NoReturn:
     print("CodeWeaver - AI-powered iterative code generation tool")
     
     if len(sys.argv) < 2:

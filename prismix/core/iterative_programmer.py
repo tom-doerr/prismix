@@ -1,9 +1,10 @@
-import dspy
-from typing import List, Dict
+from typing import List, Dict, Tuple, Any, Optional, Callable
 from dataclasses import dataclass
+import dspy
 
 @dataclass
 class CodeResult:
+    """Result of code generation and execution"""
     code: str
     success: bool
     output: str
@@ -11,26 +12,32 @@ class CodeResult:
 
 class ProgramSpec(dspy.Signature):
     """Analyze command and create program specification"""
-    command = dspy.InputField()
-    requirements = dspy.OutputField(desc="List of requirements and constraints")
-    approach = dspy.OutputField(desc="High-level approach to implement the program")
+    command: dspy.InputField[str] = dspy.InputField()
+    requirements: dspy.OutputField[str] = dspy.OutputField(desc="List of requirements and constraints")
+    approach: dspy.OutputField[str] = dspy.OutputField(desc="High-level approach to implement the program")
 
 class CodeImplementation(dspy.Signature):
     """Generate code implementation"""
-    requirements = dspy.InputField() 
-    approach = dspy.InputField()
-    previous_attempt = dspy.InputField(desc="Previous code attempt and errors if any")
-    code = dspy.OutputField(desc="Complete code implementation")
+    requirements: dspy.InputField[str] = dspy.InputField() 
+    approach: dspy.InputField[str] = dspy.InputField()
+    previous_attempt: dspy.InputField[str] = dspy.InputField(desc="Previous code attempt and errors if any")
+    code: dspy.OutputField[str] = dspy.OutputField(desc="Complete code implementation")
 
 class CodeReview(dspy.Signature):
     """Review and improve code"""
-    code = dspy.InputField()
-    error = dspy.InputField()
-    improvements = dspy.OutputField(desc="List of suggested improvements")
-    fixed_code = dspy.OutputField(desc="Improved code implementation")
+    code: dspy.InputField[str] = dspy.InputField()
+    error: dspy.InputField[str] = dspy.InputField()
+    improvements: dspy.OutputField[str] = dspy.OutputField(desc="List of suggested improvements")
+    fixed_code: dspy.OutputField[str] = dspy.OutputField(desc="Improved code implementation")
 
 class IterativeProgrammer(dspy.Module):
-    def __init__(self):
+    spec_generator: dspy.ChainOfThought
+    code_generator: dspy.ChainOfThought
+    code_reviewer: dspy.ChainOfThought
+    safety_checker: dspy.ChainOfThought
+    max_iterations: int
+
+    def __init__(self) -> None:
         super().__init__()
         self.spec_generator = dspy.ChainOfThought(ProgramSpec)
         self.code_generator = dspy.ChainOfThought(CodeImplementation) 
@@ -38,12 +45,13 @@ class IterativeProgrammer(dspy.Module):
         self.safety_checker = dspy.ChainOfThought(CodeSafetyCheck)
         self.max_iterations = 3
 
-    def is_code_safe(self, code: str) -> tuple[bool, str]:
+    def is_code_safe(self, code: str) -> Tuple[bool, str]:
         """Check if code is safe to execute using LLM"""
         safety_check = self.safety_checker(code=code)
         return safety_check.is_safe, safety_check.safety_message
 
     def execute_code(self, code: str) -> CodeResult:
+        """Execute the generated code in a safe environment and return results"""
         """Execute the generated code and return results"""
         # First check if code is safe
         is_safe, safety_msg = self.is_code_safe(code)
@@ -113,6 +121,7 @@ class IterativeProgrammer(dspy.Module):
             )
 
     def forward(self, command: str) -> CodeResult:
+        """Generate and execute code based on the given command"""
         print("1. Generating program specification...")
         spec = self.spec_generator(command=command)
         print(f"Requirements: {spec.requirements}")
@@ -179,7 +188,8 @@ class CodeSafetyCheck(dspy.Signature):
     is_safe: bool = dspy.OutputField(desc="Boolean indicating if code is safe")
     safety_message: str = dspy.OutputField(desc="Explanation of safety concerns if any")
 
-def setup_agent():
+def setup_agent() -> IterativeProgrammer:
+    """Configure and return an instance of IterativeProgrammer"""
     # Configure LM
     lm = dspy.LM(
         model="gpt-4o-mini",
