@@ -297,6 +297,52 @@ def test_empty_and_whitespace_lines():
     assert "new line 3" in new_content
     assert len(changes) == 2
 
+def test_apply_line_edits_debug():
+    """Debug test for line edits"""
+    editor = FileEditor()
+    content = "line 1\nline 2\nline 3\nline 4"
+    
+    # Test each edit type separately with debug output
+    
+    # Test REPLACE
+    print("\nTesting REPLACE:")
+    edits = [("replace", 2, "modified line 2")]
+    new_content, changes = editor._apply_line_edits(content, edits)
+    print(f"Content after replace:\n{new_content}")
+    print(f"Changes: {changes}")
+    
+    # Test INSERT
+    print("\nTesting INSERT:")
+    edits = [("insert", 2, "new line")]
+    new_content, changes = editor._apply_line_edits(content, edits)
+    print(f"Content after insert:\n{new_content}")
+    print(f"Changes: {changes}")
+    
+    # Test DELETE
+    print("\nTesting DELETE:")
+    edits = [("delete", 2, "")]
+    new_content, changes = editor._apply_line_edits(content, edits)
+    print(f"Content after delete:\n{new_content}")
+    print(f"Changes: {changes}")
+    
+    # Test string format
+    print("\nTesting string format:")
+    string_edits = "REPLACE 2 | modified line 2"
+    new_content, changes = editor._apply_line_edits(content, string_edits)
+    print(f"Content after string edit:\n{new_content}")
+    print(f"Changes: {changes}")
+    
+    # Test multiple edits
+    print("\nTesting multiple edits:")
+    edits = [
+        ("replace", 1, "modified line 1"),
+        ("insert", 3, "new line"),
+        ("delete", 4, "")
+    ]
+    new_content, changes = editor._apply_line_edits(content, edits)
+    print(f"Content after multiple edits:\n{new_content}")
+    print(f"Changes: {changes}")
+
 def test_invalid_file():
     """Test handling non-existent file"""
     result = FileManager.read_file("nonexistent.py")
