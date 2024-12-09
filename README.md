@@ -1,6 +1,6 @@
-# CodeCraft AI
+# Prismix
 
-An AI-powered iterative code generation tool that safely generates Python code from natural language descriptions.
+An AI-powered code synthesis tool that transforms natural language into production-ready Python code.
 
 ## Features
 
@@ -24,7 +24,7 @@ export OPENAI_API_KEY='your-api-key-here'
 
 Basic usage:
 ```bash
-poetry run codecraft "write a function that calculates factorial"
+poetry run prismix "write a function that calculates factorial"
 ```
 
 The tool will:
