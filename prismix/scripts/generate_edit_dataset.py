@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import dspy
 from typing import List, Dict, Any, Tuple
 from prismix.core.file_operations import FileEditor
+from prismix.core.metrics import calculate_levenshtein_similarity
 
 class GenerateScript(dspy.Signature):
     """Generate a Python script based on a theme"""
@@ -85,16 +86,21 @@ class EditDatasetGenerator:
         if generated_script.endswith("```"):
             generated_script = generated_script[:-3].strip()
             
-        # Compare both versions and use the one that's different
+        # Compare both versions and use the one with significant changes
         editor_script = file_context.content if not file_context.error else None
         
-        if editor_script and editor_script != original_script:
+        # Calculate similarity scores
+        editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
+        generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
+        
+        # We want changes that are different enough (similarity < 0.9) but not too different (similarity > 0.3)
+        if editor_script and 0.3 < editor_similarity < 0.9:
             edited_script = editor_script
-        elif generated_script != original_script:
+        elif 0.3 < generated_similarity < 0.9:
             edited_script = generated_script
         else:
-            # Force a modification by adding a comment
-            edited_script = original_script + "\n# Modified version"
+            # Try again with a different theme
+            return self.generate_datapoint()
         
         # 4. Generate hindsight edit command
         hindsight = self.hindsight_generator(
