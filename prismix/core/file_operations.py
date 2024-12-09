@@ -153,9 +153,14 @@ class FileEditor:
                         lines.insert(line_num - 1, new_text)
                         changes.append(f"Inserted at line {line_num}: '{new_text}'")
                     elif mode == "DELETE" and 1 <= line_num <= len(lines):
-                        old_text = lines[line_num - 1]
-                        lines.pop(line_num - 1)
+                        old_text = lines.pop(line_num - 1)
                         changes.append(f"Deleted line {line_num}: '{old_text}'")
+                        # Adjust line numbers for subsequent edits
+                        for j in range(i + 1, len(line_edits)):
+                            if isinstance(line_edits[j], tuple):
+                                mode_j, num_j, text_j = line_edits[j] if len(line_edits[j]) == 3 else ("REPLACE", line_edits[j][0], line_edits[j][1])
+                                if num_j > line_num:
+                                    line_edits[j] = (mode_j, num_j - 1, text_j)
                         # Adjust line numbers for subsequent edits
                         for j in range(len(edit_lines)):
                             try:
