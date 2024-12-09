@@ -16,7 +16,7 @@ pytest = "^8.3.3"
 pytest-asyncio = "^0.24.0"
 python-dotenv = "^1.0.0"
 openai = "^1.0.0"
-python-Levenshtein = "^0.25.0"
+rapidfuzz = "^3.6.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"

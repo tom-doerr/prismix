@@ -1,5 +1,5 @@
 from typing import List
-import Levenshtein
+from rapidfuzz.distance import Levenshtein
 from dataclasses import dataclass
 
 @dataclass
