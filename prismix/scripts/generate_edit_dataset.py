@@ -181,7 +181,7 @@ def main():
     # Set up generator with retry transform and custom backtrack handler
     generator = EditDatasetGenerator()
     from functools import partial
-    custom_backtrack = partial(dspy.backtrack_handler, max_backtracks=3)
+    custom_backtrack = partial(dspy.backtrack_handler, max_backtracks=30)
     generator = dspy.assert_transform_module(
         generator.map_named_predictors(dspy.Retry), 
         custom_backtrack
