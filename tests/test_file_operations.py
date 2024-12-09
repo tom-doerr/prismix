@@ -93,6 +93,7 @@ def test_file_edit(agent, test_file):
     assert '"""' in result.content  # Should have added docstring
     assert len(result.changes) > 0
     assert any("Replaced line" in change for change in result.changes)  # Verify line number in changes
+    assert any("Inserted" in change for change in result.changes)  # Verify insertion in changes
 
 def test_replace_line(test_file):
     """Test replacing a line"""
