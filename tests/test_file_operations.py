@@ -55,11 +55,25 @@ def test_line_numbering(test_file):
     assert all("|" in line for line in lines)  # Check separator
     assert lines[0].startswith("   1 |")  # Check first line number
 
-def test_apply_line_edits(test_file):
-    """Test applying line-specific edits"""
+def test_apply_line_edits_list(test_file):
+    """Test applying line-specific edits with list format"""
     editor = FileEditor()
     original = "line 1\nline 2\nline 3"
     edits = [(2, "modified line 2")]
+    
+    new_content, changes = editor._apply_line_edits(original, edits)
+    
+    assert "modified line 2" in new_content
+    assert len(changes) == 1
+    assert "Line 2" in changes[0]
+    assert "line 2" in changes[0]
+    assert "modified line 2" in changes[0]
+
+def test_apply_line_edits_string():
+    """Test applying line-specific edits with string format"""
+    editor = FileEditor()
+    original = "line 1\nline 2\nline 3"
+    edits = "2 | modified line 2"
     
     new_content, changes = editor._apply_line_edits(original, edits)
     

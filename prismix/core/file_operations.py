@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import Optional, List
+from typing import Optional, List, Union, Tuple
 import dspy
 
 @dataclass
@@ -81,25 +81,33 @@ class FileEditor:
         lines = content.splitlines()
         return '\n'.join(f"{i+1:4d} | {line}" for i, line in enumerate(lines))
 
-    def _apply_line_edits(self, content: str, line_edits: str) -> tuple[str, list[str]]:
+    def _apply_line_edits(self, content: str, line_edits: Union[str, List[Tuple[int, str]]]) -> tuple[str, list[str]]:
         """Apply line edits to content"""
         lines = content.splitlines()
         changes = []
         
-        # Parse line edits from string format
-        edit_lines = line_edits.splitlines()
-        for edit in edit_lines:
-            try:
-                # Parse "line_num | new_text" format
-                line_num = int(edit.split('|')[0].strip())
-                new_text = edit.split('|')[1].strip()
-                
+        if isinstance(line_edits, str):
+            # Parse string format (from LLM)
+            edit_lines = line_edits.splitlines()
+            for edit in edit_lines:
+                try:
+                    # Parse "line_num | new_text" format
+                    line_num = int(edit.split('|')[0].strip())
+                    new_text = edit.split('|')[1].strip()
+                    
+                    if 1 <= line_num <= len(lines):
+                        old_text = lines[line_num - 1]
+                        lines[line_num - 1] = new_text
+                        changes.append(f"Line {line_num}: '{old_text}' -> '{new_text}'")
+                except (ValueError, IndexError):
+                    continue
+        else:
+            # Handle direct line number/text pairs (from tests)
+            for line_num, new_text in line_edits:
                 if 1 <= line_num <= len(lines):
                     old_text = lines[line_num - 1]
                     lines[line_num - 1] = new_text
                     changes.append(f"Line {line_num}: '{old_text}' -> '{new_text}'")
-            except (ValueError, IndexError):
-                continue
         
         return '\n'.join(lines), changes
 
