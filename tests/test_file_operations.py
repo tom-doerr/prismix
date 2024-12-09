@@ -144,9 +144,82 @@ def test_multiple_edit_modes(test_file):
     
     new_content, changes = editor._apply_line_edits(content, edits)
     
+    # Check content modifications
     assert "modified line 1" in new_content
     assert "new line" in new_content
     assert "line 4" not in new_content
+    
+    # Check changes list
+    assert len(changes) == 3
+    assert any("'line 1' -> 'modified line 1'" in change for change in changes)
+    assert any("inserted 'new line'" in change for change in changes)
+    assert any("deleted 'line 4'" in change for change in changes)
+    
+    # Check final content structure
+    lines = new_content.splitlines()
+    assert len(lines) == 3
+    assert lines[0] == "modified line 1"
+    assert lines[1] == "line 2"
+    assert lines[2] == "new line"
+
+def test_edit_line_numbers(test_file):
+    """Test line number adjustments after edits"""
+    editor = FileEditor()
+    content = "line 1\nline 2\nline 3\nline 4"
+    
+    # Test that deleting a line adjusts subsequent line numbers
+    edits = [
+        ("delete", 2, ""),
+        ("insert", 2, "new line")  # Should insert at the original line 2 position
+    ]
+    
+    new_content, changes = editor._apply_line_edits(content, edits)
+    lines = new_content.splitlines()
+    
+    assert len(lines) == 4
+    assert lines[0] == "line 1"
+    assert lines[1] == "new line"
+    assert lines[2] == "line 3"
+    assert lines[3] == "line 4"
+
+def test_edit_boundary_conditions(test_file):
+    """Test edge cases in line editing"""
+    editor = FileEditor()
+    content = "line 1\nline 2"
+    
+    # Test invalid line numbers
+    edits = [("replace", 0, "invalid"), ("replace", 999, "invalid")]
+    new_content, changes = editor._apply_line_edits(content, edits)
+    assert new_content == content  # Should not modify content
+    assert any("Failed to apply" in change for change in changes)
+    
+    # Test empty content
+    new_content, changes = editor._apply_line_edits("", [("insert", 1, "new line")])
+    assert new_content == "new line"
+    
+    # Test inserting at end
+    new_content, changes = editor._apply_line_edits(content, [("insert", 3, "new line")])
+    assert new_content.endswith("new line")
+
+def test_edit_format_handling(test_file):
+    """Test handling of different edit format inputs"""
+    editor = FileEditor()
+    content = "line 1\nline 2"
+    
+    # Test string format
+    string_edits = "REPLACE 1 | modified line 1"
+    new_content, changes = editor._apply_line_edits(content, string_edits)
+    assert "modified line 1" in new_content
+    
+    # Test tuple format with explicit mode
+    tuple_edits = [("REPLACE", 1, "modified again")]
+    new_content, changes = editor._apply_line_edits(content, tuple_edits)
+    assert "modified again" in new_content
+    
+    # Test tuple format without mode (should default to REPLACE)
+    simple_edits = [(1, "simple modification")]
+    new_content, changes = editor._apply_line_edits(content, simple_edits)
+    assert "simple modification" in new_content
     assert len(changes) == 3
 
 def test_invalid_file():
