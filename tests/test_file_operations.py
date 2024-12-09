@@ -86,7 +86,7 @@ def test_apply_line_edits_string():
 def test_file_edit(agent, test_file):
     """Test editing file content"""
     instruction = "add a docstring to the main function"
-    result = agent.forward(f"edit {test_file} {instruction}")
+    result = agent.forward(f"edit {test_file} '{instruction}'")
     
     assert isinstance(result, FileContext)
     assert result.error is None
@@ -147,7 +147,7 @@ def test_multiple_edit_modes(test_file):
     # Check content modifications
     assert "modified line 1" in new_content
     assert "new line" in new_content
-    assert "line 4" not in new_content
+    assert "line 4" not in new_content  # Ensure line 4 is deleted
     
     # Check changes list
     assert len(changes) == 3
