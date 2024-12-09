@@ -28,10 +28,9 @@ class FileEdit(dspy.Signature):
     
     Rules:
     1. Maintain consistent indentation with surrounding code
-    2. Use spaces for indentation (4 spaces per level)
-    3. Align with the indentation of the target line or previous line
-    4. Keep proper spacing around operators and after commas
-    5. Include proper line endings and empty lines where needed""")
+    2. Align with the indentation of the target line or previous line
+    3. Keep proper spacing around operators and after commas
+    4. Include proper line endings and empty lines where needed""")
 
 class FileManager:
     """Handles file operations"""
