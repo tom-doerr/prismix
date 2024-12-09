@@ -14,6 +14,7 @@ def calculate_sum(a, b):
     return a + b
 
 def main():
+    """Main function to execute the sum calculation and print the result."""
     result = calculate_sum(5, 3)
     print(f"Sum: {result}")
 
