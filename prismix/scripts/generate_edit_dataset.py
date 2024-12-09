@@ -89,18 +89,22 @@ class EditDatasetGenerator:
         # Compare both versions and use the one with significant changes
         editor_script = file_context.content if not file_context.error else None
         
-        # Calculate similarity scores
+        # Calculate similarity scores and use DSPy assertions
         editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
         generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
         
-        # We want changes that are different enough (similarity < 0.9) but not too different (similarity > 0.3)
+        # Assert that changes are meaningful but not too drastic
+        dspy.Assert(
+            0.3 < editor_similarity < 0.9 or 0.3 < generated_similarity < 0.9,
+            "Generated edits must make meaningful changes (similarity between 0.3 and 0.9)",
+            target_module=GenerateScript
+        )
+        
+        # Choose the version with better similarity score
         if editor_script and 0.3 < editor_similarity < 0.9:
             edited_script = editor_script
-        elif 0.3 < generated_similarity < 0.9:
-            edited_script = generated_script
         else:
-            # Try again with a different theme
-            return self.generate_datapoint()
+            edited_script = generated_script
         
         # 4. Generate hindsight edit command
         hindsight = self.hindsight_generator(
