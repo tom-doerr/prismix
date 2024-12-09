@@ -135,7 +135,7 @@ class FileEditor:
                     continue
         else:
             # Handle direct mode/line/text tuples (from tests)
-            for edit in line_edits:
+            for i, edit in enumerate(line_edits):
                 if len(edit) == 2:
                     # Simple line number + text format
                     line_num, new_text = edit
