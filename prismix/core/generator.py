@@ -1,7 +1,4 @@
-from dataclasses import dataclass
-from typing import Optional, Dict, Any
 import dspy
-from .executor import CodeResult, CodeExecutor
 from .signatures import ProgramSpec, CodeImplementation, CodeReview
 
 @dataclass
