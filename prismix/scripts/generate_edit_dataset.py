@@ -139,7 +139,7 @@ class EditDatasetGenerator:
 
 def main():
     # Configure DSPy
-    lm = dspy.LM(model="gpt-4", max_tokens=2000)
+    lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
     dspy.configure(lm=lm)
     
     # Generate dataset
