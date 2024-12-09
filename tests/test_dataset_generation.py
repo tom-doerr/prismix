@@ -228,17 +228,17 @@ def subtract(a, b):
 
 def test_retry_mechanism(generator):
     """Test the retry mechanism with backtracking"""
-    with patch('dspy.Predict.__call__') as mock_predict:
+    with patch.object(generator.script_generator, 'forward') as mock_script:
         # Simulate improving results over retries
-        mock_predict.side_effect = [
-            MagicMock(script="def test(): pass"),  # Too similar
-            MagicMock(script="def test():\n    '''Doc'''\n    pass"),  # Still too similar
-            MagicMock(script="def test():\n    '''Doc'''\n    return True"),  # Good enough
+        mock_script.side_effect = [
+            dspy.Prediction(script="def test(): pass"),  # Too similar
+            dspy.Prediction(script="def test():\n    '''Doc'''\n    pass"),  # Still too similar
+            dspy.Prediction(script="def test():\n    '''Doc'''\n    return True"),  # Good enough
         ]
-        
+            
         datapoint = generator.generate_datapoint()
         assert isinstance(datapoint, EditDataPoint)
-        assert len(mock_predict.mock_calls) > 1  # Should have retried
+        assert mock_script.call_count > 1  # Should have retried
 
 def test_parallel_generation(generator):
     """Test generating multiple examples in parallel"""

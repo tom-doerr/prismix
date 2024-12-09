@@ -34,6 +34,10 @@ class EditDataPoint:
 class EditDatasetGenerator(dspy.Module):
     def __init__(self):
         super().__init__()
+        self.signature = dspy.Signature(
+            inputs=["num_examples", "output_file"],
+            outputs=["dataset"]
+        )
         self.script_generator = dspy.ChainOfThought(GenerateScript)
         self.edit_generator = dspy.ChainOfThought(GenerateEditInstruction)
         self.hindsight_generator = dspy.ChainOfThought(GenerateHindsightEdit)
@@ -227,17 +231,22 @@ def main():
     lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
     dspy.configure(lm=lm)
     
-    # Configure DSPy with retries
+    # Configure DSPy with retries and assertions
     lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
     dspy.configure(lm=lm)
     
     # Set up generator with retry transform
     generator = EditDatasetGenerator()
-    generator = dspy.Retry(generator)
+    generator = dspy.Retry(generator, max_retries=5)
+    
+    # Add backtracking for failed assertions
+    def backtrack_handler(state, suggestion):
+        print(f"Backtracking with suggestion: {suggestion}")
+        return True
+    
     generator = dspy.assert_transform_module(
         generator,
-        backtrack_handler=lambda *args, **kwargs: True,  # Always allow retries
-        max_retries=5  # Limit total retries per example
+        backtrack_handler=backtrack_handler
     )
     generator(
         num_examples=10,
