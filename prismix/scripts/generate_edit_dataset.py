@@ -90,7 +90,7 @@ class EditDatasetGenerator(dspy.Module):
         # Compare both versions and use the one with significant changes
         editor_script = file_context.content if not file_context.error else None
 
-        # Calculate similarity scores
+        # Calculate similarity scores and retry until we get meaningful changes
         editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
         generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
         
@@ -98,18 +98,29 @@ class EditDatasetGenerator(dspy.Module):
         dspy.Assert(
             0.3 < editor_similarity < 0.9 or 0.3 < generated_similarity < 0.9,
             f"Similarity scores (editor: {editor_similarity:.2f}, generated: {generated_similarity:.2f}) " 
-            "should be between 0.3 and 0.9 for meaningful changes"
+            "should be between 0.3 and 0.9 for meaningful changes. "
+            "Try making more substantial modifications to the code structure, "
+            "such as adding new functions, changing logic flow, or restructuring classes."
         )
         
-        dspy.Suggest(
-            editor_similarity != 1.0,
-            "The editor-based changes should modify the code meaningfully"
-        )
+        # Provide specific suggestions for the LLM to improve the changes
+        if editor_similarity >= 0.9:
+            dspy.Suggest(
+                "Make more significant changes in the editor version by:\n"
+                "1. Adding new helper functions\n"
+                "2. Implementing error handling\n"
+                "3. Restructuring the code organization\n"
+                "4. Adding new features or functionality"
+            )
         
-        dspy.Suggest(
-            generated_similarity != 1.0,
-            "The generated version should be different from the original"
-        )
+        if generated_similarity >= 0.9:
+            dspy.Suggest(
+                "Generate a more substantially different version by:\n"
+                "1. Using different algorithms or approaches\n"
+                "2. Adding new class structures\n"
+                "3. Implementing additional features\n"
+                "4. Changing the code architecture"
+            )
         
         # Choose the version with better similarity score
         if editor_script and 0.3 < editor_similarity < 0.9:
