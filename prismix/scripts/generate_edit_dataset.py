@@ -51,17 +51,19 @@ class EditDatasetGenerator:
             "configuration management"
         ]
         
-    def generate_datapoint(self) -> EditDataPoint:
-        """Generate a single edit transformation example"""
-        # 1. Generate original script
-        theme = random.choice(self.themes)
-        result = self.script_generator(theme=theme)
-        # Remove markdown wrapper if present
-        original_script = result.script.strip()
-        if original_script.startswith("```python"):
-            original_script = original_script[8:].strip()
-        if original_script.endswith("```"):
-            original_script = original_script[:-3].strip()
+    def generate_datapoint(self, max_retries: int = 3) -> EditDataPoint:
+        """Generate a single edit transformation example with retries"""
+        for attempt in range(max_retries):
+            try:
+                # 1. Generate original script
+                theme = random.choice(self.themes)
+                result = self.script_generator(theme=theme)
+                # Remove markdown wrapper if present
+                original_script = result.script.strip()
+                if original_script.startswith("```python"):
+                    original_script = original_script[8:].strip()
+                if original_script.endswith("```"):
+                    original_script = original_script[:-3].strip()
         
         # 2. Generate edit instruction
         edit_result = self.edit_generator(script=original_script)
@@ -89,22 +91,24 @@ class EditDatasetGenerator:
         # Compare both versions and use the one with significant changes
         editor_script = file_context.content if not file_context.error else None
         
-        # Calculate similarity scores and use DSPy assertions
-        editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
-        generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
-        
-        # Assert that changes are meaningful but not too drastic
-        dspy.Assert(
-            0.3 < editor_similarity < 0.9 or 0.3 < generated_similarity < 0.9,
-            "Generated edits must make meaningful changes (similarity between 0.3 and 0.9)",
-            target_module=GenerateScript
-        )
-        
-        # Choose the version with better similarity score
-        if editor_script and 0.3 < editor_similarity < 0.9:
-            edited_script = editor_script
-        else:
-            edited_script = generated_script
+                # Calculate similarity scores
+                editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
+                generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
+                
+                # Check similarity scores
+                if not (0.3 < editor_similarity < 0.9 or 0.3 < generated_similarity < 0.9):
+                    print(f"Attempt {attempt + 1}/{max_retries}: Similarity scores out of range")
+                    print(f"Editor similarity: {editor_similarity:.2f}")
+                    print(f"Generated similarity: {generated_similarity:.2f}")
+                    if attempt < max_retries - 1:
+                        continue
+                    raise ValueError("Failed to generate sufficiently different edit after max retries")
+                
+                # Choose the version with better similarity score
+                if editor_script and 0.3 < editor_similarity < 0.9:
+                    edited_script = editor_script
+                else:
+                    edited_script = generated_script
         
         # 4. Generate hindsight edit command
         hindsight = self.hindsight_generator(
@@ -112,12 +116,17 @@ class EditDatasetGenerator:
             edited=edited_script
         )
         
-        return EditDataPoint(
-            original_script=original_script,
-            edited_script=edited_script,
-            edit_instruction=edit_instruction,
-            hindsight_command=hindsight.edit_command
-        )
+                return EditDataPoint(
+                    original_script=original_script,
+                    edited_script=edited_script,
+                    edit_instruction=edit_instruction,
+                    hindsight_command=hindsight.edit_command
+                )
+                
+            except Exception as e:
+                print(f"Attempt {attempt + 1}/{max_retries} failed: {str(e)}")
+                if attempt == max_retries - 1:
+                    raise ValueError(f"Failed to generate valid edit after {max_retries} attempts: {str(e)}")
     
     def generate_dataset(self, num_examples: int, output_file: str) -> None:
         """Generate multiple examples and save to JSON file"""
