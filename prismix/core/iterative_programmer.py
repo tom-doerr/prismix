@@ -1,34 +1,7 @@
-from typing import List, Dict, Tuple, Any, Optional, Callable
-from dataclasses import dataclass
+from typing import Tuple
 import dspy
-
-@dataclass
-class CodeResult:
-    """Result of code generation and execution"""
-    code: str
-    success: bool
-    output: str
-    error: str = ""
-
-class ProgramSpec(dspy.Signature):
-    """Analyze command and create program specification"""
-    command = dspy.InputField()
-    requirements = dspy.OutputField(desc="List of requirements and constraints")
-    approach = dspy.OutputField(desc="High-level approach to implement the program")
-
-class CodeImplementation(dspy.Signature):
-    """Generate code implementation"""
-    requirements = dspy.InputField() 
-    approach = dspy.InputField()
-    previous_attempt = dspy.InputField(desc="Previous code attempt and errors if any")
-    code = dspy.OutputField(desc="Complete code implementation")
-
-class CodeReview(dspy.Signature):
-    """Review and improve code"""
-    code = dspy.InputField()
-    error = dspy.InputField()
-    improvements = dspy.OutputField(desc="List of suggested improvements")
-    fixed_code = dspy.OutputField(desc="Improved code implementation")
+from .signatures import ProgramSpec, CodeImplementation, CodeReview, CodeSafetyCheck
+from .executor import CodeResult, CodeExecutor
 
 class IterativeProgrammer(dspy.Module):
     spec_generator: dspy.ChainOfThought
@@ -53,8 +26,6 @@ class IterativeProgrammer(dspy.Module):
 
     def execute_code(self, code: str) -> CodeResult:
         """Execute the generated code in a safe environment and return results"""
-        """Execute the generated code and return results"""
-        # First check if code is safe
         is_safe, safety_msg = self.is_code_safe(code)
         print("is_safe:", is_safe)
         if not is_safe:
@@ -64,62 +35,7 @@ class IterativeProgrammer(dspy.Module):
                 output="",
                 error=f"Safety check failed: {safety_msg}"
             )
-            
-        try:
-            # Set up isolated execution environment with necessary builtins
-            safe_builtins = {
-                "print": print,
-                "isinstance": isinstance,
-                "range": range,
-                "int": int,
-                "str": str,
-                "bool": bool,
-                "len": len,
-                "ValueError": ValueError,
-                "TypeError": TypeError
-            }
-            local_vars = {}
-            exec(code, {"__builtins__": safe_builtins}, local_vars)
-            
-            # Get the main function from the generated code
-            main_func = None
-            for name, obj in local_vars.items():
-                if callable(obj):
-                    main_func = obj
-                    break
-            
-            if main_func is None:
-                return CodeResult(
-                    code=code,
-                    success=False,
-                    output="",
-                    error="No callable function found in generated code"
-                )
-            
-            # Test the function with a sample input
-            try:
-                # Try with a simple test case (5)
-                result = main_func(5)
-                return CodeResult(
-                    code=code,
-                    success=True, 
-                    output=f"Code executed successfully. Test {main_func.__name__}(5) = {result}"
-                )
-            except TypeError as e:
-                # If the function requires different arguments, return error
-                return CodeResult(
-                    code=code,
-                    success=False,
-                    output="",
-                    error=f"Function execution failed: {str(e)}"
-                )
-        except Exception as e:
-            return CodeResult(
-                code=code,
-                success=False,
-                output="",
-                error=str(e)
-            )
+        return CodeExecutor.execute(code)
 
     def forward(self, command: str) -> CodeResult:
         """Generate and execute code based on the given command"""
@@ -183,11 +99,6 @@ class IterativeProgrammer(dspy.Module):
         # Return last attempt if max iterations reached
         return result
 
-class CodeSafetyCheck(dspy.Signature):
-    """Analyze code for potential security risks"""
-    code: str = dspy.InputField(desc="Code to analyze")
-    is_safe: bool = dspy.OutputField(desc="Boolean indicating if code is safe")
-    safety_message: str = dspy.OutputField(desc="Explanation of safety concerns if any")
 
 def setup_agent() -> IterativeProgrammer:
     """Configure and return an instance of IterativeProgrammer"""
