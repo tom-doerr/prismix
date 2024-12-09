@@ -160,8 +160,12 @@ def main():
     lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
     dspy.configure(lm=lm)
     
-    # Generate dataset
+    # Set up generator with retry transform
     generator = EditDatasetGenerator()
+    generator = dspy.assert_transform_module(
+        generator.map_named_predictors(dspy.Retry(max_retries=3)), 
+        dspy.backtrack_handler
+    )
     generator.generate_dataset(
         num_examples=10,
         output_file="data/edit_dataset.json"
