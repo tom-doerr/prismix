@@ -164,9 +164,6 @@ class FileEditor:
                                     mode_j, num_j, text_j = "REPLACE", line_edits[j][0], line_edits[j][1]
                                 if num_j > line_num:
                                     line_edits[j] = (mode_j, num_j - 1, text_j)
-                                elif num_j == line_num and mode_j != "DELETE":
-                                    # Keep same line number for inserts/replaces at deleted position
-                                    line_edits[j] = (mode_j, num_j, text_j)
                 except (ValueError, IndexError) as e:
                     changes.append(f"Failed to apply {mode} at line {line_num}: {str(e)}")
                     continue

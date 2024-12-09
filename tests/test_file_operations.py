@@ -65,7 +65,7 @@ def test_apply_line_edits_list(test_file):
     
     assert "modified line 2" in new_content
     assert len(changes) == 1
-    assert "Line 2" in changes[0]
+    assert "Replaced line 2" in changes[0]
     assert "line 2" in changes[0]
     assert "modified line 2" in changes[0]
 
@@ -79,7 +79,7 @@ def test_apply_line_edits_string():
     
     assert "modified line 2" in new_content
     assert len(changes) == 1
-    assert "Line 2" in changes[0]
+    assert "Replaced line 2" in changes[0]
     assert "line 2" in changes[0]
     assert "modified line 2" in changes[0]
 
@@ -92,7 +92,7 @@ def test_file_edit(agent, test_file):
     assert result.error is None
     assert '"""' in result.content  # Should have added docstring
     assert len(result.changes) > 0
-    assert any("Line" in change for change in result.changes)  # Verify line number in changes
+    assert any("Replaced line" in change for change in result.changes)  # Verify line number in changes
 
 def test_replace_line(test_file):
     """Test replacing a line"""
@@ -211,7 +211,7 @@ def test_edit_format_handling(test_file):
     new_content, changes = editor._apply_line_edits(content, string_edits)
     assert "modified line 1" in new_content
     assert len(changes) == 1
-    assert "Line 1: 'line 1' -> 'modified line 1'" in changes[0]
+    assert "Replaced line 1" in changes[0]
     
     # Test tuple format with explicit mode
     tuple_edits = [("REPLACE", 1, "modified again")]
@@ -240,7 +240,7 @@ def test_concurrent_edits():
     new_content, changes = editor._apply_line_edits(content, edits)
     assert "second change" in new_content
     assert len(changes) == 2
-    assert "Line 2: 'line 2' -> 'first change'" in changes[0]
+    assert "Replaced line 2" in changes[0]
     assert "Line 2: 'first change' -> 'second change'" in changes[1]
 
 def test_edit_chain_effects():
