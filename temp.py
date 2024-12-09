@@ -1,29 +1,35 @@
 n
-import argparse
 import os
+from collections import Counter
 
-def read_file(filename):
-    """Read and return the contents of the file."""
-    if not os.path.isfile(filename):
-        raise FileNotFoundError(f"The file {filename} does not exist.")
+def read_file(file_path):
+    """Read the content of a file and return it as a string."""
+    if not os.path.isfile(file_path):
+        raise FileNotFoundError(f"The file {file_path} does not exist.")
     
-    with open(filename, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         return file.read()
 
-def main():
-    # Set up argument parser
-    parser = argparse.ArgumentParser(description='A simple command line tool to read a file.')
-    parser.add_argument('filename', type=str, help='The name of the file to read')
+def process_text(text):
+    """Process the text to count word frequencies."""
+    words = text.split()
+    word_count = Counter(words)
+    return word_count
 
-    # Parse the arguments
-    args = parser.parse_args()
+def display_word_frequencies(word_count):
+    """Display the word frequencies in a sorted manner."""
+    for word, count in word_count.most_common():
+        print(f"{word}: {count}")
 
+def main(file_path):
+    """Main function to execute the text processing."""
     try:
-        # Read and print the file contents
-        contents = read_file(args.filename)
-        print(contents)
+        text = read_file(file_path)
+        word_count = process_text(text)
+        display_word_frequencies(word_count)
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"An error occurred: {e}")
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    # Example usage: replace 'example.txt' with your file path
+    main('example.txt')

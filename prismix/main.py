@@ -1,3 +1,5 @@
+"""Main module for the Prismix application."""
+
 import sys
 import os
 from typing import NoReturn
@@ -25,7 +27,7 @@ def execute_instruction(instruction: str) -> None:
         
         output_file = f"output/{function_name}.py"
         os.makedirs("output", exist_ok=True)
-        with open(output_file, "w") as f:
+        with open(output_file, "w", encoding="utf-8") as f:
             f.write(result.code)
         
         print("\nGeneration Result:")
@@ -56,6 +58,7 @@ def execute_instruction(instruction: str) -> None:
     print("----------")
 
 def main() -> NoReturn:
+    """Main function to execute the Prismix application."""
     print("CodeWeaver - AI-powered iterative code generation tool")
     
     if len(sys.argv) < 2:

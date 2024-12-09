@@ -25,22 +25,26 @@ if __name__ == "__main__":
     class_file = samples_dir / "user_manager.py"
     class_file.write_text('''
 class UserManager:
+    """Manages user data."""
     def __init__(self):
         self.users = []
     
     def add_user(self, username, email):
+        """Add a user to the manager."""
         if not username or not email:
             return False
         self.users.append({"username": username, "email": email})
         return True
     
     def get_user(self, username):
+        """Get a user by username."""
         for user in self.users:
             if user["username"] == username:
                 return user
         return None
 
 def main():
+    """Main function to demonstrate UserManager."""
     manager = UserManager()
     manager.add_user("alice", "alice@example.com")
     print(manager.get_user("alice"))
