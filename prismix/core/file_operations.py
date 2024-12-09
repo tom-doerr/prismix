@@ -12,12 +12,11 @@ class FileContext:
     error: Optional[str] = None
 
 class FileEdit(dspy.Signature):
-    """Analyze file and propose edits"""
+    """Analyze file and propose line-by-line edits"""
     filepath = dspy.InputField(desc="Path to the file")
-    content = dspy.InputField(desc="Current file content")
+    numbered_content = dspy.InputField(desc="Current file content with line numbers")
     instruction = dspy.InputField(desc="Edit instruction")
-    changes = dspy.OutputField(desc="List of specific changes to make")
-    updated_content = dspy.OutputField(desc="Complete updated file content")
+    line_edits = dspy.OutputField(desc="List of line number and replacement text pairs")
 
 class FileManager:
     """Handles file operations"""
@@ -77,6 +76,24 @@ class FileEditor:
     def __init__(self):
         self.edit_generator = dspy.ChainOfThought(FileEdit)
 
+    def _number_lines(self, content: str) -> str:
+        """Add line numbers to content"""
+        lines = content.splitlines()
+        return '\n'.join(f"{i+1:4d} | {line}" for i, line in enumerate(lines))
+
+    def _apply_line_edits(self, content: str, line_edits: list) -> tuple[str, list[str]]:
+        """Apply line edits to content"""
+        lines = content.splitlines()
+        changes = []
+        
+        for line_num, new_text in line_edits:
+            if 1 <= line_num <= len(lines):
+                old_text = lines[line_num - 1]
+                lines[line_num - 1] = new_text
+                changes.append(f"Line {line_num}: '{old_text}' -> '{new_text}'")
+        
+        return '\n'.join(lines), changes
+
     def edit_file(self, filepath: str, instruction: str) -> FileContext:
         """Edit file based on instruction"""
         # Read current file
@@ -84,20 +101,26 @@ class FileEditor:
         if context.error:
             return context
         
+        # Generate numbered content
+        numbered_content = self._number_lines(context.content)
+        
         # Generate edits
         edit_result = self.edit_generator(
             filepath=filepath,
-            content=context.content,
+            numbered_content=numbered_content,
             instruction=instruction
         )
         
-        # Apply changes
-        result = FileManager.write_file(
-            filepath=filepath,
-            content=edit_result.updated_content
+        # Apply line edits
+        new_content, changes = self._apply_line_edits(
+            context.content, 
+            edit_result.line_edits
         )
         
+        # Write updated content
+        result = FileManager.write_file(filepath, new_content)
+        
         if not result.error:
-            result.changes = edit_result.changes
+            result.changes = changes
         
         return result
