@@ -39,8 +39,8 @@ class IterativeProgrammer(dspy.Module):
         # Check if this is a file editing command
         if command.startswith("edit "):
             # Extract filepath and instruction
-            parts = command[5:].split(" ", 1)
-            if len(parts) != 2:
+            parts = command[5:].strip().split(" ", 1)
+            if not parts or len(parts) != 2:
                 return FileContext(
                     filepath="",
                     content="",
