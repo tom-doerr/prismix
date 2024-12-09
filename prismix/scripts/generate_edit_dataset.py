@@ -55,7 +55,12 @@ class EditDatasetGenerator:
         # 1. Generate original script
         theme = random.choice(self.themes)
         result = self.script_generator(theme=theme)
-        original_script = result.script
+        # Remove markdown wrapper if present
+        original_script = result.script.strip()
+        if original_script.startswith("```python"):
+            original_script = original_script[8:].strip()
+        if original_script.endswith("```"):
+            original_script = original_script[:-3].strip()
         
         # 2. Generate edit instruction
         edit_result = self.edit_generator(script=original_script)
@@ -63,8 +68,10 @@ class EditDatasetGenerator:
         
         # 3. Apply edit instruction using FileEditor
         editor = FileEditor()
+        with open("temp.py", "w") as f:
+            f.write(original_script)
         file_context = editor.edit_file("temp.py", edit_instruction)
-        edited_script = file_context.content
+        edited_script = file_context.content if file_context.content else original_script
         
         # 4. Generate hindsight edit command
         hindsight = self.hindsight_generator(
