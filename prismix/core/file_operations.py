@@ -123,13 +123,13 @@ class FileEditor:
                     if mode == "REPLACE" and 1 <= line_num <= len(lines):
                         old_text = lines[line_num - 1]
                         lines[line_num - 1] = new_text
-                        changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
+                        changes.append(f"Line {line_num}: '{old_text}' -> '{new_text}'")
                     elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
                         lines.insert(line_num - 1, new_text)
-                        changes.append(f"Inserted at line {line_num}: '{new_text}'")
+                        changes.append(f"Line {line_num}: inserted '{new_text}'")
                     elif mode == "DELETE" and 1 <= line_num <= len(lines):
                         old_text = lines.pop(line_num - 1)
-                        changes.append(f"Deleted line {line_num}: '{old_text}'")
+                        changes.append(f"Line {line_num}: deleted '{old_text}'")
                 except (ValueError, IndexError) as e:
                     changes.append(f"Failed to parse edit: {edit} - {str(e)}")
                     continue
@@ -148,13 +148,13 @@ class FileEditor:
                     if mode == "REPLACE" and 1 <= line_num <= len(lines):
                         old_text = lines[line_num - 1]
                         lines[line_num - 1] = new_text
-                        changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
+                        changes.append(f"Line {line_num}: '{old_text}' -> '{new_text}'")
                     elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
                         lines.insert(line_num - 1, new_text)
-                        changes.append(f"Inserted at line {line_num}: '{new_text}'")
+                        changes.append(f"Line {line_num}: inserted '{new_text}'")
                     elif mode == "DELETE" and 1 <= line_num <= len(lines):
                         old_text = lines.pop(line_num - 1)
-                        changes.append(f"Deleted line {line_num}: '{old_text}'")
+                        changes.append(f"Line {line_num}: deleted '{old_text}'")
                         # Adjust line numbers for subsequent edits
                         for j in range(i + 1, len(line_edits)):
                             if isinstance(line_edits[j], tuple):
