@@ -1,8 +1,9 @@
-from typing import Tuple
+from typing import Tuple, Union
 import dspy
 from .signatures import CodeSafetyCheck
 from .executor import CodeResult, CodeExecutor
 from .generator import CodeGenerator, GenerationContext
+from .file_operations import FileEditor, FileContext
 
 class IterativeProgrammer(dspy.Module):
     """Main module that coordinates code generation, safety checks and execution"""
@@ -11,6 +12,7 @@ class IterativeProgrammer(dspy.Module):
         super().__init__()
         self.generator = CodeGenerator(max_iterations)
         self.safety_checker = dspy.TypedPredictor(CodeSafetyCheck)
+        self.file_editor = FileEditor()
         self.max_iterations = max_iterations
 
     def is_code_safe(self, code: str) -> Tuple[bool, str]:
@@ -32,8 +34,25 @@ class IterativeProgrammer(dspy.Module):
             )
         return CodeExecutor.execute(code)
 
-    def forward(self, command: str) -> CodeResult:
-        """Generate and execute code based on the given command"""
+    def forward(self, command: str) -> Union[CodeResult, FileContext]:
+        """Generate and execute code or edit files based on the command"""
+        # Check if this is a file editing command
+        if command.startswith("edit "):
+            # Extract filepath and instruction
+            parts = command[5:].split(" ", 1)
+            if len(parts) != 2:
+                return FileContext(
+                    filepath="",
+                    content="",
+                    changes=[],
+                    error="Invalid edit command. Use: edit <filepath> <instruction>"
+                )
+            filepath, instruction = parts
+            print(f"Editing file: {filepath}")
+            print(f"Instruction: {instruction}\n")
+            return self.file_editor.edit_file(filepath, instruction)
+
+        # Regular code generation flow
         print("1. Generating program specification...")
         context = self.generator.generate_spec(command)
         print(f"Requirements: {context.requirements}")
