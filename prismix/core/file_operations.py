@@ -16,7 +16,22 @@ class FileEdit(dspy.Signature):
     filepath = dspy.InputField(desc="Path to the file")
     numbered_content = dspy.InputField(desc="Current file content with line numbers")
     instruction = dspy.InputField(desc="Edit instruction")
-    line_edits = dspy.OutputField(desc="List of edits in format: 'MODE LINE_NUM | NEW_TEXT' where MODE is REPLACE/INSERT/DELETE. Example: 'REPLACE 5 | new code here' or 'DELETE 3 |' or 'INSERT 2 | new line here'")
+    line_edits = dspy.OutputField(desc="""List of edits in format: 'MODE LINE_NUM | NEW_TEXT' where:
+    - MODE is REPLACE/INSERT/DELETE
+    - LINE_NUM is the target line number
+    - NEW_TEXT is the new content, maintaining proper indentation
+    
+    Examples:
+    'REPLACE 5 |     def hello():  # 4 spaces indent'
+    'INSERT 2 |         return x + y  # 8 spaces indent'
+    'DELETE 3 |'
+    
+    Rules:
+    1. Maintain consistent indentation with surrounding code
+    2. Use spaces for indentation (4 spaces per level)
+    3. Align with the indentation of the target line or previous line
+    4. Keep proper spacing around operators and after commas
+    5. Include proper line endings and empty lines where needed""")
 
 class FileManager:
     """Handles file operations"""
