@@ -1,4 +1,4 @@
-# CodeWeaver
+# CodeCraft AI
 
 An AI-powered iterative code generation tool that safely generates Python code from natural language descriptions.
 
@@ -24,7 +24,7 @@ export OPENAI_API_KEY='your-api-key-here'
 
 Basic usage:
 ```bash
-poetry run codeweaver "write a function that calculates factorial"
+poetry run codecraft "write a function that calculates factorial"
 ```
 
 The tool will:
