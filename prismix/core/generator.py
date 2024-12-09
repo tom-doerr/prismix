@@ -4,6 +4,7 @@ from .signatures import ProgramSpec, CodeImplementation, CodeReview
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass
 class GenerationContext:
     """Tracks the state of code generation process"""
@@ -21,6 +22,7 @@ class CodeGenerator:
         self.code_reviewer = dspy.ChainOfThought(CodeReview)
         self.max_iterations = max_iterations
 
+    
     def generate_spec(self, command: str) -> GenerationContext:
         """Generate program specification from command"""
         spec = self.spec_generator(command=command)
@@ -38,6 +40,7 @@ class CodeGenerator:
         )
         return implementation.code
 
+    
     def improve_implementation(self, code: str, error: str) -> str:
         """Review and improve failed implementation"""
         review = self.code_reviewer(code=code, error=error)
