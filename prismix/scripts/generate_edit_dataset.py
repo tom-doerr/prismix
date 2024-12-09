@@ -130,6 +130,10 @@ class EditDatasetGenerator(dspy.Module):
             hindsight_command=hindsight.edit_command
         )
     
+    def forward(self, num_examples: int = 10, output_file: str = "data/edit_dataset.json") -> None:
+        """Forward method for compatibility with DSPy transforms"""
+        return self.generate_dataset(num_examples, output_file)
+        
     def generate_dataset(self, num_examples: int, output_file: str) -> None:
         """Generate multiple examples and save to JSON file"""
         dataset = []
@@ -171,7 +175,7 @@ def main():
         generator.map_named_predictors(dspy.Retry), 
         custom_backtrack
     )
-    generator.generate_dataset(
+    generator(
         num_examples=10,
         output_file="data/edit_dataset.json"
     )
