@@ -1,5 +1,5 @@
 import pytest
-from codeweaver.core.iterative_programmer import IterativeProgrammer, setup_agent
+from prismix.core.iterative_programmer import IterativeProgrammer, setup_agent
 
 @pytest.fixture
 def agent():
