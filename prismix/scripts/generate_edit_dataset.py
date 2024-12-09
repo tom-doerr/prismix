@@ -31,8 +31,9 @@ class EditDataPoint:
     edit_instruction: str
     hindsight_command: str
     
-class EditDatasetGenerator:
+class EditDatasetGenerator(dspy.Module):
     def __init__(self):
+        super().__init__()
         self.script_generator = dspy.ChainOfThought(GenerateScript)
         self.edit_generator = dspy.ChainOfThought(GenerateEditInstruction)
         self.hindsight_generator = dspy.ChainOfThought(GenerateHindsightEdit)
