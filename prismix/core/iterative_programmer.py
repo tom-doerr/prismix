@@ -42,15 +42,14 @@ class IterativeProgrammer(dspy.Module):
         self.spec_generator = dspy.ChainOfThought(ProgramSpec)
         self.code_generator = dspy.ChainOfThought(CodeImplementation) 
         self.code_reviewer = dspy.ChainOfThought(CodeReview)
-        self.safety_checker = dspy.ChainOfThought(CodeSafetyCheck)
+        self.safety_checker = dspy.TypedPredictor(CodeSafetyCheck)
         self.max_iterations = 3
 
     def is_code_safe(self, code: str) -> Tuple[bool, str]:
         """Check if code is safe to execute using LLM"""
         safety_check = self.safety_checker(code=code)
-        # Force boolean conversion regardless of input type
-        is_safe = bool(safety_check.is_safe and str(safety_check.is_safe).lower() == 'true')
-        return is_safe, safety_check.safety_message
+        # TypedPredictor ensures is_safe is already a boolean
+        return safety_check.is_safe, safety_check.safety_message
 
     def execute_code(self, code: str) -> CodeResult:
         """Execute the generated code in a safe environment and return results"""
@@ -186,9 +185,9 @@ class IterativeProgrammer(dspy.Module):
 
 class CodeSafetyCheck(dspy.Signature):
     """Analyze code for potential security risks"""
-    code = dspy.InputField()
-    is_safe = dspy.OutputField(desc="Boolean indicating if code is safe")
-    safety_message = dspy.OutputField(desc="Explanation of safety concerns if any")
+    code: str = dspy.InputField(desc="Code to analyze")
+    is_safe: bool = dspy.OutputField(desc="Boolean indicating if code is safe")
+    safety_message: str = dspy.OutputField(desc="Explanation of safety concerns if any")
 
 def setup_agent() -> IterativeProgrammer:
     """Configure and return an instance of IterativeProgrammer"""
