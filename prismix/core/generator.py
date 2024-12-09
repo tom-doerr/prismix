@@ -1,6 +1,8 @@
 import dspy
 from .signatures import ProgramSpec, CodeImplementation, CodeReview
 
+from dataclasses import dataclass
+
 @dataclass
 class GenerationContext:
     """Tracks the state of code generation process"""
