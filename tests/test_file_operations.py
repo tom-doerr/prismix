@@ -94,21 +94,60 @@ def test_file_edit(agent, test_file):
     assert len(result.changes) > 0
     assert any("Line" in change for change in result.changes)  # Verify line number in changes
 
-def test_multiple_line_edits(test_file):
-    """Test multiple line edits at once"""
+def test_replace_line(test_file):
+    """Test replacing a line"""
+    editor = FileEditor()
+    content = "line 1\nline 2\nline 3"
+    edits = [("replace", 2, "modified line 2")]
+    
+    new_content, changes = editor._apply_line_edits(content, edits)
+    
+    assert "modified line 2" in new_content
+    assert len(changes) == 1
+    assert "Replaced line 2" in changes[0]
+
+def test_insert_line(test_file):
+    """Test inserting a line"""
+    editor = FileEditor()
+    content = "line 1\nline 2\nline 3"
+    edits = [("insert", 2, "new line")]
+    
+    new_content, changes = editor._apply_line_edits(content, edits)
+    
+    assert new_content.splitlines()[1] == "new line"
+    assert len(new_content.splitlines()) == 4
+    assert len(changes) == 1
+    assert "Inserted at line 2" in changes[0]
+
+def test_delete_line(test_file):
+    """Test deleting a line"""
+    editor = FileEditor()
+    content = "line 1\nline 2\nline 3"
+    edits = [("delete", 2, "")]
+    
+    new_content, changes = editor._apply_line_edits(content, edits)
+    
+    assert "line 2" not in new_content
+    assert len(new_content.splitlines()) == 2
+    assert len(changes) == 1
+    assert "Deleted line 2" in changes[0]
+
+def test_multiple_edit_modes(test_file):
+    """Test multiple edits with different modes"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3\nline 4"
     edits = [
-        (1, "modified line 1"),
-        (3, "modified line 3")
+        ("replace", 1, "modified line 1"),
+        ("insert", 3, "new line"),
+        ("delete", 4, "")
     ]
     
     new_content, changes = editor._apply_line_edits(content, edits)
     
     assert "modified line 1" in new_content
-    assert "modified line 3" in new_content
-    assert "line 2" in new_content  # Unchanged line
-    assert len(changes) == 2
+    assert "new line" in new_content
+    assert "line 4" not in new_content
+    assert len(changes) == 3
 
 def test_invalid_file():
     """Test handling non-existent file"""
