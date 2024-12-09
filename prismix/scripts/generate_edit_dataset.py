@@ -65,31 +65,31 @@ class EditDatasetGenerator:
                 if original_script.endswith("```"):
                     original_script = original_script[:-3].strip()
         
-        # 2. Generate edit instruction
-        edit_result = self.edit_generator(script=original_script)
-        edit_instruction = edit_result.instruction
-        
-        # 3. Apply edit instruction using FileEditor
-        editor = FileEditor()
-        temp_file = "temp.py"
-        with open(temp_file, "w") as f:
-            f.write(original_script)
-            
-        file_context = editor.edit_file(temp_file, edit_instruction)
-        
-        # Generate modified version with both approaches
-        modified_result = self.script_generator(
-            theme=theme,
-            instruction=edit_instruction
-        )
-        generated_script = modified_result.script.strip()
-        if generated_script.startswith("```python"):
-            generated_script = generated_script[8:].strip()
-        if generated_script.endswith("```"):
-            generated_script = generated_script[:-3].strip()
-            
-        # Compare both versions and use the one with significant changes
-        editor_script = file_context.content if not file_context.error else None
+                # 2. Generate edit instruction
+                edit_result = self.edit_generator(script=original_script)
+                edit_instruction = edit_result.instruction
+                
+                # 3. Apply edit instruction using FileEditor
+                editor = FileEditor()
+                temp_file = "temp.py"
+                with open(temp_file, "w") as f:
+                    f.write(original_script)
+                    
+                file_context = editor.edit_file(temp_file, edit_instruction)
+                
+                # Generate modified version with both approaches
+                modified_result = self.script_generator(
+                    theme=theme,
+                    instruction=edit_instruction
+                )
+                generated_script = modified_result.script.strip()
+                if generated_script.startswith("```python"):
+                    generated_script = generated_script[8:].strip()
+                if generated_script.endswith("```"):
+                    generated_script = generated_script[:-3].strip()
+                    
+                # Compare both versions and use the one with significant changes
+                editor_script = file_context.content if not file_context.error else None
         
                 # Calculate similarity scores
                 editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
