@@ -52,81 +52,83 @@ class EditDatasetGenerator(dspy.Module):
             "configuration management"
         ]
         
-    def generate_datapoint(self, max_retries: int = 3) -> EditDataPoint:
-        """Generate a single edit transformation example with retries"""
-        for attempt in range(max_retries):
-            try:
-                # 1. Generate original script
-                theme = random.choice(self.themes)
-                result = self.script_generator(theme=theme)
-                # Remove markdown wrapper if present
-                original_script = result.script.strip()
-                if original_script.startswith("```python"):
-                    original_script = original_script[8:].strip()
-                if original_script.endswith("```"):
-                    original_script = original_script[:-3].strip()
+    def generate_datapoint(self) -> EditDataPoint:
+        """Generate a single edit transformation example"""
+        # 1. Generate original script
+        theme = random.choice(self.themes)
+        result = self.script_generator(theme=theme)
+        # Remove markdown wrapper if present
+        original_script = result.script.strip()
+        if original_script.startswith("```python"):
+            original_script = original_script[8:].strip()
+        if original_script.endswith("```"):
+            original_script = original_script[:-3].strip()
+    
+        # 2. Generate edit instruction
+        edit_result = self.edit_generator(script=original_script)
+        edit_instruction = edit_result.instruction
         
-                # 2. Generate edit instruction
-                edit_result = self.edit_generator(script=original_script)
-                edit_instruction = edit_result.instruction
-                
-                # 3. Apply edit instruction using FileEditor
-                editor = FileEditor()
-                temp_file = "temp.py"
-                with open(temp_file, "w") as f:
-                    f.write(original_script)
-                    
-                file_context = editor.edit_file(temp_file, edit_instruction)
-                
-                # Generate modified version with both approaches
-                modified_result = self.script_generator(
-                    theme=theme,
-                    instruction=edit_instruction
-                )
-                generated_script = modified_result.script.strip()
-                if generated_script.startswith("```python"):
-                    generated_script = generated_script[8:].strip()
-                if generated_script.endswith("```"):
-                    generated_script = generated_script[:-3].strip()
-                    
-                # Compare both versions and use the one with significant changes
-                editor_script = file_context.content if not file_context.error else None
+        # 3. Apply edit instruction using FileEditor
+        editor = FileEditor()
+        temp_file = "temp.py"
+        with open(temp_file, "w") as f:
+            f.write(original_script)
+            
+        file_context = editor.edit_file(temp_file, edit_instruction)
         
-                # Calculate and validate similarity scores using DSPy assertions
-                editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
-                generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
-                
-                # Assert that at least one version has meaningful changes
-                dspy.Assert(
-                    0.3 < editor_similarity < 0.9 or 0.3 < generated_similarity < 0.9,
-                    f"Similarity scores (editor: {editor_similarity:.2f}, generated: {generated_similarity:.2f}) " 
-                    "should be between 0.3 and 0.9 for meaningful changes",
-                    on_failure=dspy.Suggest("Try generating a more substantially different version")
-                )
-                
-                # Choose the version with better similarity score
-                if editor_script and 0.3 < editor_similarity < 0.9:
-                    edited_script = editor_script
-                else:
-                    edited_script = generated_script
+        # Generate modified version with both approaches
+        modified_result = self.script_generator(
+            theme=theme,
+            instruction=edit_instruction
+        )
+        generated_script = modified_result.script.strip()
+        if generated_script.startswith("```python"):
+            generated_script = generated_script[8:].strip()
+        if generated_script.endswith("```"):
+            generated_script = generated_script[:-3].strip()
+            
+        # Compare both versions and use the one with significant changes
+        editor_script = file_context.content if not file_context.error else None
 
-                # 4. Generate hindsight edit command
-                hindsight = self.hindsight_generator(
-                    original=original_script,
-                    edited=edited_script
-                )
+        # Calculate similarity scores
+        editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
+        generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
+        
+        # Use DSPy assertions with suggestions for guidance
+        dspy.Assert(
+            0.3 < editor_similarity < 0.9 or 0.3 < generated_similarity < 0.9,
+            f"Similarity scores (editor: {editor_similarity:.2f}, generated: {generated_similarity:.2f}) " 
+            "should be between 0.3 and 0.9 for meaningful changes"
+        )
+        
+        dspy.Suggest(
+            editor_similarity != 1.0,
+            "The editor-based changes should modify the code meaningfully"
+        )
+        
+        dspy.Suggest(
+            generated_similarity != 1.0,
+            "The generated version should be different from the original"
+        )
+        
+        # Choose the version with better similarity score
+        if editor_script and 0.3 < editor_similarity < 0.9:
+            edited_script = editor_script
+        else:
+            edited_script = generated_script
 
-                return EditDataPoint(
-                    original_script=original_script,
-                    edited_script=edited_script,
-                    edit_instruction=edit_instruction,
-                    hindsight_command=hindsight.edit_command
-                )
-                
-            except Exception as e:
-                print(f"Attempt {attempt + 1}/{max_retries} failed: {str(e)}")
-                if attempt == max_retries - 1:
-                    raise ValueError(f"Failed to generate valid edit after {max_retries} attempts: {str(e)}")
+        # 4. Generate hindsight edit command
+        hindsight = self.hindsight_generator(
+            original=original_script,
+            edited=edited_script
+        )
+
+        return EditDataPoint(
+            original_script=original_script,
+            edited_script=edited_script,
+            edit_instruction=edit_instruction,
+            hindsight_command=hindsight.edit_command
+        )
     
     def generate_dataset(self, num_examples: int, output_file: str) -> None:
         """Generate multiple examples and save to JSON file"""
@@ -161,11 +163,13 @@ def main():
     lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
     dspy.configure(lm=lm)
     
-    # Set up generator with retry transform
+    # Set up generator with retry transform and custom backtrack handler
     generator = EditDatasetGenerator()
+    from functools import partial
+    custom_backtrack = partial(dspy.backtrack_handler, max_backtracks=3)
     generator = dspy.assert_transform_module(
-        generator.map_named_predictors(dspy.Retry(max_retries=3)), 
-        dspy.backtrack_handler
+        generator.map_named_predictors(dspy.Retry), 
+        custom_backtrack
     )
     generator.generate_dataset(
         num_examples=10,
