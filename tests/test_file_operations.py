@@ -1,7 +1,7 @@
 import os
 import pytest
 from prismix.core.iterative_programmer import setup_agent
-from prismix.core.file_operations import FileContext, FileManager
+from prismix.core.file_operations import FileContext, FileManager, FileEditor
 
 @pytest.fixture
 def test_file(tmp_path):
