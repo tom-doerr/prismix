@@ -54,29 +54,48 @@ class EditDatasetGenerator(dspy.Module):
         
     def generate_datapoint(self) -> EditDataPoint:
         """Generate a single edit transformation example"""
+        print("\nGenerating new datapoint...")
+        
         # 1. Generate original script
         theme = random.choice(self.themes)
+        print(f"Selected theme: {theme}")
+        
         result = self.script_generator(theme=theme)
+        print("Generated original script length:", len(result.script))
+        
         # Remove markdown wrapper if present
         original_script = result.script.strip()
         if original_script.startswith("```python"):
             original_script = original_script[8:].strip()
         if original_script.endswith("```"):
             original_script = original_script[:-3].strip()
+        
+        print("Cleaned script length:", len(original_script))
+        print("Script preview:", original_script[:100] + "..." if len(original_script) > 100 else original_script)
     
         # 2. Generate edit instruction
+        print("\nGenerating edit instruction...")
         edit_result = self.edit_generator(script=original_script)
         edit_instruction = edit_result.instruction
+        print("Edit instruction:", edit_instruction)
         
         # 3. Apply edit instruction using FileEditor
+        print("\nApplying edits...")
         editor = FileEditor()
         temp_file = "temp.py"
         with open(temp_file, "w") as f:
             f.write(original_script)
             
         file_context = editor.edit_file(temp_file, edit_instruction)
+        if file_context.error:
+            print("Editor error:", file_context.error)
+        else:
+            print("Editor changes:", len(file_context.changes), "modifications")
+            for change in file_context.changes:
+                print(f"- {change}")
         
         # Generate modified version with both approaches
+        print("\nGenerating alternative version...")
         modified_result = self.script_generator(
             theme=theme,
             instruction=edit_instruction
@@ -87,8 +106,23 @@ class EditDatasetGenerator(dspy.Module):
         if generated_script.endswith("```"):
             generated_script = generated_script[:-3].strip()
             
+        print("Generated alternative length:", len(generated_script))
+        
         # Compare both versions and use the one with significant changes
         editor_script = file_context.content if not file_context.error else None
+        
+        # Log similarity scores
+        if editor_script:
+            editor_similarity = calculate_levenshtein_similarity(original_script, editor_script)
+            print(f"\nEditor version similarity: {editor_similarity:.3f}")
+            print("Editor changes preview:", editor_script[:100] + "..." if len(editor_script) > 100 else editor_script)
+        else:
+            editor_similarity = 1.0
+            print("\nNo valid editor version")
+            
+        generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
+        print(f"Generated version similarity: {generated_similarity:.3f}")
+        print("Generated changes preview:", generated_script[:100] + "..." if len(generated_script) > 100 else generated_script)
 
         # Calculate similarity scores and retry until we get meaningful changes
         editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
