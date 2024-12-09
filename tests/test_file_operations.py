@@ -210,17 +210,90 @@ def test_edit_format_handling(test_file):
     string_edits = "REPLACE 1 | modified line 1"
     new_content, changes = editor._apply_line_edits(content, string_edits)
     assert "modified line 1" in new_content
+    assert len(changes) == 1
+    assert "Line 1: 'line 1' -> 'modified line 1'" in changes[0]
     
     # Test tuple format with explicit mode
     tuple_edits = [("REPLACE", 1, "modified again")]
     new_content, changes = editor._apply_line_edits(content, tuple_edits)
     assert "modified again" in new_content
+    assert len(changes) == 1
+    assert "Line 1: 'line 1' -> 'modified again'" in changes[0]
     
     # Test tuple format without mode (should default to REPLACE)
     simple_edits = [(1, "simple modification")]
     new_content, changes = editor._apply_line_edits(content, simple_edits)
     assert "simple modification" in new_content
+    assert len(changes) == 1
+    assert "Line 1: 'line 1' -> 'simple modification'" in changes[0]
+
+def test_concurrent_edits():
+    """Test multiple edits happening at the same line"""
+    editor = FileEditor()
+    content = "line 1\nline 2\nline 3"
+    
+    # Multiple edits targeting same line
+    edits = [
+        ("replace", 2, "first change"),
+        ("replace", 2, "second change")
+    ]
+    new_content, changes = editor._apply_line_edits(content, edits)
+    assert "second change" in new_content
+    assert len(changes) == 2
+    assert "Line 2: 'line 2' -> 'first change'" in changes[0]
+    assert "Line 2: 'first change' -> 'second change'" in changes[1]
+
+def test_edit_chain_effects():
+    """Test how edits affect subsequent operations"""
+    editor = FileEditor()
+    content = "line 1\nline 2\nline 3\nline 4"
+    
+    # Chain of edits that affect each other
+    edits = [
+        ("delete", 2, ""),  # Deletes line 2
+        ("insert", 2, "new line"),  # Inserts at the old line 2 position
+        ("replace", 3, "modified line")  # Should affect what was line 3
+    ]
+    new_content, changes = editor._apply_line_edits(content, edits)
+    lines = new_content.splitlines()
+    assert len(lines) == 4
+    assert lines[0] == "line 1"
+    assert lines[1] == "new line"
+    assert lines[2] == "modified line"
+    assert lines[3] == "line 4"
     assert len(changes) == 3
+
+def test_whitespace_handling():
+    """Test handling of whitespace in edits"""
+    editor = FileEditor()
+    content = "    indented line\n\tline with tab\nno indent"
+    
+    # Test preserving indentation
+    edits = [
+        ("replace", 1, "    new indented line"),
+        ("replace", 2, "\tnew tabbed line")
+    ]
+    new_content, changes = editor._apply_line_edits(content, edits)
+    lines = new_content.splitlines()
+    assert lines[0].startswith("    ")
+    assert lines[1].startswith("\t")
+    assert len(changes) == 2
+
+def test_empty_and_whitespace_lines():
+    """Test handling of empty and whitespace-only lines"""
+    editor = FileEditor()
+    content = "line 1\n\n    \nline 4"
+    
+    # Test operations on empty/whitespace lines
+    edits = [
+        ("replace", 2, "new line 2"),
+        ("replace", 3, "new line 3")
+    ]
+    new_content, changes = editor._apply_line_edits(content, edits)
+    assert len(new_content.splitlines()) == 4
+    assert "new line 2" in new_content
+    assert "new line 3" in new_content
+    assert len(changes) == 2
 
 def test_invalid_file():
     """Test handling non-existent file"""
