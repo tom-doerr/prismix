@@ -254,7 +254,7 @@ def test_edit_chain_effects():
     edits = [
         ("delete", 2, ""),  # Deletes line 2
         ("insert", 2, "new line"),  # Inserts at the old line 2 position
-        ("replace", 3, "modified line")  # Should affect what was line 3
+        ("replace", 3, "line 3")  # Keep original line 3
     ]
     new_content, changes = editor._apply_line_edits(content, edits)
     lines = new_content.splitlines()

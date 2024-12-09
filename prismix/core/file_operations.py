@@ -122,11 +122,12 @@ class FileEditor:
                     
                     if mode == "REPLACE" and 1 <= line_num <= len(lines):
                         old_text = lines[line_num - 1]
+                        old_text = lines[line_num - 1]
                         lines[line_num - 1] = new_text
-                        changes.append(f"Replaced line {line_num}")
+                        changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
                     elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
                         lines.insert(line_num - 1, new_text)
-                        changes.append(f"Inserted '{new_text}'")
+                        changes.append(f"inserted '{new_text}'")
                         # Adjust line numbers for subsequent edits after insert
                         for j in range(len(edit_lines)):
                             if j > edit_lines.index(edit):
@@ -139,7 +140,7 @@ class FileEditor:
                                         edit_lines[j] = ' '.join(mode_line_j) + '|' + parts_j[1]
                     elif mode == "DELETE" and 1 <= line_num <= len(lines):
                         old_text = lines.pop(line_num - 1)
-                        changes.append(f"Deleted line {line_num}")
+                        changes.append(f"deleted '{old_text}'")
                         # Adjust line numbers for subsequent edits after delete
                         for j in range(len(edit_lines)):
                             if j > edit_lines.index(edit):
