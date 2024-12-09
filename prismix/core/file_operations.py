@@ -16,7 +16,7 @@ class FileEdit(dspy.Signature):
     filepath = dspy.InputField(desc="Path to the file")
     numbered_content = dspy.InputField(desc="Current file content with line numbers")
     instruction = dspy.InputField(desc="Edit instruction")
-    line_edits = dspy.OutputField(desc="List of edits in format: 'mode line_num | new_text' where mode is replace/insert/delete")
+    line_edits = dspy.OutputField(desc="List of edits in format: 'MODE LINE_NUM | NEW_TEXT' where MODE is REPLACE/INSERT/DELETE. Example: 'REPLACE 5 | new code here' or 'DELETE 3 |' or 'INSERT 2 | new line here'")
 
 class FileManager:
     """Handles file operations"""
@@ -91,39 +91,49 @@ class FileEditor:
             edit_lines = line_edits.splitlines()
             for edit in edit_lines:
                 try:
-                    # Parse "mode line_num | new_text" format
-                    parts = edit.split('|')
-                    mode_line = parts[0].strip().split()
-                    mode = mode_line[0].lower()
+                    # Parse "MODE LINE_NUM | NEW_TEXT" format
+                    parts = edit.split('|', 1)  # Split on first | only
+                    if not parts:
+                        continue
+                        
+                    mode_line = parts[0].strip().split(None, 1)  # Split on first whitespace
+                    if len(mode_line) != 2:
+                        continue
+                        
+                    mode = mode_line[0].upper()
                     line_num = int(mode_line[1])
                     new_text = parts[1].strip() if len(parts) > 1 else ""
                     
-                    if mode == "replace" and 1 <= line_num <= len(lines):
+                    if mode == "REPLACE" and 1 <= line_num <= len(lines):
                         old_text = lines[line_num - 1]
                         lines[line_num - 1] = new_text
                         changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
-                    elif mode == "insert" and 1 <= line_num <= len(lines) + 1:
+                    elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
                         lines.insert(line_num - 1, new_text)
                         changes.append(f"Inserted at line {line_num}: '{new_text}'")
-                    elif mode == "delete" and 1 <= line_num <= len(lines):
+                    elif mode == "DELETE" and 1 <= line_num <= len(lines):
                         old_text = lines.pop(line_num - 1)
                         changes.append(f"Deleted line {line_num}: '{old_text}'")
-                except (ValueError, IndexError):
+                except (ValueError, IndexError) as e:
+                    changes.append(f"Failed to parse edit: {edit} - {str(e)}")
                     continue
         else:
             # Handle direct mode/line/text tuples (from tests)
             for mode, line_num, new_text in line_edits:
-                mode = mode.lower()
-                if mode == "replace" and 1 <= line_num <= len(lines):
-                    old_text = lines[line_num - 1]
-                    lines[line_num - 1] = new_text
-                    changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
-                elif mode == "insert" and 1 <= line_num <= len(lines) + 1:
-                    lines.insert(line_num - 1, new_text)
-                    changes.append(f"Inserted at line {line_num}: '{new_text}'")
-                elif mode == "delete" and 1 <= line_num <= len(lines):
-                    old_text = lines.pop(line_num - 1)
-                    changes.append(f"Deleted line {line_num}: '{old_text}'")
+                mode = mode.upper()
+                try:
+                    if mode == "REPLACE" and 1 <= line_num <= len(lines):
+                        old_text = lines[line_num - 1]
+                        lines[line_num - 1] = new_text
+                        changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
+                    elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
+                        lines.insert(line_num - 1, new_text)
+                        changes.append(f"Inserted at line {line_num}: '{new_text}'")
+                    elif mode == "DELETE" and 1 <= line_num <= len(lines):
+                        old_text = lines.pop(line_num - 1)
+                        changes.append(f"Deleted line {line_num}: '{old_text}'")
+                except (ValueError, IndexError) as e:
+                    changes.append(f"Failed to apply {mode} at line {line_num}: {str(e)}")
         
         return '\n'.join(lines), changes
 
