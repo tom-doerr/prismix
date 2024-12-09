@@ -73,19 +73,23 @@ class EditDatasetGenerator:
             f.write(original_script)
             
         file_context = editor.edit_file(temp_file, edit_instruction)
+        
+        # Always generate a modified version to ensure differences
+        modified_result = self.script_generator(
+            theme=theme,
+            instruction=edit_instruction
+        )
+        edited_script = modified_result.script.strip()
+        if edited_script.startswith("```python"):
+            edited_script = edited_script[8:].strip()
+        if edited_script.endswith("```"):
+            edited_script = edited_script[:-3].strip()
+            
+        # If FileEditor made changes, compare and use the better version
         if not file_context.error and file_context.changes:
-            edited_script = file_context.content
-        else:
-            # Generate a modified version if FileEditor didn't make changes
-            modified_result = self.script_generator(
-                theme=theme,
-                instruction=edit_instruction
-            )
-            edited_script = modified_result.script.strip()
-            if edited_script.startswith("```python"):
-                edited_script = edited_script[8:].strip()
-            if edited_script.endswith("```"):
-                edited_script = edited_script[:-3].strip()
+            # Use FileEditor version if it made meaningful changes
+            if file_context.content != original_script:
+                edited_script = file_context.content
         
         # 4. Generate hindsight edit command
         hindsight = self.hindsight_generator(

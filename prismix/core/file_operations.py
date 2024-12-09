@@ -110,12 +110,14 @@ class FileEditor:
                     if not parts:
                         continue
                         
-                    mode_line = parts[0].strip().split(None, 1)  # Split on first whitespace
-                    if len(mode_line) != 2:
-                        continue
-                        
-                    mode = mode_line[0].upper()
-                    line_num = int(mode_line[1])
+                    mode_line = parts[0].strip().split()  # Split on whitespace
+                    if len(mode_line) < 2:
+                        mode = "REPLACE"  # Default mode
+                        line_num = int(mode_line[0])
+                    else:
+                        mode = mode_line[0].upper()
+                        line_num = int(mode_line[1])
+                    
                     new_text = parts[1].strip() if len(parts) > 1 else ""
                     
                     if mode == "REPLACE" and 1 <= line_num <= len(lines):
@@ -133,7 +135,14 @@ class FileEditor:
                     continue
         else:
             # Handle direct mode/line/text tuples (from tests)
-            for mode, line_num, new_text in line_edits:
+            for edit in line_edits:
+                if len(edit) == 2:
+                    # Simple line number + text format
+                    line_num, new_text = edit
+                    mode = "REPLACE"
+                else:
+                    # Full mode + line + text format
+                    mode, line_num, new_text = edit
                 mode = mode.upper()
                 try:
                     if mode == "REPLACE" and 1 <= line_num <= len(lines):
