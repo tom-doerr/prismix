@@ -156,12 +156,12 @@ class FileEditor:
                         old_text = lines.pop(line_num - 1)
                         changes.append(f"Deleted line {line_num}: '{old_text}'")
                         # Adjust line numbers for subsequent edits
-                        for i in range(len(edits)):
-                            if i >= len(edits):
+                        for i in range(len(line_edits)):
+                            if i >= len(line_edits):
                                 break
-                            if isinstance(edits[i], tuple) and edits[i][1] > line_num:
-                                mode_i, num_i, text_i = edits[i]
-                                edits[i] = (mode_i, num_i - 1, text_i)
+                            if isinstance(line_edits[i], tuple) and line_edits[i][1] > line_num:
+                                mode_i, num_i, text_i = line_edits[i]
+                                line_edits[i] = (mode_i, num_i - 1, text_i)
                 except (ValueError, IndexError) as e:
                     changes.append(f"Failed to apply {mode} at line {line_num}: {str(e)}")
         
