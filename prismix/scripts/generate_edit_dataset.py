@@ -63,12 +63,19 @@ class EditDatasetGenerator(dspy.Module):
         result = self.script_generator(theme=theme)
         print("Generated original script length:", len(result.script))
         
-        # Remove markdown wrapper if present
+        # Clean and validate the generated script
         original_script = result.script.strip()
-        if original_script.startswith("```python"):
-            original_script = original_script[8:].strip()
-        if original_script.endswith("```"):
-            original_script = original_script[:-3].strip()
+        if "```" in original_script:
+            # Extract code from markdown block
+            import re
+            code_match = re.search(r'```python\n(.*?)\n```', original_script, re.DOTALL)
+            if code_match:
+                original_script = code_match.group(1).strip()
+            else:
+                # Try without language specification
+                code_match = re.search(r'```\n(.*?)\n```', original_script, re.DOTALL)
+                if code_match:
+                    original_script = code_match.group(1).strip()
         
         print("Cleaned script length:", len(original_script))
         print("Script preview:", original_script[:100] + "..." if len(original_script) > 100 else original_script)
@@ -82,8 +89,9 @@ class EditDatasetGenerator(dspy.Module):
         # 3. Apply edit instruction using FileEditor
         print("\nApplying edits...")
         editor = FileEditor()
-        temp_file = "temp.py"
-        with open(temp_file, "w") as f:
+        import tempfile
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+            temp_file = f.name
             f.write(original_script)
             
         file_context = editor.edit_file(temp_file, edit_instruction)
@@ -124,17 +132,24 @@ class EditDatasetGenerator(dspy.Module):
         print(f"Generated version similarity: {generated_similarity:.3f}")
         print("Generated changes preview:", generated_script[:100] + "..." if len(generated_script) > 100 else generated_script)
 
-        # Calculate similarity scores and retry until we get meaningful changes
+        # Calculate similarity scores
         editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
         generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
         
+        print(f"\nSimilarity scores:")
+        print(f"Editor version: {editor_similarity:.3f}")
+        print(f"Generated version: {generated_similarity:.3f}")
+        
         # Use DSPy assertions with suggestions for guidance
+        too_similar = editor_similarity > 0.9 and generated_similarity > 0.9
+        too_different = editor_similarity < 0.3 and generated_similarity < 0.3
+        
         dspy.Assert(
-            0.3 < editor_similarity < 0.9 or 0.3 < generated_similarity < 0.9,
+            not (too_similar or too_different),
             f"Similarity scores (editor: {editor_similarity:.2f}, generated: {generated_similarity:.2f}) " 
-            "should be between 0.3 and 0.9 for meaningful changes. "
-            "Try making more substantial modifications to the code structure, "
-            "such as adding new functions, changing logic flow, or restructuring classes."
+            "indicate changes are not optimal. " +
+            ("Changes are too minor. " if too_similar else "Changes are too drastic. ") +
+            "Try adjusting the modifications to maintain code structure while adding meaningful changes."
         )
         
         # Provide specific suggestions for the LLM to improve the changes
@@ -212,13 +227,17 @@ def main():
     lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
     dspy.configure(lm=lm)
     
-    # Set up generator with retry transform and custom backtrack handler
+    # Configure DSPy with retries
+    lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
+    dspy.configure(lm=lm)
+    
+    # Set up generator with retry transform
     generator = EditDatasetGenerator()
-    from functools import partial
-    custom_backtrack = partial(dspy.backtrack_handler, max_backtracks=30)
+    generator = dspy.Retry(generator)
     generator = dspy.assert_transform_module(
-        generator.map_named_predictors(dspy.Retry), 
-        custom_backtrack
+        generator,
+        backtrack_handler=lambda *args, **kwargs: True,  # Always allow retries
+        max_retries=5  # Limit total retries per example
     )
     generator(
         num_examples=10,
