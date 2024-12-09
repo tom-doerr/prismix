@@ -48,8 +48,8 @@ class IterativeProgrammer(dspy.Module):
     def is_code_safe(self, code: str) -> Tuple[bool, str]:
         """Check if code is safe to execute using LLM"""
         safety_check = self.safety_checker(code=code)
-        # Convert string 'True'/'False' to actual boolean
-        is_safe = str(safety_check.is_safe).lower() == 'true'
+        # Force boolean conversion regardless of input type
+        is_safe = bool(safety_check.is_safe and str(safety_check.is_safe).lower() == 'true')
         return is_safe, safety_check.safety_message
 
     def execute_code(self, code: str) -> CodeResult:
