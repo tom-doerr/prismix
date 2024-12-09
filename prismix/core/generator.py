@@ -2,6 +2,7 @@ import dspy
 from .signatures import ProgramSpec, CodeImplementation, CodeReview
 
 from dataclasses import dataclass
+from typing import Optional
 
 @dataclass
 class GenerationContext:
