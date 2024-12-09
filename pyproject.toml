@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "codeweaver"
-version = "0.1.0-dev"
+version = "0.1.0"
 description = "An AI-powered iterative code generation tool"
 authors = ["Tom Dörr <tomdoerr96@gmail.com>"]
 readme = "README.md"
