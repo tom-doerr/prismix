@@ -123,13 +123,13 @@ class FileEditor:
                     if mode == "REPLACE" and 1 <= line_num <= len(lines):
                         old_text = lines[line_num - 1]
                         lines[line_num - 1] = new_text
-                        changes.append(f"Line {line_num}: '{old_text}' -> '{new_text}'")
+                        changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
                     elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
                         lines.insert(line_num - 1, new_text)
-                        changes.append(f"Line {line_num}: inserted '{new_text}'")
+                        changes.append(f"Inserted at line {line_num}: '{new_text}'")
                     elif mode == "DELETE" and 1 <= line_num <= len(lines):
                         old_text = lines.pop(line_num - 1)
-                        changes.append(f"Line {line_num}: deleted '{old_text}'")
+                        changes.append(f"Deleted line {line_num}: '{old_text}'")
                 except (ValueError, IndexError) as e:
                     changes.append(f"Failed to parse edit: {edit} - {str(e)}")
                     continue
@@ -148,30 +148,22 @@ class FileEditor:
                     if mode == "REPLACE" and 1 <= line_num <= len(lines):
                         old_text = lines[line_num - 1]
                         lines[line_num - 1] = new_text
-                        changes.append(f"Line {line_num}: '{old_text}' -> '{new_text}'")
+                        changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
                     elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
                         lines.insert(line_num - 1, new_text)
-                        changes.append(f"Line {line_num}: inserted '{new_text}'")
+                        changes.append(f"Inserted at line {line_num}: '{new_text}'")
                     elif mode == "DELETE" and 1 <= line_num <= len(lines):
                         old_text = lines.pop(line_num - 1)
-                        changes.append(f"Line {line_num}: deleted '{old_text}'")
+                        changes.append(f"Deleted line {line_num}: '{old_text}'")
                         # Adjust line numbers for subsequent edits
                         for j in range(i + 1, len(line_edits)):
                             if isinstance(line_edits[j], tuple):
                                 mode_j, num_j, text_j = line_edits[j] if len(line_edits[j]) == 3 else ("REPLACE", line_edits[j][0], line_edits[j][1])
                                 if num_j > line_num:
                                     line_edits[j] = (mode_j, num_j - 1, text_j)
-                            try:
-                                next_mode_line = edit_lines[j].split('|')[0].strip().split()
-                                if len(next_mode_line) >= 2:
-                                    next_line_num = int(next_mode_line[1])
-                                    if next_line_num > line_num:
-                                        next_mode_line[1] = str(next_line_num - 1)
-                                        edit_lines[j] = f"{' '.join(next_mode_line)} | {edit_lines[j].split('|')[1].strip()}"
-                            except (IndexError, ValueError):
-                                continue
                 except (ValueError, IndexError) as e:
                     changes.append(f"Failed to apply {mode} at line {line_num}: {str(e)}")
+                    continue
         
         return '\n'.join(lines), changes
 
