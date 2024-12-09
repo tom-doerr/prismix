@@ -20,6 +20,7 @@ openai = "^1.0.0"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.3"
 pytest-cov = "^6.0.0"
+mypy = "^1.13.0"
 
 [build-system]
 requires = ["poetry-core"]
