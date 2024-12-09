@@ -109,13 +109,13 @@ class EditDatasetGenerator:
                     edited_script = editor_script
                 else:
                     edited_script = generated_script
-        
-        # 4. Generate hindsight edit command
-        hindsight = self.hindsight_generator(
-            original=original_script,
-            edited=edited_script
-        )
-        
+
+                # 4. Generate hindsight edit command
+                hindsight = self.hindsight_generator(
+                    original=original_script,
+                    edited=edited_script
+                )
+
                 return EditDataPoint(
                     original_script=original_script,
                     edited_script=edited_script,
