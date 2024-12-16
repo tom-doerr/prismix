@@ -1,3 +1,7 @@
+"""
+Test module for the CodeIndexer class.
+"""
+
 import os
 import tempfile
 import pytest
@@ -5,11 +9,13 @@ from prismix.core.code_indexer import CodeIndexer
 
 @pytest.fixture
 def code_indexer():
+    """Fixture to create an instance of CodeIndexer."""
     return CodeIndexer()
 
 
 @pytest.fixture
 def temp_dir():
+    """Fixture to create a temporary directory with dummy files."""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create some dummy files
         with open(os.path.join(tmpdir, "test1.py"), "w", encoding='utf-8') as f:
