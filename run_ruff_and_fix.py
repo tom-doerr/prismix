@@ -78,8 +78,15 @@ def parse_ruff_output(ruff_output):
 
 def call_aider(file_path, ruff_output):
     """Call aider to fix issues based on ruff output."""
-    # Placeholder for the actual implementation of calling aider
-    print(f"Calling aider to fix issues in {file_path} with output:\n{ruff_output}")
+    try:
+        print(f"Calling aider to fix issues in {file_path}...")
+        subprocess.run(
+            ["aider", "--deepseek", "--edit-format", "diff", "--yes-always", "--no-suggest-shell-commands", "--file", file_path, "--message", f"Ruff output: {ruff_output}. Fix it"],
+            check=True
+        )
+        print(f"Aider fixed issues in {file_path}.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error calling aider on {file_path}: {e}")
 
 def main():
     """Main function to run ruff on all provided files and fix issues if any."""
