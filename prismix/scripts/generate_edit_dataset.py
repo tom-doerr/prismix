@@ -35,9 +35,9 @@ class EditDatasetGenerator(dspy.Module):
     def __init__(self):
         super().__init__()
         class GenerateDatasetSignature(dspy.Signature):
-            num_examples = dspy.InputField()
-            output_file = dspy.InputField()
-            dataset = dspy.OutputField()
+            num_examples = dspy.InputField(desc="Number of examples to generate")
+            output_file = dspy.InputField(desc="Path to the output JSON file")
+            dataset = dspy.OutputField(desc="Generated dataset containing examples")
 
         self.signature = GenerateDatasetSignature()
         self.script_generator = dspy.ChainOfThought(GenerateScript)
