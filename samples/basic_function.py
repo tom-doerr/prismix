@@ -1,6 +1,6 @@
 def calculate_sum(a, b, c):  # Updated to include an additional parameter
     """Calculate the sum of two numbers."""
-print(f"The sum is: {a + b + c}")
+    print(f"The sum is: {a + b + c}")
     return a + b + c
 
 def main():
