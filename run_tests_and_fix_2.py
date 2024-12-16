@@ -152,29 +152,41 @@ if __name__ == "__main__":
         default=1,
         help="Number of random pylint files to run.",
     )
+    parser.add_argument(
+        "--iterations",
+        type=int,
+        default=1,
+        help="Number of iterations to run the tests and fixes.",
+    )
     args = parser.parse_args()
 
     all_files = glob.glob("**/*.py", recursive=True)
-    pylint_success, pylint_output = run_pylint()
-    ruff_success, ruff_output = run_ruff_fix()
-    # Run n random pytest tests and n random pylint checks
-    pytest_output = run_random_pytest(args.pytest_files, all_files)
-    pylint_output = run_random_pylint(args.pylint_files, all_files)
     
-    # Combine the outputs
-    combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
-    
-    # Filter files based on the output
-    files_to_fix = filter_files_by_output(combined_output, all_files)
-    
-    # Run black on the files
-    run_black(files_to_fix)
-    
-    # Only pass the directly involved files to aider
-    call_aider(files_to_fix, combined_output)
+    for iteration in range(args.iterations):
+        print(f"Starting iteration {iteration + 1} of {args.iterations}...")
+        pylint_success, pylint_output = run_pylint()
+        ruff_success, ruff_output = run_ruff_fix()
+        # Run n random pytest tests and n random pylint checks
+        pytest_output = run_random_pytest(args.pytest_files, all_files)
+        pylint_output = run_random_pylint(args.pylint_files, all_files)
+        
+        # Combine the outputs
+        combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
+        
+        # Filter files based on the output
+        files_to_fix = filter_files_by_output(combined_output, all_files)
+        
+        # Run black on the files
+        run_black(files_to_fix)
+        
+        # Only pass the directly involved files to aider
+        call_aider(files_to_fix, combined_output)
 
-    if pylint_success and ruff_success:
-        print("Ruff and Pylint checks and fixes applied successfully.")
+        if pylint_success and ruff_success and not files_to_fix:
+            print("No more issues found. Stopping early.")
+            break
+
+    print("All iterations completed.")
 
 
 def run_black(file_paths):
