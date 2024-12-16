@@ -1,26 +1,44 @@
+def add_numbers(numbers):
+    """Add all numbers in the list."""
+    return sum(numbers)
+
+def multiply_numbers(numbers):
+    """Multiply all numbers in the list."""
+    result = 1
+    for num in numbers:
+        result *= num
+    return result
+
+def calculate_average(numbers):
+    """Calculate the average of the numbers."""
+    if not numbers:
+        return 0
+    return sum(numbers) / len(numbers)
+
+def calculate_stats(numbers):
+    """Calculate the minimum, maximum, and average of the numbers."""
+    if not numbers:
+        return {"min": 0, "max": 0, "avg": 0}
+    total = sum(numbers)
+    minimum = min(numbers)
+    maximum = max(numbers)
+    return {
+        "min": minimum,
+        "max": maximum,
+        "avg": total / len(numbers)
+    }
+
 def process_calculation(operation, numbers):
-    """Process a calculation based on the operation and numbers provided."""
+    """Process the calculation based on the operation."""
     if operation == "add":
-        return sum(numbers)
-    elif operation == "multiply":
-        result = 1
-        for num in numbers:
-            result *= num
-        return result
-    elif operation == "average":
-        if not numbers:
-            return 0
-        return sum(numbers) / len(numbers)
-    elif operation == "stats":
-        if not numbers:
-            return {"min": 0, "max": 0, "avg": 0}
-        return {
-            "min": min(numbers),
-            "max": max(numbers),
-            "avg": sum(numbers) / len(numbers),
-        }
-    else:
-        return None
+        return add_numbers(numbers)
+    if operation == "multiply":
+        return multiply_numbers(numbers)
+    if operation == "average":
+        return calculate_average(numbers)
+    if operation == "stats":
+        return calculate_stats(numbers)
+    return None
 
 
 def main():
