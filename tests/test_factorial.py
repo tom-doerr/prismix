@@ -1,3 +1,6 @@
+"""
+Test module for factorial calculations.
+"""
 import pytest
 from prismix.core.iterative_programmer import setup_agent, CodeResult
 
@@ -45,5 +48,5 @@ def test_code_result_structure():
     assert isinstance(result.code, str)
     assert isinstance(result.success, bool)
     assert isinstance(result.output, str)
-    assert result.success == True
+    assert result.success is True
     assert "factorial" in result.code

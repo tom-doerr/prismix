@@ -3,7 +3,7 @@ This module provides a safe execution environment for code generation and execut
 """
 
 from dataclasses import dataclass
-from typing import Dict, Any, Callable
+from typing import Dict, Any
 
 
 @dataclass
