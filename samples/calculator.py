@@ -17,10 +17,11 @@ def process_calculation(operation, numbers):
         return {
             "min": min(numbers),
             "max": max(numbers),
-            "avg": sum(numbers) / len(numbers)
+            "avg": sum(numbers) / len(numbers),
         }
     else:
         return None
+
 
 def main():
     """Main function to demonstrate process_calculation."""
@@ -29,6 +30,7 @@ def main():
     print(f"Product: {process_calculation('multiply', numbers)}")
     print(f"Average: {process_calculation('average', numbers)}")
     print(f"Stats: {process_calculation('stats', numbers)}")
+
 
 if __name__ == "__main__":
     main()
