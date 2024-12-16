@@ -1,130 +1,59 @@
 import subprocess
-import sys
 import os
-import re
+import glob
 
-def run_ruff(file_path):
-    """Run ruff on the given file and return the output and exit code."""
+def run_pylint():
+    """Runs pylint on the entire project."""
     try:
-        print(f"Executing ruff on {file_path}...")
-        result = subprocess.run(
-            ["ruff", "check", file_path],
-            capture_output=True,
-            text=True,
-            check=False  # Do not raise an exception on non-zero exit code
-        )
-        print(f"Raw ruff output for {file_path}:\n{result.stdout}")
-        return result.stdout, result.returncode  # Return both output and exit code
-    except Exception as e:
-        print(f"Error running ruff on {file_path}: {e}")
-        return "", 1  # Return empty output and non-zero exit code in case of error
+        subprocess.run(["pylint", "."], check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error running ruff or pylint: {e}")
+        return False
+    return True
 
-def fix_syntax_errors(file_path, ruff_output):
-    """Fix syntax errors in the file based on ruff output."""
+def run_ruff_fix():
+    """Runs ruff to fix code style issues."""
     try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            content = file.readlines()
+        subprocess.run(["ruff", ".", "--fix"], check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:
+        print(f"Error running ruff fix: {e}")
+        return False
+    return True
 
-        for line in ruff_output.splitlines():
-            if line.startswith("SyntaxError:"):
-                # Parse the error and attempt to fix it
-                # This is a simplified example and may need to be extended for complex cases
-                error_info = line.split(":")
-                line_number = int(error_info[1].strip()) - 1
-                error_type = error_info[2].strip()
+def is_test_file(file_path):
+    """Checks if a file is a test file."""
+    return file_path.endswith("_test.py") or "tests" in file_path.split(os.sep)
 
-                if error_type == "Unexpected indentation":
-                    content[line_number] = content[line_number].lstrip()
-                elif error_type == "Expected a statement":
-                    content[line_number] = ""
-                elif error_type == "Got unexpected token":
-                    content[line_number] = content[line_number].replace("```", "")
+def find_related_files(file_path):
+    """Finds related files for a given file (very basic implementation)."""
+    # This is a placeholder, you might need more sophisticated logic
+    if is_test_file(file_path):
+        base_name = os.path.basename(file_path).replace("_test.py", ".py")
+        potential_related_file = os.path.join(os.path.dirname(file_path), base_name)
+        if os.path.exists(potential_related_file):
+            return [file_path, potential_related_file]
+    return [file_path]
 
-        with open(file_path, 'w', encoding='utf-8') as file:
-            file.writelines(content)
-    except Exception as e:
-        print(f"Error fixing syntax errors in {file_path}: {e}")
-
-def apply_search_replace(file_path, search_replace_blocks):
-    """Apply the SEARCH/REPLACE blocks to the file."""
-    try:
-        with open(file_path, 'r', encoding='utf-8') as file:
-            content = file.read()
-
-        for block in search_replace_blocks:
-            search_pattern = block['search']
-            replace_pattern = block['replace']
-            content = re.sub(search_pattern, replace_pattern, content)
-
-        with open(file_path, 'w', encoding='utf-8') as file:
-            file.write(content)
-    except Exception as e:
-        print(f"Error applying changes to {file_path}: {e}")
-
-def parse_ruff_output(ruff_output):
-    """Parse the ruff output to generate SEARCH/REPLACE blocks."""
-    search_replace_blocks = []
-    for line in ruff_output.splitlines():
-        if line.startswith("FIX:"):
-            parts = line.split("|")
-            if len(parts) == 3:
-                search_pattern = parts[1].strip()
-                replace_pattern = parts[2].strip()
-                search_replace_blocks.append({
-                    'search': search_pattern,
-                    'replace': replace_pattern
-                })
-    return search_replace_blocks
-
-def call_aider(file_path, ruff_output):
+def call_aider(file_paths, ruff_output):
     """Call aider to fix issues based on ruff output."""
     try:
-        print(f"Calling aider to fix issues in {file_path}...")
+        print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
         subprocess.run(
-            ["aider", "--deepseek", "--edit-format", "diff", "--yes-always", "--no-suggest-shell-commands", "--file", file_path, "--message", f"Ruff output: {ruff_output}. Fix it"],
+            ["aider", "--deepseek", "--edit-format", "diff", "--yes-always", "--no-suggest-shell-commands"] +
+            ["--file", file_path for file_path in file_paths] +
+            ["--message", f"Ruff output: {ruff_output}. Fix it"],
             check=True
         )
-        print(f"Aider fixed issues in {file_path}.")
+        print(f"Aider fixed issues in {', '.join(file_paths)}.")
     except subprocess.CalledProcessError as e:
-        print(f"Error calling aider on {file_path}: {e}")
-
-def main():
-    """Main function to run ruff on all provided files and fix issues if any."""
-    if len(sys.argv) < 2:
-        print("Usage: python run_ruff_and_fix.py <file1> <file2> ... [--test] [--dry-run]")
-        sys.exit(1)
-
-    test_mode = "--test" in sys.argv
-    dry_run = "--dry-run" in sys.argv
-
-    for file_path in sys.argv[1:]:
-        if file_path in ["--test", "--dry-run"]:
-            continue
-
-        if not os.path.isfile(file_path):
-            print(f"File not found: {file_path}")
-            continue
-
-        print(f"Running ruff on {file_path}...")
-
-        if test_mode:
-            # Simulate ruff output with issues for testing
-            ruff_output = "FIX: | old_code | new_code\nFIX: | another_old_code | another_new_code"
-            ruff_exit_code = 1  # Simulate non-zero exit code for testing
-        else:
-            ruff_output, ruff_exit_code = run_ruff(file_path)
-
-        if ruff_exit_code != 0:  # Check if there are any issues based on exit code
-            print(f"Issues found in {file_path}. Fixing...")
-            if dry_run:
-                print(f"Dry run for {file_path}:")
-                print(f"Ruff output: {ruff_output}")
-            else:
-                # Call aider to fix the issues
-                call_aider(file_path, ruff_output)
-                print(f"Fixed issues in {file_path}.")
-        else:
-            print(f"No issues found in {file_path}. Skipping...")
+        print(f"Error calling aider on {', '.join(file_paths)}: {e}")
 
 if __name__ == "__main__":
-    main()
+    all_files = glob.glob("**/*.py", recursive=True)
+    if run_pylint():
+        if run_ruff_fix():
+            files_to_aider = []
+            for file_path in all_files:
+                files_to_aider.extend(find_related_files(file_path))
+            call_aider(files_to_aider, "")
+            print("Ruff and Pylint checks and fixes applied successfully.")
