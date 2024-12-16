@@ -18,6 +18,10 @@ class IterativeProgrammer(dspy.Module):
 
     def is_code_safe(self, code: str) -> Tuple[bool, str]:
         """Check if code is safe to execute using LLM"""
+        # Basic check for potentially unsafe operations
+        if "import os" in code or "os.system" in code:
+            return False, "The code contains potentially unsafe operations (e.g., import os, os.system)."
+        
         safety_check = self.safety_checker(code=code)
         # TypedPredictor ensures is_safe is already a boolean
         return safety_check.is_safe, safety_check.safety_message
