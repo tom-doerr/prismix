@@ -4,13 +4,14 @@ import glob
 import random
 
 def run_pylint():
-    """Runs pylint on the entire project."""
+    """Runs pylint on the entire project and captures the output."""
     try:
-        subprocess.run(["pylint", "."], check=True, capture_output=True, text=True)
+        result = subprocess.run(["pylint", "."], check=True, capture_output=True, text=True)
+        pylint_output = result.stdout
     except subprocess.CalledProcessError as e:
-        print(f"Error running ruff or pylint: {e}")
-        return False
-    return True
+        pylint_output = f"Error running pylint: {e}\n{e.stdout}"
+        return False, pylint_output
+    return True, pylint_output
 
 def run_random_pytest(n):
     """Runs n random pytest tests and captures the output."""
@@ -40,13 +41,14 @@ def run_random_pylint(n):
     return pylint_output
 
 def run_ruff_fix():
-    """Runs ruff to fix code style issues."""
+    """Runs ruff to fix code style issues and captures the output."""
     try:
-        subprocess.run(["ruff", ".", "--fix"], check=True, capture_output=True, text=True)
+        result = subprocess.run(["ruff", ".", "--fix"], check=True, capture_output=True, text=True)
+        ruff_output = result.stdout
     except subprocess.CalledProcessError as e:
-        print(f"Error running ruff fix: {e}")
-        return False
-    return True
+        ruff_output = f"Error running ruff fix: {e}\n{e.stdout}"
+        return False, ruff_output
+    return True, ruff_output
 
 def is_test_file(file_path):
     """Checks if a file is a test file."""
@@ -82,12 +84,15 @@ def call_aider(file_paths, ruff_output):
 
 if __name__ == "__main__":
     all_files = glob.glob("**/*.py", recursive=True)
-    pylint_success = run_pylint()
-    ruff_success = run_ruff_fix()
+    pylint_success, pylint_output = run_pylint()
+    ruff_success, ruff_output = run_ruff_fix()
     files_to_aider = []
     for file_path in all_files:
         files_to_aider.extend(find_related_files(file_path))
-    call_aider(files_to_aider, "")
+    # Combine the outputs
+    combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
+    
+    call_aider(files_to_aider, combined_output)
     
     # Run n random pytest tests and n random pylint checks
     n = 3  # Number of random tests and pylint checks to run
