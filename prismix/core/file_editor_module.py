@@ -113,6 +113,8 @@ class FileEditorModule(dspy.Module):
 
         result.content = updated_content
         logging.info(f"File edit successful. Updated content: {updated_content}")
+        result.content = updated_content
+        logging.info(f"File edit successful. Updated content: {updated_content}")
         
-        # Return the updated content directly
-        return updated_content
+        # Return the FileEdit object
+        return result

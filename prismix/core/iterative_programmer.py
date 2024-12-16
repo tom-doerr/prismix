@@ -75,7 +75,8 @@ class IterativeProgrammer(dspy.Module):
             filepath, instruction = parts
             print(f"Editing file: {filepath}")
             print(f"Instruction: {instruction}\n")
-            return self.file_editor.edit_file(filepath, instruction)
+            file_context = self.file_editor.edit_file(filepath, instruction)
+            return file_context
 
         # Regular code generation flow
         print("1. Generating program specification...")
