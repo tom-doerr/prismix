@@ -85,7 +85,7 @@ def process_file(filepath):
     word_count = len(words)
     
     try:
-        with open(filepath + '.stats', 'w') as f:
+        with open(filepath + '.stats', 'w', encoding='utf-8') as f:
             f.write(f"Word count: {word_count}")
     except IOError:
         print(f"Error: An error occurred while writing to the file {filepath + '.stats'}.")
