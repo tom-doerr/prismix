@@ -184,7 +184,8 @@ if __name__ == "__main__":
         pylint_output = run_random_pylint(selected_files)
         # Combine the outputs
         # combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
-        combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
+        # combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
+        combined_output = f"Pylint output:\n{pylint_output}\nPytest output:\n{pytest_output}"
         if not 'All checks passed' in ruff_output:
             combined_output += f"\nRuff output:\n{ruff_output}"
         
