@@ -3,6 +3,8 @@ Sample file processor module.
 """
 
 
+import sys
+
 def process_file(filepath: str) -> None:
     """Process a file and count the number of words."""
     with open(filepath, "r", encoding="utf-8") as f:
@@ -16,9 +18,6 @@ def process_file(filepath: str) -> None:
 
 
 def main():
-    """Main function to process a file."""
-    import sys
-
     """Main function to process a file."""
     if len(sys.argv) != 2:
         print("Usage: python file_processor.py <filepath>")
