@@ -27,6 +27,7 @@ def temp_file():
 
 
 def test_file_edit_module_no_change(file_editor_module, temp_file):
+    """Test file edit with no change."""
     # Test file edit with no change
     updated_content = file_editor_module.forward(
         context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
@@ -39,6 +40,7 @@ def test_file_edit_module_no_change(file_editor_module, temp_file):
 
 
 def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
+    """Test file edit with multiple replacements."""
     # Test file edit with multiple replacements
     updated_content = file_editor_module.forward(
         context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
@@ -57,7 +59,8 @@ def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
     ]
 
 
-def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file):
+def test_file_edit_module_overlapping_replacements(file_editor_module_fixture, temp_file_fixture):
+    """Test file edit with overlapping replacements."""
     # Test file edit with overlapping replacements
     updated_content = file_editor_module.forward(
         context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
@@ -68,7 +71,7 @@ def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file
     assert updated_content.content == "def greet():\n    print('hi')\n"
 
 
-def test_file_edit_module_empty_file(file_editor_module):
+def test_file_edit_module_empty_file(file_editor_module_fixture):
     # Test file edit with an empty file
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
         f.write("")
@@ -84,7 +87,7 @@ def test_file_edit_module_empty_file(file_editor_module):
     assert updated_content.changes == []
 
     # Read the file again to ensure the changes were written
-    with open(temp_file_path, "r") as f:
+    with open(temp_file_path, "r", encoding="utf-8") as f:
         final_content = f.read()
 
     assert final_content == ""
@@ -156,7 +159,7 @@ def test_write_file(file_editor_module, temp_file):
     assert file_context.changes == []
 
     # Read the file again to ensure the changes were written
-    with open(temp_file, "r") as f:
+    with open(temp_file, "r", encoding="utf-8") as f:
         final_content = f.read()
     assert final_content == new_content
 
