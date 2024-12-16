@@ -50,8 +50,8 @@ def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
     # Ensure the file was written
     assert updated_content.content == "def greet():\n    print('hi')\n"
     assert updated_content.changes == [
-        ("    print('hello')", "    print('hi')"),
         ("def hello():", "def greet():"),
+        ("    print('hello')", "    print('hi')")
     ]
     assert updated_content.changes == [
         ("def hello():", "def greet():"),
