@@ -25,3 +25,11 @@ class CodeSafetyCheck(dspy.Signature):
     code: str = dspy.InputField(desc="Code to analyze")
     is_safe: bool = dspy.OutputField(desc="Boolean indicating if code is safe")
     safety_message: str = dspy.OutputField(desc="Explanation of safety concerns if any")
+
+class FileEdit(dspy.Signature):
+    """
+    Signature for editing code in a file.
+    """
+    filepath = dspy.InputField(desc="The path to the file to be edited.")
+    search_pattern = dspy.InputField(desc="The search pattern (code) to be replaced.")
+    replacement_code = dspy.InputField(desc="The code to replace the search pattern with.")
