@@ -140,6 +140,17 @@ def test_read_file_not_found(file_editor_module):
     assert file_context.changes == []
 
 
+def test_forward_with_no_file_content_in_context(file_editor_module, temp_file):
+    instruction = "Replace 'print(\\'hello\\')' with 'print(\\'hi\\')'"
+    file_context = file_editor_module.forward(
+        context=f"{temp_file} def hello():\n    print('hello')\n",
+        instruction=instruction,
+    )
+    assert file_context.content == "def hello():\n    print('hi')\n"
+    assert not file_context.error
+    assert file_context.changes == [("    print('hello')", "    print('hi')")]
+
+
 def test_write_file(file_editor_module, temp_file):
     new_content = "def greet():\n    print('hi')\n"
     file_context = file_editor_module.write_file(temp_file, new_content)

@@ -32,6 +32,8 @@ class FileEditorModule(dspy.Module):
     def apply_replacements(self, content: str, instruction: str) -> str:
         """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
+        if not replacements:
+            return content
         for search_pattern, replacement_code in replacements:
             content = self.apply_single_replacement(content, search_pattern, replacement_code)
         return content
@@ -59,8 +61,18 @@ class FileEditorModule(dspy.Module):
     def forward(self, context: str, instruction: str) -> FileContext:
         """Edit the file based on the context and instruction."""
         # Extract filepath from context
-        filepath = context.split("File: ")[1].split("\n")[0].strip()
-        content = context.split("Content: ")[1].strip()
+        filepath = ""
+        content = ""
+        if "File: " in context:
+            try:
+                filepath = context.split("File: ")[1].split("\n")[0].strip()
+            except IndexError:
+                pass
+        if "Content: " in context:
+            try:
+                content = context.split("Content: ")[1].strip()
+            except IndexError:
+                pass
 
         # Apply replacements
         updated_content = self.apply_replacements(content, instruction)
