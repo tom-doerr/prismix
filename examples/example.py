@@ -1,7 +1,14 @@
+"""
+Example script demonstrating the usage of the IterativeProgrammer from Prismix.
+"""
+
 from prismix.core.iterative_programmer import setup_agent
 
 
 def main():
+    """
+    Main function to demonstrate the usage of the IterativeProgrammer.
+    """
     programmer = setup_agent()
     result = programmer.forward(
         "Create a function that calculates factorial of a number"
