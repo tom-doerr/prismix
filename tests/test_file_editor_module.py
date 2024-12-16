@@ -23,9 +23,8 @@ def temp_file():
 def test_file_edit_module(file_editor_module, temp_file):
     # Test successful file edit
     result = file_editor_module.forward(
-        context="Edit the hello function to print 'hi' instead of 'hello'.",
-        instruction="Replace 'print('hello')' with 'print('hi')'.",
-        inputs="def hello():\n    print('hello')\n"
+        context="def hello():\n    print('hello')\n",
+        instruction="Replace 'print('hello')' with 'print('hi')'."
     )
     
     file_manager = FileManager()
@@ -36,9 +35,8 @@ def test_file_edit_module(file_editor_module, temp_file):
 def test_file_edit_module_no_change(file_editor_module, temp_file):
     # Test file edit with no change
     result = file_editor_module.forward(
-        context="Do not change the hello function.",
-        instruction="Do not change 'print('hello')'.",
-        inputs="def hello():\n    print('hello')\n"
+        context="def hello():\n    print('hello')\n",
+        instruction="Do not change 'print('hello')'."
     )
     
     file_manager = FileManager()
@@ -49,8 +47,7 @@ def test_file_edit_module_no_change(file_editor_module, temp_file):
 def test_file_edit_module_file_not_found(file_editor_module):
     # Test file edit with file not found
     result = file_editor_module.forward(
-        context="Edit a non-existent file.",
-        instruction="Replace 'print('hello')' with 'print('hi')'.",
-        inputs="def hello():\n    print('hello')\n"
+        context="def hello():\n    print('hello')\n",
+        instruction="Replace 'print('hello')' with 'print('hi')'."
     )
     assert "Error reading file" in result.error
