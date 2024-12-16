@@ -1,6 +1,5 @@
 import unittest
 import dspy
-from prismix.core.signatures import CodeSafetyCheck
 from prismix.core.iterative_programmer import IterativeProgrammer
 
 class TestSafetyCheck(unittest.TestCase):
