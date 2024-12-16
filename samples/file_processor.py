@@ -16,6 +16,7 @@ def process_file(filepath: str) -> None:
 
 
 def main():
+    """Main function to process a file."""
     import sys
 
     """Main function to process a file."""
