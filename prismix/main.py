@@ -140,12 +140,6 @@ def main() -> NoReturn:
                 print(f"- {result[:100]}...")  # Display first 100 chars
         else:
             print("No results found.")
-    elif command == "milvus_setup":
-        setup_milvus_local_db()
-    elif command == "milvus_insert":
-        insert_data_into_milvus()
-    elif command == "milvus_search":
-        search_milvus_collection()
     else:
         execute_instruction(command)
 
