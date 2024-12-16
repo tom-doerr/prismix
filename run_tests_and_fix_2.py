@@ -112,8 +112,6 @@ def call_aider(file_paths, combined_output):
         command = [
             "aider",
             "--deepseek",
-            "--edit-format",
-            "diff",
             "--yes-always",
             "--no-suggest-shell-commands"
         ] + [item for file_path in file_paths for item in ["--file", file_path]] + [
@@ -144,19 +142,19 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pytest-files",
         type=int,
-        default=1,
+        default=3,
         help="Number of random pytest files to run.",
     )
     parser.add_argument(
         "--pylint-files",
         type=int,
-        default=1,
+        default=3,
         help="Number of random pylint files to run.",
     )
     parser.add_argument(
         "--iterations",
         type=int,
-        default=100,
+        default=1000,
         help="Number of iterations to run the tests and fixes.",
     )
     args = parser.parse_args()
