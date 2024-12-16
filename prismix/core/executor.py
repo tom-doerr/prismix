@@ -1,3 +1,7 @@
+"""
+This module provides a safe execution environment for code generation and execution.
+"""
+
 from dataclasses import dataclass
 from typing import Dict, Any, Callable
 
@@ -37,7 +41,7 @@ class CodeExecutor:
             
             # Get the main function from the generated code
             main_func = None
-            for name, obj in local_vars.items():
+            for _, obj in local_vars.items():
                 if callable(obj):
                     main_func = obj
                     break
@@ -65,7 +69,7 @@ class CodeExecutor:
                     output="",
                     error=f"Function execution failed: {str(e)}"
                 )
-        except Exception as e:
+        except (SyntaxError, NameError) as e:
             return CodeResult(
                 code=code,
                 success=False,
