@@ -16,7 +16,7 @@ def get_all_files_to_index(directory: str) -> List[str]:
     return files_to_index
 
 
-
+# ai! add code that adds the data to the db
 
 
 
