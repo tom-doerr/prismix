@@ -74,6 +74,8 @@ class FileEditorModule(dspy.Module):
         logging.info(f"Received context: {context}")
         logging.info(f"Received instruction: {instruction}")
 
+        filename = context.split(" ")[0]
+
         result = self.file_edit_predictor(
             filename=filename,
             context=context,
