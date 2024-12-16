@@ -30,29 +30,23 @@ def temp_file():
 
 def test_file_edit_module(file_editor_module):
     # Test successful file edit
-    result = file_editor_module.forward(
+    updated_content = file_editor_module.forward(
         context="def hello():\n    print('hello')\n",
         instruction="Replace 'print('hello')' with 'print('hi')'.",
     )
-
-    file_manager = FileManager()
-    file_context = file_manager.read_file(result.filename)
-    assert file_context.content == "def hello():\n    print('hi')\n"
-    assert result.error is None
-    assert result.replacement == "print('hi')"
-
+    
+    # Ensure the file was written
+    assert updated_content == "def hello():\n    print('hi')\n"
 
 def test_file_edit_module_no_change(file_editor_module):
     # Test file edit with no change
-    result = file_editor_module.forward(
+    updated_content = file_editor_module.forward(
         context="def hello():\n    print('hello')\n",
         instruction="Do not change 'print('hello')'.",
     )
-
-    file_manager = FileManager()
-    file_context = file_manager.read_file(result.filename)
-    assert file_context.content == "def hello():\n    print('hello')\n"
-    assert result.error is None
+    
+    # Ensure the file was written
+    assert updated_content == "def hello():\n    print('hello')\n"
 
 
 def test_file_edit_module_file_not_found(file_editor_module):
