@@ -59,7 +59,20 @@ class FileEditorModule(dspy.Module):
 
         logging.info(f"File content before update: {file_context.content}")
 
-        updated_content = self.apply_edit(file_context.content, search_pattern, replacement_code)
+        # Handle "Do not change" instruction
+        if "Do not change" in instruction:
+            updated_content = file_context.content
+        else:
+            # Handle multiple replacements
+            replacements = instruction.split(" and ")
+            updated_content = file_context.content
+            for replacement in replacements:
+                if "Replace" in replacement:
+                    parts = replacement.split(" with ")
+                    if len(parts) == 2:
+                        search_pattern = parts[0].replace("Replace ", "").strip("'")
+                        replacement_code = parts[1].strip("'")
+                        updated_content = self.apply_edit(updated_content, search_pattern, replacement_code)
 
         logging.info(f"File content after update: {updated_content}")
 
