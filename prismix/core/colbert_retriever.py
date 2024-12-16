@@ -44,17 +44,11 @@ from prismix.core.qdrant_manager import QdrantManager
 
 import logging
 
-class ColbertRetriever(dspy.Retrieve):
-    def __init__(self, url: str, k: int = 3):
-        super().__init__(k=k)
-        self.url = url
-        self.qdrant_manager = QdrantManager(collection_name="colbert_embeddings")
-        # Ensure the retrieval model (RM) is loaded
-        dspy.settings.configure(lm=dspy.OpenAI(api_key="your_openai_api_key"))
-        logging.basicConfig(level=logging.INFO)
+class DataInserter:
+    def __init__(self, qdrant_manager: QdrantManager):
+        self.qdrant_manager = qdrant_manager
 
     def add_data_to_db(self, directory: str):
-        """Add data to the Qdrant database."""
         indexer = CodeIndexer()
         files_to_index = get_all_files_to_index(directory)
         for filepath in files_to_index:
@@ -68,12 +62,19 @@ class ColbertRetriever(dspy.Retrieve):
                         "payload": {"content": file_context.content}
                     }])
                     logging.info(f"Added to Qdrant: {filepath}")
-                    # Check if the embedding was correctly inserted
-                    inserted_embedding = self.qdrant_manager.search_embeddings(embedding, top_k=1)
-                    if not inserted_embedding:
-                        logging.warning(f"Embedding for {filepath} not found in Qdrant after insertion.")
             except Exception as e:
                 logging.error(f"Error adding {filepath} to Qdrant: {e}")
+
+class ColbertRetriever(dspy.Retrieve):
+    def __init__(self, url: str, k: int = 3):
+        super().__init__(k=k)
+        self.url = url
+        self.qdrant_manager = QdrantManager(collection_name="colbert_embeddings")
+        self.data_inserter = DataInserter(self.qdrant_manager)
+        dspy.settings.configure(lm=dspy.OpenAI(api_key="your_openai_api_key"))
+
+    def add_data_to_db(self, directory: str):
+        self.data_inserter.add_data_to_db(directory)
 
 import logging
 

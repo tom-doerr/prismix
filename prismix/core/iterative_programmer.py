@@ -20,15 +20,22 @@ class IterativeProgrammer(dspy.Module):
         self.file_editor = FileEditor()
         self.max_iterations = max_iterations
 
+def is_code_safe(code: str, safety_checker: dspy.TypedPredictor) -> Tuple[bool, str]:
+    if "import os" in code or "os.system" in code:
+        return False, "The code contains potentially unsafe operations (e.g., import os, os.system)."
+    safety_check = safety_checker(code=code)
+    return safety_check.is_safe, safety_check.safety_message
+
+class IterativeProgrammer(dspy.Module):
+    def __init__(self, max_iterations: int = 3) -> None:
+        super().__init__()
+        self.generator = CodeGenerator(max_iterations)
+        self.safety_checker = dspy.TypedPredictor(CodeSafetyCheck)
+        self.file_editor = FileEditor()
+        self.max_iterations = max_iterations
+
     def is_code_safe(self, code: str) -> Tuple[bool, str]:
-        """Check if code is safe to execute using LLM"""
-        # Basic check for potentially unsafe operations
-        if "import os" in code or "os.system" in code:
-            return False, "The code contains potentially unsafe operations (e.g., import os, os.system)."
-        
-        safety_check = self.safety_checker(code=code)
-        # TypedPredictor ensures is_safe is already a boolean
-        return safety_check.is_safe, safety_check.safety_message
+        return is_code_safe(code, self.safety_checker)
 
     def execute_code(self, code: str) -> CodeResult:
         """Execute the generated code in a safe environment and return results"""

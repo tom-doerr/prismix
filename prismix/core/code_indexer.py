@@ -11,42 +11,18 @@ class IndexedCode:
     embedding: List[float]  # Placeholder for embedding
 
 
+class CodeEmbedder:
+    def embed_code(self, content: str) -> List[float]:
+        # Placeholder for embedding logic
+        return [0.0] * 128  # Dummy embedding
+
 class CodeIndexer:
-    """Indexes code files for semantic search."""
-
-    DEFAULT_IGNORE_PATTERNS = [
-        ".git",
-        "__pycache__",
-        "*.pyc",
-        "*.swp",
-        "*.swo",
-        ".DS_Store",
-        "node_modules",
-        "*.log",
-        "*.egg-info",
-        "dist",
-        "build",
-    ]
-
-    def __init__(self, ignore_patterns: List[str] = None):
+    def __init__(self, embedder: CodeEmbedder, ignore_patterns: List[str] = None):
+        self.embedder = embedder
         self.ignore_patterns = ignore_patterns or self.DEFAULT_IGNORE_PATTERNS
         self.indexed_code: Dict[str, IndexedCode] = {}
 
-    def _is_ignored(self, path: str) -> bool:
-        """Check if a path should be ignored based on the ignore patterns."""
-        for pattern in self.ignore_patterns:
-            if fnmatch.fnmatch(path, pattern) or fnmatch.fnmatch(os.path.basename(path), pattern):
-                return True
-        return False
-
-    def _embed_code(self, content: str) -> List[float]:
-        """Embed code content using a suitable embedding model."""
-        # Placeholder for embedding logic
-        # In a real implementation, this would use a model like SentenceTransformers
-        return [0.0] * 128  # Dummy embedding
-
     def index_directory(self, directory: str) -> None:
-        """Index all code files in the given directory."""
         for root, _, files in os.walk(directory):
             for file in files:
                 filepath = os.path.join(root, file)
@@ -54,7 +30,7 @@ class CodeIndexer:
                     try:
                         file_context = FileManager.read_file(filepath)
                         if file_context and file_context.content:
-                            embedding = self._embed_code(file_context.content)
+                            embedding = self.embedder.embed_code(file_context.content)
                             indexed_code = IndexedCode(filepath, file_context.content, embedding)
                             self.indexed_code[filepath] = indexed_code
                             print(f"Indexed: {filepath}")

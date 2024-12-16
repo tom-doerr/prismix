@@ -39,45 +39,45 @@ class FileEdit(dspy.Signature):
     )
 
 
+from abc import ABC, abstractmethod
+
+class FileOperations(ABC):
+    @abstractmethod
+    def read_file(self, filepath: str) -> str:
+        pass
+
+    @abstractmethod
+    def write_file(self, filepath: str, content: str) -> None:
+        pass
+
+class DefaultFileOperations(FileOperations):
+    def read_file(self, filepath: str) -> str:
+        with open(filepath, "r") as f:
+            return f.read()
+
+    def write_file(self, filepath: str, content: str) -> None:
+        with open(filepath, "w") as f:
+            f.write(content)
+
 class FileManager:
-    """Handles file operations"""
+    def __init__(self, file_operations: FileOperations):
+        self.file_operations = file_operations
 
-    @staticmethod
-    def read_file(filepath: str) -> FileContext:
-        """Read file content safely"""
+    def read_file(self, filepath: str) -> FileContext:
         try:
-            if not os.path.exists(filepath):
-                return FileContext(
-                    filepath=filepath,
-                    content="",
-                    changes=[],
-                    error="File does not exist",
-                )
-
-            with open(filepath, "r") as f:
-                content = f.read()
+            content = self.file_operations.read_file(filepath)
             return FileContext(filepath=filepath, content=content, changes=[])
+        except FileNotFoundError:
+            return FileContext(filepath=filepath, content="", changes=[], error="File does not exist")
         except Exception as e:
             return FileContext(filepath=filepath, content="", changes=[], error=str(e))
 
-    @staticmethod
-    def write_file(filepath: str, content: str) -> FileContext:
-        """Write content to file safely"""
+    def write_file(self, filepath: str, content: str) -> FileContext:
         try:
-            # Create directories if they don't exist
-            os.makedirs(os.path.dirname(filepath), exist_ok=True)
-
-            with open(filepath, "w") as f:
-                f.write(content)
-            return FileContext(
-                filepath=filepath,
-                content=content,
-                changes=["File updated successfully"],
-            )
+            self.file_operations.write_file(filepath, content)
+            return FileContext(filepath=filepath, content=content, changes=["File updated successfully"])
         except Exception as e:
-            return FileContext(
-                filepath=filepath, content=content, changes=[], error=str(e)
-            )
+            return FileContext(filepath=filepath, content=content, changes=[], error=str(e))
 
 
 class FileEditor:
