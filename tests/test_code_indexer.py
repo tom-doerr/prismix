@@ -2,6 +2,10 @@
 Test module for the CodeIndexer class.
 """
 
+"""
+Test module for the CodeIndexer class.
+"""
+
 import os
 import tempfile
 import pytest
