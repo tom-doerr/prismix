@@ -45,12 +45,12 @@ def check_formatting(content: str) -> float:
         line_score = 1.0
         # Check operator spacing
         if any(op in line for op in ["=", "+", "-", "*", "/"]):
-            if "=" in line and not " = " in line:
+            if "=" in line and " = " not in line:
                 line_score *= 0.8
-            if any(op in line and not f" {op} " in line for op in ["+", "-", "*", "/"]):
+            if any(op in line and f" {op} " not in line for op in ["+", "-", "*", "/"]):
                 line_score *= 0.8
         # Check comma spacing
-        if "," in line and not ", " in line:
+        if "," in line and ", " not in line:
             line_score *= 0.8
         scores.append(line_score)
 
