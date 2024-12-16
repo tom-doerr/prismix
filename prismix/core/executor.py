@@ -45,7 +45,7 @@ class CodeExecutor:
             # Get the main function from the generated code
             main_func = None
             for _, obj in local_vars.items():
-                if callable(obj):
+                if callable(obj) and obj.__name__ == "main":
                     main_func = obj
                     break
 
@@ -54,7 +54,7 @@ class CodeExecutor:
                     code=code,
                     success=False,
                     output="",
-                    error="No callable function found in generated code",
+                    error="No callable 'main' function found in generated code",
                 )
 
             # Test the function with a sample input
@@ -63,7 +63,7 @@ class CodeExecutor:
                 return CodeResult(
                     code=code,
                     success=True,
-                    output=f"Code executed successfully. Test {main_func.__name__}(5) = {result}",
+                    output=f"Code executed successfully. Test main(5) = {result}",
                 )
             except TypeError as e:
                 return CodeResult(

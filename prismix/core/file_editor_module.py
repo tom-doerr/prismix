@@ -52,5 +52,17 @@ class FileEditorModule(dspy.Module):
         file_manager = FileManager()
         return file_manager.write_file(filename, content)
 
+    def forward(self, context: str, instruction: str) -> FileContext:
+        """Edit the file based on the context and instruction."""
+        # Extract filepath from context
+        filepath = context.split("File: ")[1].split("\n")[0].strip()
+        content = context.split("Content: ")[1].strip()
+
+        # Apply replacements
+        updated_content = self.apply_replacements(content, instruction)
+
+        # Write the updated content back to the file
+        return self.write_file(filepath, updated_content)
+
 
 
