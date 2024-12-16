@@ -1,5 +1,6 @@
 from typing import Tuple, Union
 import dspy
+import tempfile  # Add this import
 from .signatures import CodeSafetyCheck
 from .executor import CodeResult, CodeExecutor
 from .generator import CodeGenerator, GenerationContext
