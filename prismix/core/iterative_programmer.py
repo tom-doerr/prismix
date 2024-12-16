@@ -70,6 +70,18 @@ class IterativeProgrammer(dspy.Module):
             with open(file_path, 'w') as f:
                 f.write(modified_content)
 
+            # Read the original file content
+            with open(file_path, 'r') as f:
+                original_content = f.read()
+
+            # Apply the changes to the original content
+            file_editor = FileEditor()
+            modified_content, _ = file_editor._apply_line_edits(original_content, code)
+
+            # Write the modified content back to the original file
+            with open(file_path, 'w') as f:
+                f.write(modified_content)
+
             # Capture stdout and stderr
             old_stdout = sys.stdout
             old_stderr = sys.stderr
