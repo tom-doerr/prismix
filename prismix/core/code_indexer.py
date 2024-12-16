@@ -66,12 +66,24 @@ class CodeIndexer:
         query_embedding = self._embed_code(query)
         # Placeholder for search logic
         # In a real implementation, this would use a similarity search on the embeddings
-        return [] # Dummy return
-        # return sorted(
-        #     self.indexed_code.values(),
-        #     key=lambda x: self._similarity(query_embedding, x.embedding),
-        #     reverse=True,
-        # )
+        return []  # Dummy return
+
+    def search_code_on_the_fly(self, directory: str, query: str) -> List[IndexedCode]:
+        """Search code files in the given directory without using an index."""
+        results = []
+        for root, _, files in os.walk(directory):
+            for file in files:
+                filepath = os.path.join(root, file)
+                if not self._is_ignored(filepath):
+                    try:
+                        file_context = FileManager.read_file(filepath)
+                        if file_context and file_context.content and query in file_context.content:
+                            embedding = self._embed_code(file_context.content)
+                            indexed_code = IndexedCode(filepath, file_context.content, embedding)
+                            results.append(indexed_code)
+                    except Exception as e:
+                        print(f"Error searching {filepath}: {e}")
+        return results
 
     def _similarity(self, emb1: List[float], emb2: List[float]) -> float:
         """Calculate the similarity between two embeddings."""

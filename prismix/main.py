@@ -95,6 +95,21 @@ def main() -> NoReturn:
         for filepath in indexer.indexed_code:
             print(f"- {filepath}")
         print("Indexing complete.")
+    elif command == "search":
+        if len(sys.argv) < 4:
+            print("Usage: codeweaver search <path> <query>")
+            return
+        path = sys.argv[2]
+        query = sys.argv[3]
+        print(f"Searching code at path: {path} for query: {query}")
+        indexer = CodeIndexer()
+        results = indexer.search_code_on_the_fly(path, query)
+        if results:
+            print("Search results:")
+            for result in results:
+                print(f"- {result.filepath}")
+        else:
+            print("No results found.")
     else:
         execute_instruction(command)
 
