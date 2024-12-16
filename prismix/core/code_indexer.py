@@ -78,6 +78,28 @@ class CodeIndexer:
                         print(f"Error searching {filepath}: {e}")
         return results
 
+    def _is_ignored(self, filepath: str) -> bool:
+        """Check if the file should be ignored based on the ignore patterns."""
+        for pattern in self.ignore_patterns:
+            if fnmatch.fnmatch(filepath, pattern):
+                return True
+        return False
+                    try:
+                        file_context = FileManager.read_file(filepath)
+                        if (
+                            file_context
+                            and file_context.content
+                            and query in file_context.content
+                        ):
+                            embedding = self._embed_code(file_context.content)
+                            indexed_code = IndexedCode(
+                                filepath, file_context.content, embedding
+                            )
+                            results.append(indexed_code)
+                    except Exception as e:
+                        print(f"Error searching {filepath}: {e}")
+        return results
+
     def _similarity(self, emb1: List[float], emb2: List[float]) -> float:
         """Calculate the similarity between two embeddings using cosine similarity."""
         dot_product = sum(x * y for x, y in zip(emb1, emb2))
