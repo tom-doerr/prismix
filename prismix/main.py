@@ -117,18 +117,28 @@ def main() -> NoReturn:
                 print(f"- {result.filepath}")
         else:
             print("No results found.")
-    elif command == "search_colbert":
+    elif command == "qdrant_insert":
         if len(sys.argv) < 3:
-            print("Usage: codeweaver search_colbert <query>")
+            print("Usage: codeweaver qdrant_insert <path>")
+            return
+        path = sys.argv[2]
+        print(f"Inserting data into Qdrant from path: {path}")
+        retriever = ColbertRetriever()
+        retriever.add_data_to_db(path)
+        print("Insertion complete.")
+
+    elif command == "qdrant_search":
+        if len(sys.argv) < 3:
+            print("Usage: codeweaver qdrant_search <query>")
             return
         query = sys.argv[2]
-        print(f"Searching with Colbert for query: {query}")
-        indexer = CodeIndexer()
-        results = indexer.search_code(query)
+        print(f"Searching Qdrant for query: {query}")
+        retriever = ColbertRetriever()
+        results = retriever.forward(query)
         if results:
-            print("Colbert search results:")
+            print("Qdrant search results:")
             for result in results:
-                print(f"- {result.filepath}: {result.content[:100]}...")  # Display first 100 chars
+                print(f"- {result[:100]}...")  # Display first 100 chars
         else:
             print("No results found.")
     elif command == "milvus_setup":

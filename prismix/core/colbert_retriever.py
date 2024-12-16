@@ -1,7 +1,7 @@
 import dspy
 import os
 from typing import List
-from prismix.core.code_indexer import CodeIndexer, IndexedCode
+from prismix.core.qdrant_manager import QdrantManager
 from prismix.core.file_operations import FileManager
 
 
