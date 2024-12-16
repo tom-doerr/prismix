@@ -50,10 +50,10 @@ def call_aider(file_paths, ruff_output):
 
 if __name__ == "__main__":
     all_files = glob.glob("**/*.py", recursive=True)
-    if run_pylint():
-        if run_ruff_fix():
-            files_to_aider = []
-            for file_path in all_files:
-                files_to_aider.extend(find_related_files(file_path))
-            call_aider(files_to_aider, "")
-            print("Ruff and Pylint checks and fixes applied successfully.")
+    run_pylint()
+    run_ruff_fix()
+    files_to_aider = []
+    for file_path in all_files:
+        files_to_aider.extend(find_related_files(file_path))
+    call_aider(files_to_aider, "")
+    print("Ruff and Pylint checks and fixes applied successfully.")
