@@ -145,6 +145,10 @@ class IterativeProgrammer(dspy.Module):
 
             # Test implementation
             print("4. Testing implementation...")
+            print("Code to be executed:")
+            print("----------")
+            print(code)
+            print("----------")
             result = self.execute_code(code)
 
             if result.success:
@@ -163,6 +167,9 @@ class IterativeProgrammer(dspy.Module):
             if improved_result.success:
                 return improved_result
 
+        if not result.success:
+            return result
+        
         return result
 
 
