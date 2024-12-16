@@ -19,7 +19,9 @@ class CodeEmbedder:
 
 
 class CodeIndexer:
-    def __init__(self, embedder: CodeEmbedder, ignore_patterns: List[str] = None):
+    def __init__(self, embedder: CodeEmbedder = None, ignore_patterns: List[str] = None):
+        if embedder is None:
+            embedder = CodeEmbedder()
         self.embedder = embedder
         self.ignore_patterns = ignore_patterns or self.DEFAULT_IGNORE_PATTERNS
         self.indexed_code: Dict[str, IndexedCode] = {}
