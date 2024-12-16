@@ -248,7 +248,7 @@ class FileEditor:
     def edit_file(self, filepath: str, instruction: str) -> FileContext:
         """Edit file based on instruction"""
         # Read current file
-        context = FileManager.read_file(filepath)
+        context = self.file_manager.read_file(filepath)  # Use the instance here
         if context.error:
             return context
 
@@ -268,7 +268,7 @@ class FileEditor:
         )
 
         # Write updated content
-        result = FileManager.write_file(filepath, new_content)
+        result = self.file_manager.write_file(filepath, new_content)  # Use the instance here
 
         if not result.error:
             result.changes = changes
