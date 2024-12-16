@@ -16,10 +16,11 @@ def test_factorial_basic():
         "Create a function that calculates factorial of a number"
     )
 
-    # Execute the generated code
-    local_vars = {}
-    exec(result.code, {}, local_vars)
-    factorial = local_vars["factorial"]
+    # Execute the generated code using CodeExecutor
+    from prismix.core.executor import CodeExecutor
+    code_result = CodeExecutor.execute(result.code)
+    assert code_result.success, f"Code execution failed: {code_result.error}"
+    factorial = locals().get("factorial")
 
     # Test basic cases
     assert factorial(0) == 1
