@@ -1,15 +1,7 @@
-"""
-Test module for the CodeIndexer class.
-"""
-
 import os
 import tempfile
 import pytest
 from prismix.core.code_indexer import CodeIndexer
-
-"""
-Test module for the CodeIndexer class.
-"""
 
 @pytest.fixture
 def code_indexer():
@@ -30,7 +22,6 @@ def temp_dir():
 
 
 def test_search_code_on_the_fly(code_indexer, temp_dir):
-    """Test search_code_on_the_fly with various queries."""
     """Test the search_code_on_the_fly method."""
     # Test search with a query that exists in some files
     results = code_indexer.search_code_on_the_fly(temp_dir, "print")
