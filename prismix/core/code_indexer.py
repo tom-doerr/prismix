@@ -89,11 +89,8 @@ class CodeIndexer:
         return results
 
     def _similarity(self, emb1: List[float], emb2: List[float]) -> float:
-        """Calculate the similarity between two embeddings."""
-        # Placeholder for similarity calculation
-        # In a real implementation, this would use cosine similarity or similar
-        return 0.0 # Dummy return
-        # dot_product = sum(x * y for x, y in zip(emb1, emb2))
-        # magnitude1 = sum(x ** 2 for x in emb1) ** 0.5
-        # magnitude2 = sum(y ** 2 for y in emb2) ** 0.5
-        # return dot_product / (magnitude1 * magnitude2) if magnitude1 and magnitude2 else 0.0
+        """Calculate the similarity between two embeddings using cosine similarity."""
+        dot_product = sum(x * y for x, y in zip(emb1, emb2))
+        magnitude1 = sum(x ** 2 for x in emb1) ** 0.5
+        magnitude2 = sum(y ** 2 for y in emb2) ** 0.5
+        return dot_product / (magnitude1 * magnitude2) if magnitude1 and magnitude2 else 0.0
