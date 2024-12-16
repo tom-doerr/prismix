@@ -80,7 +80,7 @@ class FileEditorModule(dspy.Module):
 
         try:
             result = subprocess.run(
-                ["ruff", tmp_file_path],
+                ["ruff", "check", tmp_file_path],
                 capture_output=True,
                 text=True,
                 check=False
