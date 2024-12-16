@@ -2,6 +2,7 @@ from prismix.core.file_editor_module import FileEditorModule
 
 
 def test_apply_replacements():
+    """Test the apply_replacements method."""
     editor = FileEditorModule()
     content = "def foo():\n    pass"
     instruction = "Replace 'pass' with 'print(\"hello\")'"
@@ -10,9 +11,10 @@ def test_apply_replacements():
 
 
 def test_read_file_existing():
+    """Test reading an existing file."""
     editor = FileEditorModule()
     # Create a dummy file for testing
-    with open("test_file.txt", "w") as f:
+    with open("test_file.txt", "w", encoding="utf-8") as f:
         f.write("test content")
     file_context = editor.read_file("test_file.txt")
     assert file_context.content == "test content"
@@ -23,6 +25,7 @@ def test_read_file_existing():
 
 
 def test_read_file_not_existing():
+    """Test reading a non-existing file."""
     editor = FileEditorModule()
     file_context = editor.read_file("non_existing_file.txt")
     assert file_context.content == ""
@@ -30,14 +33,20 @@ def test_read_file_not_existing():
 
 
 def test_write_file():
+    """Test writing to a file."""
     editor = FileEditorModule()
     content = "new content"
     file_context = editor.write_file("test_write_file.txt", content)
     assert file_context.content == content
     assert file_context.error is None
-    with open("test_write_file.txt", "r") as f:
+    with open("test_write_file.txt", "r", encoding="utf-8") as f:
         file_content = f.read()
     assert file_content == content
     import os
 
     os.remove("test_write_file.txt")
+"""
+Test module for the FileEditorModule class.
+"""
+
+import os

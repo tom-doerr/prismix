@@ -8,12 +8,14 @@ import tempfile
 import pytest
 
 from prismix.core.code_indexer import CodeIndexer, IndexedCode
+from prismix.core.file_operations import FileManager, DefaultFileOperations
 
 
 @pytest.fixture
 def code_indexer():
     """Fixture to create an instance of CodeIndexer."""
-    return CodeIndexer()
+    file_manager = FileManager(DefaultFileOperations())
+    return CodeIndexer(file_manager=file_manager)
 
 
 @pytest.fixture
