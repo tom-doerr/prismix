@@ -141,6 +141,7 @@ def process_calculation(operation, numbers):
         return None
 
 def main():
+    """Main function to demonstrate the calculator."""
     numbers = [1, 2, 3, 4, 5]
     print(f"Sum: {process_calculation('add', numbers)}")
     print(f"Product: {process_calculation('multiply', numbers)}")
