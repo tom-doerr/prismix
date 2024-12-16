@@ -29,6 +29,12 @@ class QdrantManager:
             points=embeddings,
         )
 
+    def _embed_code(self, content: str) -> List[float]:
+        """Embed code content using a suitable embedding model."""
+        # Placeholder for embedding logic
+        # In a real implementation, this would use a model like SentenceTransformers
+        return [0.0] * 128  # Dummy embedding
+
     def search_embeddings(self, query_embedding: List[float], top_k: int = 3) -> List[Dict[str, any]]:
         """Search for similar embeddings in the Qdrant collection."""
         results = self.client.search(
