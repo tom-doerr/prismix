@@ -1,4 +1,3 @@
-import pytest
 from prismix.main import execute_instruction
 from unittest.mock import patch
 import io
