@@ -25,6 +25,8 @@ def test_levenshtein_similarity():
     # Empty texts
     assert calculate_levenshtein_similarity("", "") == 1.0
     assert calculate_levenshtein_similarity("hello", "") == 0.0
+    # Partial match
+    assert calculate_levenshtein_similarity("hello", "hell") > 0.7
 
 
 def test_indentation_consistency():

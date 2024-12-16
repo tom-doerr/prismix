@@ -55,6 +55,7 @@ if __name__ == "__main__":
     result = programmer.execute_code(code)
     assert result.success
     assert "Sum: 8" in result.output
+    assert "Function execution failed" not in result.error
 
 
 def test_execute_code_fail():

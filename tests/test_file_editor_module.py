@@ -28,7 +28,7 @@ def temp_file():
 
 def test_file_edit_module_no_change(file_editor_module, temp_file):
     # Test file edit with no change
-    updated_content = file_editor_module.edit_file(
+    updated_content = file_editor_module.forward(
         context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
         instruction="Do not change 'print('hello')'.",
     )
