@@ -34,10 +34,12 @@ class EditDataPoint:
 class EditDatasetGenerator(dspy.Module):
     def __init__(self):
         super().__init__()
-        self.signature = dspy.Signature(
-            inputs=["num_examples", "output_file"],
-            outputs=["dataset"]
-        )
+        class GenerateDatasetSignature(dspy.Signature):
+            num_examples = dspy.InputField()
+            output_file = dspy.InputField()
+            dataset = dspy.OutputField()
+
+        self.signature = GenerateDatasetSignature()
         self.script_generator = dspy.ChainOfThought(GenerateScript)
         self.edit_generator = dspy.ChainOfThought(GenerateEditInstruction)
         self.hindsight_generator = dspy.ChainOfThought(GenerateHindsightEdit)
