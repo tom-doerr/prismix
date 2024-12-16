@@ -73,7 +73,7 @@ def test_file_edit_module_overlapping_replacements(
     assert updated_content.content == "def greet():\n    print('hi')\n"
 
 
-def test_file_edit_module_empty_file(file_editor_module_fixture):
+def test_file_edit_module_empty_file(file_editor_module):
     # Test file edit with an empty file
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
         f.write("")

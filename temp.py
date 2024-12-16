@@ -1,5 +1,6 @@
-n
-
+"""
+This module provides functions to count words in a file and write the word count to another file.
+"""
 
 def count_words_in_file(input_file):
     """Counts the number of words in a given text file."""
@@ -11,8 +12,11 @@ def count_words_in_file(input_file):
     except FileNotFoundError:
         print(f"Error: The file '{input_file}' was not found.")
         return None
+    except FileNotFoundError:
+        print(f"Error: The file '{input_file}' was not found.")
+        return None
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"An unexpected error occurred: {e}")
         return None
 
 
@@ -21,11 +25,14 @@ def write_word_count_to_file(output_file, word_count):
     try:
         with open(output_file, "w", encoding="utf-8") as file:
             file.write(f"Word Count: {word_count}\n")
-    except Exception as e:
+    except IOError as e:
         print(f"An error occurred while writing to the file: {e}")
 
 
 def main():
+    """
+    Main function to count words in a file and write the count to another file.
+    """
     input_file = "input.txt"  # Specify the input file name
     output_file = "output.txt"  # Specify the output file name
 
