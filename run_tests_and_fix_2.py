@@ -1,6 +1,7 @@
 import subprocess
 import os
 import glob
+import random
 
 def run_pylint():
     """Runs pylint on the entire project."""
@@ -10,6 +11,27 @@ def run_pylint():
         print(f"Error running ruff or pylint: {e}")
         return False
     return True
+
+def run_random_pytest(n):
+    """Runs n random pytest tests."""
+    test_files = [file_path for file_path in all_files if is_test_file(file_path)]
+    random.shuffle(test_files)
+    selected_test_files = test_files[:n]
+    for test_file in selected_test_files:
+        try:
+            subprocess.run(["pytest", test_file], check=True, capture_output=True, text=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error running pytest on {test_file}: {e}")
+
+def run_random_pylint(n):
+    """Runs pylint on n random files."""
+    random.shuffle(all_files)
+    selected_files = all_files[:n]
+    for file_path in selected_files:
+        try:
+            subprocess.run(["pylint", file_path], check=True, capture_output=True, text=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error running pylint on {file_path}: {e}")
 
 def run_ruff_fix():
     """Runs ruff to fix code style issues."""
@@ -60,5 +82,11 @@ if __name__ == "__main__":
     for file_path in all_files:
         files_to_aider.extend(find_related_files(file_path))
     call_aider(files_to_aider, "")
+    
+    # Run n random pytest tests and n random pylint checks
+    n = 3  # Number of random tests and pylint checks to run
+    run_random_pytest(n)
+    run_random_pylint(n)
+    
     if pylint_success and ruff_success:
         print("Ruff and Pylint checks and fixes applied successfully.")
