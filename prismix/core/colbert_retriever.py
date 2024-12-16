@@ -42,6 +42,8 @@ def add_data_to_db(directory: str):
 
 from prismix.core.qdrant_manager import QdrantManager
 
+import logging
+
 class ColbertRetriever(dspy.Retrieve):
     def __init__(self, url: str, k: int = 3):
         super().__init__(k=k)
@@ -49,6 +51,7 @@ class ColbertRetriever(dspy.Retrieve):
         self.qdrant_manager = QdrantManager(collection_name="colbert_embeddings")
         # Ensure the retrieval model (RM) is loaded
         dspy.settings.configure(lm=dspy.OpenAI(api_key="your_openai_api_key"))
+        logging.basicConfig(level=logging.INFO)
 
     def add_data_to_db(self, directory: str):
         """Add data to the Qdrant database."""
