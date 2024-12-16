@@ -1,12 +1,6 @@
-"""
-Test module for the CodeIndexer class.
-"""
-
 import os
 import tempfile
-
 import pytest
-
 from prismix.core.code_indexer import CodeIndexer
 
 """

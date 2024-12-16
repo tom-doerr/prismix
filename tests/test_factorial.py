@@ -7,7 +7,7 @@ Test module for factorial calculations.
 
 import pytest
 from prismix.core.iterative_programmer import setup_agent, CodeResult
-
+from prismix.core.executor import CodeExecutor
 
 def test_factorial_basic():
     """Test basic factorial calculation."""
@@ -16,8 +16,6 @@ def test_factorial_basic():
         "Create a function that calculates factorial of a number"
     )
 
-    # Execute the generated code using CodeExecutor
-    from prismix.core.executor import CodeExecutor
     code_result = CodeExecutor.execute(result.code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
     factorial = locals().get("factorial")
