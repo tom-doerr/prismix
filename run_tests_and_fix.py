@@ -17,10 +17,6 @@ def run_pylint():
         pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
         return False, pylint_output
     return True, pylint_output
-    except subprocess.CalledProcessError as e:
-        print(f"Error running pylint: {e}")
-        return False
-    return True
 
 
 def run_ruff_fix():
@@ -37,10 +33,6 @@ def run_ruff_fix():
         ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
         return False, ruff_output
     return True, ruff_output
-    except subprocess.CalledProcessError as e:
-        print(f"Error running ruff fix: {e}")
-        return False
-    return True
 
 
 def is_test_file(file_path):
