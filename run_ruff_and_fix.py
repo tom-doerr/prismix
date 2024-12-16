@@ -50,22 +50,38 @@ def parse_ruff_output(ruff_output):
 def main():
     """Main function to run ruff on all provided files and fix issues if any."""
     if len(sys.argv) < 2:
-        print("Usage: python run_ruff_and_fix.py <file1> <file2> ...")
+        print("Usage: python run_ruff_and_fix.py <file1> <file2> ... [--test] [--dry-run]")
         sys.exit(1)
 
+    test_mode = "--test" in sys.argv
+    dry_run = "--dry-run" in sys.argv
+
     for file_path in sys.argv[1:]:
+        if file_path in ["--test", "--dry-run"]:
+            continue
+
         if not os.path.isfile(file_path):
             print(f"File not found: {file_path}")
             continue
 
         print(f"Running ruff on {file_path}...")
-        ruff_output = run_ruff(file_path)
+
+        if test_mode:
+            # Simulate ruff output with issues for testing
+            ruff_output = "FIX: | old_code | new_code\nFIX: | another_old_code | another_new_code"
+        else:
+            ruff_output = run_ruff(file_path)
 
         if ruff_output.strip():
             print(f"Issues found in {file_path}. Fixing...")
             search_replace_blocks = parse_ruff_output(ruff_output)
-            apply_search_replace(file_path, search_replace_blocks)
-            print(f"Fixed issues in {file_path}.")
+            if dry_run:
+                print(f"Dry run for {file_path}:")
+                for block in search_replace_blocks:
+                    print(f"Search: {block['search']} -> Replace: {block['replace']}")
+            else:
+                apply_search_replace(file_path, search_replace_blocks)
+                print(f"Fixed issues in {file_path}.")
         else:
             print(f"No issues found in {file_path}. Skipping...")
 
