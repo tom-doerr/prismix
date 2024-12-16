@@ -1,5 +1,4 @@
 n
-import os
 
 
 def count_words_in_file(input_file):

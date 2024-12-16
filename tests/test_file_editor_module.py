@@ -51,7 +51,7 @@ def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
     assert updated_content.content == "def greet():\n    print('hi')\n"
     assert updated_content.changes == [
         ("def hello():", "def greet():"),
-        ("    print('hello')", "    print('hi')")
+        ("    print('hello')", "    print('hi')"),
     ]
     assert updated_content.changes == [
         ("def hello():", "def greet():"),
@@ -59,7 +59,9 @@ def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
     ]
 
 
-def test_file_edit_module_overlapping_replacements(file_editor_module_fixture, temp_file_fixture):
+def test_file_edit_module_overlapping_replacements(
+    file_editor_module_fixture, temp_file_fixture
+):
     """Test file edit with overlapping replacements."""
     # Test file edit with overlapping replacements
     updated_content = file_editor_module.forward(
