@@ -42,12 +42,15 @@ def run_random_pytest(n, all_files):
     return pytest_output
 
 
-def run_random_pylint(n, all_files):
+# def run_random_pylint(n, all_files):
+def run_random_pylint(files):
     """Runs pylint on n random files and captures the output."""
-    random.shuffle(all_files)
-    selected_files = all_files[:n]
+    # random.shuffle(all_files)
+    # selected_files = all_files[:n]
+    # for file_path in selected_files:
     pylint_output = ""
-    for file_path in selected_files:
+
+    for file_path in files:
         try:
             result = subprocess.run(
                 ["pylint", file_path],
@@ -61,11 +64,12 @@ def run_random_pylint(n, all_files):
     return pylint_output
 
 
-def run_ruff_fix():
+def run_ruff_fix(files):
     """Runs ruff to fix code style issues and captures the output."""
+    files_str = " ".join(files)
     try:
         result = subprocess.run(
-            ["ruff", ".", "--fix"],
+            ["ruff", "check", files_str, "--fix"],
             check=True,
             capture_output=True,  # Capture both stdout and stderr
             text=True
@@ -118,6 +122,7 @@ def call_aider(file_paths, combined_output):
             "--deepseek",
             "--architect",
             "--yes-always",
+            "--no-detect-urls",
             "--no-suggest-shell-commands"
         ] + [item for file_path in file_paths for item in ["--file", file_path]] + [
             "--message", f"Output: {combined_output}. What should we do next?"
@@ -151,7 +156,7 @@ if __name__ == "__main__":
         help="Number of random pytest files to run.",
     )
     parser.add_argument(
-        "--pylint-files",
+        "--lint-files",
         type=int,
         default=1,
         help="Number of random pylint files to run.",
@@ -169,10 +174,14 @@ if __name__ == "__main__":
     for iteration in tqdm(range(args.iterations), desc="Running iterations"):
         print(f"Starting iteration {iteration + 1} of {args.iterations}...")
         pylint_success, pylint_output = run_pylint()
-        ruff_success, ruff_output = run_ruff_fix()
+        random.shuffle(all_files)
+        selected_files = all_files[:args.lint_files]
+        ruff_success, ruff_output = run_ruff_fix(selected_files)
         # Run n random pytest tests and n random pylint checks
         pytest_output = run_random_pytest(args.pytest_files, all_files)
-        pylint_output = run_random_pylint(args.pylint_files, all_files)
+
+        # pylint_output = run_random_pylint(args.lint_files, all_files)
+        pylint_output = run_random_pylint(selected_files)
         # Combine the outputs
         combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
         
