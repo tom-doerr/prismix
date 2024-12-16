@@ -37,7 +37,9 @@ class IterativeProgrammer(dspy.Module):
         from io import StringIO
         import tempfile
         import os
+        import subprocess
         
+        tmp_file_path = None
         try:
             # Extract the file path from the code comment
             lines = code.splitlines()
@@ -74,7 +76,6 @@ class IterativeProgrammer(dspy.Module):
             redirected_error = sys.stderr = StringIO()
 
             # Execute the modified file
-            import subprocess
             subprocess.run([sys.executable, tmp_file_path], check=True)
 
             # Restore stdout and stderr
@@ -104,7 +105,8 @@ class IterativeProgrammer(dspy.Module):
                 error=f"Function execution failed: {str(e)}"
             )
         finally:
-            os.remove(tmp_file_path)
+            if tmp_file_path:
+                os.remove(tmp_file_path)
 
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
         """Generate and execute code or edit files based on the command"""
