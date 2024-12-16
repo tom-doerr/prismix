@@ -1,7 +1,6 @@
 import pytest
 import dspy
 from prismix.core.iterative_programmer import IterativeProgrammer
-from prismix.core.executor import CodeResult
 
 # Mock LM for testing
 class MockLM(dspy.LM):
