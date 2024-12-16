@@ -36,7 +36,24 @@ class CodeGenerator:
             approach=context.approach,
             previous_attempt=context.previous_code or "",
         )
-        return implementation.code
+        
+        # Wrap the generated code in a main function and call it
+        code = implementation.code
+        
+        # Extract the file path from the code comment
+        lines = code.splitlines()
+        file_path = None
+        for line in lines:
+            if line.strip().startswith("#"):
+                file_path = line.strip()[1:].strip()
+                break
+        if file_path:
+            code = f"""
+if __name__ == "__main__":
+    {code}
+    main()
+"""
+        return code
 
     def improve_implementation(self, code: str, error: str) -> str:
         """Review and improve failed implementation"""
