@@ -5,9 +5,10 @@ from .executor import CodeResult, CodeExecutor
 from .generator import CodeGenerator, GenerationContext
 from .file_operations import FileEditor, FileContext
 
+
 class IterativeProgrammer(dspy.Module):
     """Main module that coordinates code generation, safety checks and execution"""
-    
+
     def __init__(self, max_iterations: int = 3) -> None:
         super().__init__()
         self.generator = CodeGenerator(max_iterations)
@@ -30,7 +31,7 @@ class IterativeProgrammer(dspy.Module):
                 code=code,
                 success=False,
                 output="",
-                error=f"Safety check failed: {safety_msg}"
+                error=f"Safety check failed: {safety_msg}",
             )
         return CodeExecutor.execute(code)
 
@@ -44,9 +45,9 @@ class IterativeProgrammer(dspy.Module):
                     filepath="",
                     content="",
                     changes=[],
-                    error="Invalid edit command. Use: edit <filepath> <instruction>"
+                    error="Invalid edit command. Use: edit <filepath> <instruction>",
                 )
-            
+
             # Extract filepath and instruction
             parts = command[4:].strip().split(" ", 1)
             if not parts or len(parts) != 2:
@@ -54,7 +55,7 @@ class IterativeProgrammer(dspy.Module):
                     filepath="",
                     content="",
                     changes=[],
-                    error="Invalid edit command. Use: edit <filepath> <instruction>"
+                    error="Invalid edit command. Use: edit <filepath> <instruction>",
                 )
             filepath, instruction = parts
             print(f"Editing file: {filepath}")
@@ -66,16 +67,16 @@ class IterativeProgrammer(dspy.Module):
         context = self.generator.generate_spec(command)
         print(f"Requirements: {context.requirements}")
         print(f"Approach: {context.approach}\n")
-        
+
         # Iterative improvement loop
         for i in range(self.max_iterations):
             print(f"Iteration {i+1}/{self.max_iterations}")
             print("------------------------")
-            
+
             # Generate implementation
             print("2. Generating implementation...")
             code = self.generator.generate_implementation(context)
-            
+
             # Safety check
             print("3. Running safety check...")
             is_safe, safety_msg = self.is_code_safe(code)
@@ -88,39 +89,36 @@ class IterativeProgrammer(dspy.Module):
                     code=code,
                     success=False,
                     output="",
-                    error=f"Safety check failed: {safety_msg}"
+                    error=f"Safety check failed: {safety_msg}",
                 )
 
             # Test implementation
             print("4. Testing implementation...")
             result = self.execute_code(code)
-            
+
             if result.success:
                 print("Success! Implementation passed testing.\n")
                 return result
-                
+
             # Try to improve failed implementation
             print(f"Test failed: {result.error}")
             print("5. Reviewing and improving code...")
-            
+
             improved_code = self.generator.improve_implementation(code, result.error)
             context.previous_code = code
             context.previous_error = result.error
-            
+
             improved_result = self.execute_code(improved_code)
             if improved_result.success:
                 return improved_result
-                
+
         return result
 
 
 def setup_agent() -> IterativeProgrammer:
     """Configure and return an instance of IterativeProgrammer"""
     # Configure LM
-    lm = dspy.LM(
-        model="gpt-4o-mini",
-        max_tokens=2000
-    )
+    lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
     dspy.configure(lm=lm)
-    
+
     return IterativeProgrammer()
