@@ -16,7 +16,7 @@ def run_pylint():
         )
         pylint_output = result.stdout + result.stderr  # Combine stdout and stderr
     except subprocess.CalledProcessError as e:
-        pylint_output = f"Error running pylint: {e}\n{e.stdout}"
+        pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
         return False, pylint_output
     return True, pylint_output
 
@@ -37,7 +37,7 @@ def run_random_pytest(n, all_files):
             )
             pytest_output += result.stdout + result.stderr  # Combine stdout and stderr
         except subprocess.CalledProcessError as e:
-            pytest_output += f"Error running pytest on {test_file}: {e}\n"
+            pytest_output += f"Error running pytest on {test_file}: {e}\n{e.stdout}\n{e.stderr}"
     return pytest_output
 
 
@@ -56,7 +56,7 @@ def run_random_pylint(n, all_files):
             )
             pylint_output += result.stdout + result.stderr  # Combine stdout and stderr
         except subprocess.CalledProcessError as e:
-            pylint_output += f"Error running pylint on {file_path}: {e}\n"
+            pylint_output += f"Error running pylint on {file_path}: {e}\n{e.stdout}\n{e.stderr}"
     return pylint_output
 
 
@@ -71,7 +71,7 @@ def run_ruff_fix():
         )
         ruff_output = result.stdout + result.stderr  # Combine stdout and stderr
     except subprocess.CalledProcessError as e:
-        ruff_output = f"Error running ruff fix: {e}\n{e.stdout}"
+        ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
         return False, ruff_output
     return True, ruff_output
 
