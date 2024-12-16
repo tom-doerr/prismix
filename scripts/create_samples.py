@@ -101,8 +101,7 @@ if __name__ == "__main__":
     # Long function needing refactoring
     complex_calc = samples_dir / "calculator.py"
     complex_calc.write_text(
-        """
-Sample calculator module.
+        """Sample calculator module.
 
 def process_calculation(operation, numbers):
     """Process different types of calculations based on the operation."""
