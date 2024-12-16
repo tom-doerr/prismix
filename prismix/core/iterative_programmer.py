@@ -96,14 +96,14 @@ class IterativeProgrammer(dspy.Module):
                 code=code,
                 success=False,
                 output="",
-                error=f"Function execution failed: {str(e.stderr)}"
+                error=f"Function execution failed in {file_path}: {str(e.stderr)}"
             )
         except Exception as e:
             return CodeResult(
                 code=code,
                 success=False,
                 output="",
-                error=f"Function execution failed: {str(e)}"
+                error=f"Function execution failed in {file_path}: {str(e)}"
             )
 
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
