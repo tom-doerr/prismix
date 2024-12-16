@@ -59,21 +59,20 @@ MAX_RECURSION_DEPTH = 1
 
 def find_related_files(file_path):
     """Finds related files for a given file."""
-
     if is_test_file(file_path):
         base_name = os.path.basename(file_path).replace("_test.py", ".py")
         potential_related_file = os.path.join(os.path.dirname(file_path), base_name)
-        if os.path.exists(potential_related_file) :
+        if os.path.exists(potential_related_file):
             return [file_path, potential_related_file]
     return [file_path]
 
-def call_aider(file_paths, ruff_output):
-    """Call aider to fix issues based on ruff output."""
+def call_aider(file_paths, combined_output):
+    """Call aider to fix issues based on combined output."""
     try:
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
         command = ["aider", "--deepseek", "--edit-format", "diff", "--yes-always", "--no-suggest-shell-commands"] + \
             [item for file_path in file_paths for item in ["--file", file_path]] + \
-            ["--message", f"Ruff output: {ruff_output}. Fix it"]
+            ["--message", f"Output: {combined_output}. Fix it"]
         print("Aider command:", " ".join(command))
         subprocess.run(
             command,
@@ -96,11 +95,6 @@ if __name__ == "__main__":
     for file_path in all_files:
         files_to_aider.extend(find_related_files(file_path))
     
-    # Combine the outputs
-    combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
-    
-    call_aider(files_to_aider, combined_output)
-    
     # Run n random pytest tests and n random pylint checks
     pytest_output = run_random_pytest(args.pytest_files, all_files)
     pylint_output = run_random_pylint(args.pylint_files, all_files)
@@ -108,7 +102,18 @@ if __name__ == "__main__":
     # Combine the outputs
     combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
     
+    # Run black on the files
+    run_black(files_to_aider)
+    
     call_aider(files_to_aider, combined_output)
     
     if pylint_success and ruff_success:
         print("Ruff and Pylint checks and fixes applied successfully.")
+def run_black(file_paths):
+    """Runs black on the specified files."""
+    for file_path in file_paths:
+        try:
+            subprocess.run(["black", file_path], check=True)
+            print(f"Formatted {file_path} with black.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error running black on {file_path}: {e}")
