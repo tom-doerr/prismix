@@ -171,8 +171,8 @@ class FileEditor:
                                                     )
                                             except ValueError:
                                                 pass
-                    else:
-                        changes.append(f"Failed to apply edit: Invalid line number {line_num}")
+                    except (ValueError, IndexError) as e:
+                        changes.append(f"Failed to apply edit: Invalid line number {line_num}: {str(e)}")
                         continue
         
         else:
