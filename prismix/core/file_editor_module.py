@@ -57,7 +57,7 @@ class FileEditorModule(dspy.Module):
                 flags=re.MULTILINE
             )
         else:
-            content = self.apply_edit(content, search_pattern, replacement_code)
+            content = content.replace(search_pattern, replacement_code)
         return content
 
     def apply_replacements(self, content: str, instruction: str) -> str:
@@ -96,9 +96,6 @@ class FileEditorModule(dspy.Module):
 
     def forward(self, context: str, instruction: str) -> FileEdit:
         """Edits a file based on context, instruction, and returns the FileEdit signature."""
-        logging.info(f"Received context: {context}")
-        logging.info(f"Received instruction: {instruction}")
-
         filename = context.split(" ")[0]
 
         result = self.file_edit_predictor(
@@ -107,20 +104,10 @@ class FileEditorModule(dspy.Module):
             instruction=instruction,
         )
 
-        search_pattern = result.search
-        replacement_code = result.replacement
-
-        logging.info(f"Predicted filename: {filename}")
-        logging.info(f"Predicted search pattern: {search_pattern}")
-        logging.info(f"Predicted replacement code: {replacement_code}")
-
         file_context = self.read_file(filename)
         if file_context.error:
             result.error = f"Error reading file: {file_context.error}"
-            logging.error(f"Error reading file: {file_context.error}")
             return result
-
-        logging.info(f"File content before update: {file_context.content}")
 
         # Handle "Do not change" instruction
         if "Do not change" in instruction:
@@ -129,27 +116,15 @@ class FileEditorModule(dspy.Module):
             # Handle multiple replacements
             updated_content = self.apply_replacements(file_context.content, instruction)
 
-        logging.info(f"File content after update: {updated_content}")
-        logging.info(f"Applied replacements: {instruction}")
-
         # Run linting
         self._run_lint(updated_content)
 
         write_result = self.write_file(filename, updated_content)
         if write_result.error:
             result.error = f"Error writing file: {write_result.error}"
-            logging.error(f"Error writing file: {write_result.error}")
             return result
 
         result.content = updated_content
-        logging.info(f"File edit successful. Updated content: {updated_content}")
-        
-        changes = []
-        for search_pattern, replacement_code in self.parse_instructions(instruction):
-            _, change = self.apply_single_replacement(file_context.content, search_pattern, replacement_code)
-            if change[0] and change[1]:
-                changes.append(change)
-        result.changes = changes
-        
-        # Return the FileEdit object
+        result.changes = self.parse_instructions(instruction)
+
         return result
