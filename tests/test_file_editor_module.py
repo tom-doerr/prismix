@@ -7,7 +7,6 @@ import tempfile
 import dspy
 import os
 from prismix.core.file_editor_module import FileEditorModule
-from prismix.core.file_operations import FileManager, FileContext
 
 lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
 dspy.configure(lm=lm)
