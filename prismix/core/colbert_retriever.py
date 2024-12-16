@@ -16,7 +16,21 @@ def get_all_files_to_index(directory: str) -> List[str]:
     return files_to_index
 
 
-# ai! add code that adds the data to the db
+def add_data_to_db(directory: str):
+    """Add data to the database."""
+    indexer = CodeIndexer()
+    files_to_index = get_all_files_to_index(directory)
+    for filepath in files_to_index:
+        try:
+            file_context = FileManager.read_file(filepath)
+            if file_context and file_context.content:
+                embedding = indexer._embed_code(file_context.content)
+                indexer.indexed_code[filepath] = IndexedCode(
+                    filepath, file_context.content, embedding
+                )
+                print(f"Added to db: {filepath}")
+        except Exception as e:
+            print(f"Error adding {filepath} to db: {e}")
 
 
 
