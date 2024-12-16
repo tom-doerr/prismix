@@ -33,15 +33,46 @@ class IterativeProgrammer(dspy.Module):
                 output="",
                 error=f"Safety check failed: {safety_msg}",
             )
-        # Ensure the function is called without arguments
+        import tempfile
+        import importlib.util
+        import sys
+        from io import StringIO
+
         try:
-            # Execute the code in the global scope
-            exec(code, globals())
+            # Create a temporary file
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as tmp_file:
+                tmp_file_path = tmp_file.name
+                tmp_file.write(code)
+
+            # Load the module from the temporary file
+            spec = importlib.util.spec_from_file_location("temp_module", tmp_file_path)
+            temp_module = importlib.util.module_from_spec(spec)
+            sys.modules["temp_module"] = temp_module
+            spec.loader.exec_module(temp_module)
+
+            # Capture stdout and stderr
+            old_stdout = sys.stdout
+            old_stderr = sys.stderr
+            redirected_output = sys.stdout = StringIO()
+            redirected_error = sys.stderr = StringIO()
+
+            # Execute the main function
+            if hasattr(temp_module, 'main') and callable(temp_module.main):
+                temp_module.main()
+            else:
+                print("Warning: No main function found in generated code.")
+
+            # Restore stdout and stderr
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
+            output = redirected_output.getvalue()
+            error = redirected_error.getvalue()
+
             return CodeResult(
                 code=code,
                 success=True,
-                output="",
-                error=""
+                output=output,
+                error=error
             )
         except Exception as e:
             return CodeResult(
@@ -50,6 +81,9 @@ class IterativeProgrammer(dspy.Module):
                 output="",
                 error=f"Function execution failed: {str(e)}"
             )
+        finally:
+            import os
+            os.remove(tmp_file_path)
 
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
         """Generate and execute code or edit files based on the command"""
