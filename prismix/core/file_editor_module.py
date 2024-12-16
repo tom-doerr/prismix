@@ -29,26 +29,38 @@ class FileEditorModule(dspy.Module):
         """Applies the edit to the file content."""
         return content.replace(search_pattern, replacement_code)
 
-    def apply_replacements(self, content: str, instruction: str) -> str:
-        """Applies multiple replacements based on the instruction."""
+    def parse_instructions(self, instruction: str) -> List[Tuple[str, str]]:
+        """Parses the instruction string and returns a list of replacement pairs."""
         replacements = instruction.split(" and ")
+        parsed_replacements = []
         for replacement in replacements:
             if "Replace" in replacement:
                 parts = replacement.split(" with ")
                 if len(parts) == 2:
                     search_pattern = parts[0].replace("Replace ", "").strip("'")
                     replacement_code = parts[1].strip("'")
-                    # Handle function definitions correctly
-                    if search_pattern.startswith("def "):
-                        # Replace the entire function definition
-                        content = re.sub(
-                            r"^(\s*)" + re.escape(search_pattern) + r"[\s\S]*?^(\s*)",
-                            r"\1" + replacement_code + "\n",
-                            content,
-                            flags=re.MULTILINE
-                        )
-                    else:
-                        content = self.apply_edit(content, search_pattern, replacement_code)
+                    parsed_replacements.append((search_pattern, replacement_code))
+        return parsed_replacements
+
+    def apply_single_replacement(self, content: str, search_pattern: str, replacement_code: str) -> str:
+        """Applies a single replacement to the content."""
+        if search_pattern.startswith("def "):
+            # Replace the entire function definition
+            content = re.sub(
+                r"^(\s*)" + re.escape(search_pattern) + r"[\s\S]*?^(\s*)",
+                r"\1" + replacement_code + "\n",
+                content,
+                flags=re.MULTILINE
+            )
+        else:
+            content = self.apply_edit(content, search_pattern, replacement_code)
+        return content
+
+    def apply_replacements(self, content: str, instruction: str) -> str:
+        """Applies multiple replacements based on the instruction."""
+        replacements = self.parse_instructions(instruction)
+        for search_pattern, replacement_code in replacements:
+            content = self.apply_single_replacement(content, search_pattern, replacement_code)
         return content
 
     def write_file(self, filename: str, content: str) -> FileContext:

@@ -39,6 +39,26 @@ def test_file_edit_module_no_change(file_editor_module, temp_file):
     # Ensure the file was written
     assert updated_content == "def hello():\n    print('hello')\n"
 
+def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
+    # Test file edit with multiple replacements
+    updated_content = file_editor_module.forward(
+        context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
+        instruction="Replace 'print('hello')' with 'print('hi')' and Replace 'def hello()' with 'def greet()'",
+    )
+    
+    # Ensure the file was written
+    assert updated_content == "def greet():\n    print('hi')\n"
+
+def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file):
+    # Test file edit with overlapping replacements
+    updated_content = file_editor_module.forward(
+        context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
+        instruction="Replace 'print('hello')' with 'print('hi')' and Replace 'hello' with 'greet'",
+    )
+    
+    # Ensure the file was written
+    assert updated_content == "def greet():\n    print('hi')\n"
+
 
 def test_file_edit_module_empty_file(file_editor_module):
     # Test file edit with an empty file
