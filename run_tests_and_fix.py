@@ -40,10 +40,12 @@ def call_aider(file_paths, ruff_output):
     """Call aider to fix issues based on ruff output."""
     try:
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
+        command = ["aider", "--deepseek", "--edit-format", "diff", "--yes-always", "--no-suggest-shell-commands"] + \
+            [item for file_path in file_paths for item in ["--file", file_path]] + \
+            ["--message", f"Ruff output: {ruff_output}. Fix it"]
+        print("Aider command:", " ".join(command))
         subprocess.run(
-            ["aider", "--deepseek", "--edit-format", "diff", "--yes-always", "--no-suggest-shell-commands"] +
-            [item for file_path in file_paths for item in ["--file", file_path]] +
-            ["--message", f"Ruff output: {ruff_output}. Fix it"],
+            command,
             check=True
         )
         print(f"Aider fixed issues in {', '.join(file_paths)}.")
