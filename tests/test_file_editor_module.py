@@ -1,7 +1,11 @@
 import pytest
 import tempfile
+import dspy
 from prismix.core.file_editor_module import FileEditorModule
 from prismix.core.file_operations import FileManager
+
+lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
+dspy.configure(lm=lm)
 
 @pytest.fixture
 def file_editor_module():
