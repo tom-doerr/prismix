@@ -33,7 +33,22 @@ class IterativeProgrammer(dspy.Module):
                 output="",
                 error=f"Safety check failed: {safety_msg}",
             )
-        return CodeExecutor.execute(code)
+        # Ensure the function is called without arguments
+        try:
+            exec(code, {}, {})
+            return CodeResult(
+                code=code,
+                success=True,
+                output="",
+                error=""
+            )
+        except Exception as e:
+            return CodeResult(
+                code=code,
+                success=False,
+                output="",
+                error=f"Function execution failed: {str(e)}"
+            )
 
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
         """Generate and execute code or edit files based on the command"""

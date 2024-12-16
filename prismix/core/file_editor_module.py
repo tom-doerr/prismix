@@ -30,10 +30,15 @@ class FileEditorModule(dspy.Module):
         logging.info(f"Predicted replacement code: {replacement_code}")
 
         file_manager = FileManager()
-        file_context = file_manager.read_file(filename)
-        if file_context.error:
-            result.error = f"Error reading file: {file_context.error}"
-            logging.error(f"Error reading file: {file_context.error}")
+        try:
+            file_context = file_manager.read_file(filename)
+            if file_context.error:
+                result.error = f"Error reading file: {file_context.error}"
+                logging.error(f"Error reading file: {file_context.error}")
+                return result
+        except FileNotFoundError:
+            result.error = f"Error reading file: File does not exist"
+            logging.error(f"Error reading file: File does not exist")
             return result
 
         logging.info(f"File content before update: {file_context.content}")
