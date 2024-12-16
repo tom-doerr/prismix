@@ -86,8 +86,6 @@ class ColbertRetriever(dspy.Retrieve):
 import logging
 
 
-
-
 def forward(self, query: str, k: int = None) -> List[str]:
     """Search for similar embeddings in Qdrant."""
     query_embedding = self.qdrant_manager._embed_code(query)
