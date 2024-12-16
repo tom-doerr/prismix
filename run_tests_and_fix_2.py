@@ -37,7 +37,7 @@ def run_random_pytest(n, all_files):
             )
             pytest_output += result.stdout + result.stderr  # Combine stdout and stderr
         except subprocess.CalledProcessError as e:
-            pytest_output += f"Error running pytest on {test_file}: {e}\n{e.stdout}\n{e.stderr}"
+            pytest_output += f"Error running pytest on {test_file}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
     return pytest_output
 
 
@@ -56,7 +56,7 @@ def run_random_pylint(n, all_files):
             )
             pylint_output += result.stdout + result.stderr  # Combine stdout and stderr
         except subprocess.CalledProcessError as e:
-            pylint_output += f"Error running pylint on {file_path}: {e}\n{e.stdout}\n{e.stderr}"
+            pylint_output += f"Error running pylint on {file_path}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
     return pylint_output
 
 
@@ -136,19 +136,20 @@ def run_black(file_paths):
 
 
 if __name__ == "__main__":
+    print('Starting ...')
     parser = argparse.ArgumentParser(
         description="Run random pytest tests and pylint checks on specified number of files."
     )
     parser.add_argument(
         "--pytest-files",
         type=int,
-        default=3,
+        default=1,
         help="Number of random pytest files to run.",
     )
     parser.add_argument(
         "--pylint-files",
         type=int,
-        default=3,
+        default=1,
         help="Number of random pylint files to run.",
     )
     args = parser.parse_args()
