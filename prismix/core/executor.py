@@ -41,7 +41,6 @@ class CodeExecutor:
             # Set up isolated execution environment
             local_vars = {}
             # Safely parse and execute the code
-            import ast
             parsed_code = ast.parse(code)
             exec(compile(parsed_code, filename="<string>", mode="exec"), {"__builtins__": CodeExecutor.get_safe_builtins()}, local_vars)
 
