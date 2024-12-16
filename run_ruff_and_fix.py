@@ -8,7 +8,7 @@ def run_ruff(file_path):
     try:
         print(f"Executing ruff on {file_path}...")
         result = subprocess.run(
-            ["ruff", file_path],
+            ["ruff", "check", file_path],
             capture_output=True,
             text=True,
             check=True
