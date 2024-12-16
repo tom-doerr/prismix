@@ -155,13 +155,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pytest-files",
         type=int,
-        default=1,
+        default=3,
         help="Number of random pytest files to run.",
     )
     parser.add_argument(
         "--lint-files",
         type=int,
-        default=1,
+        default=3,
         help="Number of random pylint files to run.",
     )
     parser.add_argument(

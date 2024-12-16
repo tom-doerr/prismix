@@ -45,6 +45,8 @@ def test_write_file():
     import os
 
     os.remove("test_write_file.txt")
+
+
 """
 Test module for the FileEditorModule class.
 """
