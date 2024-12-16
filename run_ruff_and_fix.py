@@ -113,7 +113,7 @@ def main():
         else:
             ruff_output = run_ruff(file_path)
 
-        if ruff_output.strip():
+        if ruff_output.strip():  # Check if there are any issues in the ruff output
             print(f"Issues found in {file_path}. Fixing...")
             if dry_run:
                 print(f"Dry run for {file_path}:")
