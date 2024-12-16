@@ -23,6 +23,8 @@ pytest-xdist = "^1.35.0"
 pytest = "^8.3.3"
 pytest-cov = "^6.0.0"
 mypy = "^1.13.0"
+# Explicitly remove pytest-parallel to avoid conflicts
+# pytest-parallel = "*"
 
 [build-system]
 requires = ["poetry-core"]
