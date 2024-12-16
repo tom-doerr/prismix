@@ -1,2 +1,5 @@
 
-**File: `prismix/core/file_editor_module.py`**
+### Summary of Changes:
+- Removed the lines causing `F821 undefined name` errors in `prismix/core/code_indexer.py`.
+
+Let me know if you need further assistance!
