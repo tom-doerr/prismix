@@ -143,8 +143,13 @@ class FileEditorModule(dspy.Module):
 
         result.content = updated_content
         logging.info(f"File edit successful. Updated content: {updated_content}")
-        result.content = updated_content
-        logging.info(f"File edit successful. Updated content: {updated_content}")
+        
+        changes = []
+        for search_pattern, replacement_code in self.parse_instructions(instruction):
+            _, change = self.apply_single_replacement(file_context.content, search_pattern, replacement_code)
+            if change[0] and change[1]:
+                changes.append(change)
+        result.changes = changes
         
         # Return the FileEdit object
         return result
