@@ -23,7 +23,7 @@ class FileEditorModule(dspy.Module):
 
         filename = result.filename
         search_pattern = result.search
-        replacement_code = result.replace
+        replacement_code = result.replacement
 
         logging.info(f"Predicted filename: {filename}")
         logging.info(f"Predicted search pattern: {search_pattern}")
