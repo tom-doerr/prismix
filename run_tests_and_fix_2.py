@@ -115,7 +115,7 @@ def call_aider(file_paths, combined_output):
             "--yes-always",
             "--no-suggest-shell-commands"
         ] + [item for file_path in file_paths for item in ["--file", file_path]] + [
-            "--message", f"Output: {combined_output}. Fix it"
+            "--message", f"Output: {combined_output}. What should we do next?"
         ]
         print("Aider command:", " ".join(command))
         subprocess.run(command, check=True)
