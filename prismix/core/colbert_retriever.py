@@ -72,7 +72,7 @@ def add_data_to_db(self, directory: str):
             except Exception as e:
                 logging.error(f"Error adding {filepath} to Qdrant: {e}")
 
-    def forward(self, query: str, k: int = None) -> List[str]:
+def forward(self, query: str, k: int = None) -> List[str]:
         """Search for similar embeddings in Qdrant."""
         query_embedding = self.qdrant_manager._embed_code(query)
         results = self.qdrant_manager.search_embeddings(query_embedding, top_k=k or self.k)
