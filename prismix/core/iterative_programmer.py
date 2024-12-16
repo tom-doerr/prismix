@@ -35,7 +35,8 @@ class IterativeProgrammer(dspy.Module):
             )
         # Ensure the function is called without arguments
         try:
-            exec(code, {}, {})
+            # Execute the code in the global scope
+            exec(code, globals())
             return CodeResult(
                 code=code,
                 success=True,
