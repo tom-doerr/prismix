@@ -1,15 +1,17 @@
 import os
 from pathlib import Path
 
+
 def create_sample_files():
     """Create sample Python files for editing practice"""
     # Create samples directory
     samples_dir = Path("samples")
     samples_dir.mkdir(exist_ok=True)
-    
+
     # Basic function without docstring
     basic_func = samples_dir / "basic_function.py"
-    basic_func.write_text('''
+    basic_func.write_text(
+        '''
 def calculate_sum(a, b):
     return a + b
 
@@ -20,11 +22,13 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''.lstrip())
+'''.lstrip()
+    )
 
     # Class needing type hints
     class_file = samples_dir / "user_manager.py"
-    class_file.write_text('''
+    class_file.write_text(
+        '''
 class UserManager:
     """Manages user data."""
     def __init__(self):
@@ -52,11 +56,13 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''.lstrip())
+'''.lstrip()
+    )
 
     # File operations without error handling
     file_ops = samples_dir / "file_processor.py"
-    file_ops.write_text('''
+    file_ops.write_text(
+        """
 def process_file(filepath):
     try:
         with open(filepath, 'r') as f:
@@ -82,11 +88,13 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''.lstrip())
+""".lstrip()
+    )
 
     # Long function needing refactoring
     complex_calc = samples_dir / "calculator.py"
-    complex_calc.write_text('''
+    complex_calc.write_text(
+        """
 def process_calculation(operation, numbers):
     if operation == "add":
         result = 0
@@ -134,7 +142,9 @@ def main():
 
 if __name__ == "__main__":
     main()
-'''.lstrip())
+""".lstrip()
+    )
+
 
 if __name__ == "__main__":
     create_sample_files()

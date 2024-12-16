@@ -5,17 +5,20 @@ This module provides a safe execution environment for code generation and execut
 from dataclasses import dataclass
 from typing import Dict, Any, Callable
 
+
 @dataclass
 class CodeResult:
     """Result of code generation and execution"""
+
     code: str
     success: bool
     output: str
     error: str = ""
 
+
 class CodeExecutor:
     """Handles safe code execution in isolated environment"""
-    
+
     @staticmethod
     def get_safe_builtins() -> Dict[str, Any]:
         """Get dictionary of allowed built-in functions"""
@@ -28,7 +31,7 @@ class CodeExecutor:
             "bool": bool,
             "len": len,
             "ValueError": ValueError,
-            "TypeError": TypeError
+            "TypeError": TypeError,
         }
 
     @staticmethod
@@ -51,7 +54,7 @@ class CodeExecutor:
                     code=code,
                     success=False,
                     output="",
-                    error="No callable function found in generated code"
+                    error="No callable function found in generated code",
                 )
 
             # Test the function with a sample input
@@ -59,20 +62,15 @@ class CodeExecutor:
                 result = main_func(5)  # Test with simple input
                 return CodeResult(
                     code=code,
-                    success=True, 
-                    output=f"Code executed successfully. Test {main_func.__name__}(5) = {result}"
+                    success=True,
+                    output=f"Code executed successfully. Test {main_func.__name__}(5) = {result}",
                 )
             except TypeError as e:
                 return CodeResult(
                     code=code,
                     success=False,
                     output="",
-                    error=f"Function execution failed: {str(e)}"
+                    error=f"Function execution failed: {str(e)}",
                 )
         except (SyntaxError, NameError) as e:
-            return CodeResult(
-                code=code,
-                success=False,
-                output="",
-                error=str(e)
-            )
+            return CodeResult(code=code, success=False, output="", error=str(e))

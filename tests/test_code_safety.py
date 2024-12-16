@@ -1,9 +1,11 @@
 import pytest
 from prismix.core.iterative_programmer import IterativeProgrammer, setup_agent
 
+
 @pytest.fixture
 def agent():
     return setup_agent()
+
 
 def test_safe_code(agent):
     """Test that safe code passes the safety check"""
@@ -16,6 +18,7 @@ def greet(name):
     assert isinstance(message, str)
     assert len(message) > 0
 
+
 def test_unsafe_code(agent):
     """Test that unsafe code fails the safety check"""
     unsafe_code = """
@@ -27,6 +30,7 @@ def delete_files():
     assert is_safe is False
     assert isinstance(message, str)
     assert len(message) > 0
+
 
 def test_code_with_imports(agent):
     """Test that code with suspicious imports fails safety check"""
@@ -53,12 +57,14 @@ def network_attack():
     assert isinstance(message, str)
     assert len(message) > 0
 
+
 def test_empty_code(agent):
     """Test handling of empty code"""
     is_safe, message = agent.is_code_safe("")
     assert isinstance(is_safe, bool)
     assert isinstance(message, str)
     assert len(message) > 0
+
 
 def test_malformed_code(agent):
     """Test handling of syntactically incorrect code"""
