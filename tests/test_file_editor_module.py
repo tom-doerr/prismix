@@ -28,20 +28,20 @@ def temp_file():
     os.remove(temp_file_path)
 
 
-def test_file_edit_module(file_editor_module):
+def test_file_edit_module(file_editor_module, temp_file):
     # Test successful file edit
     updated_content = file_editor_module.forward(
-        context="def hello():\n    print('hello')\n",
+        context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
         instruction="Replace 'print('hello')' with 'print('hi')'.",
     )
     
     # Ensure the file was written
     assert updated_content == "def hello():\n    print('hi')\n"
 
-def test_file_edit_module_no_change(file_editor_module):
+def test_file_edit_module_no_change(file_editor_module, temp_file):
     # Test file edit with no change
     updated_content = file_editor_module.forward(
-        context="def hello():\n    print('hello')\n",
+        context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
         instruction="Do not change 'print('hello')'.",
     )
     
