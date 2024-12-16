@@ -10,15 +10,6 @@ from .generator import CodeGenerator, GenerationContext
 from .file_operations import FileEditor, FileContext
 
 
-class IterativeProgrammer(dspy.Module):
-    """Main module that coordinates code generation, safety checks and execution"""
-
-    def __init__(self, max_iterations: int = 3) -> None:
-        super().__init__()
-        self.generator = CodeGenerator(max_iterations)
-        self.safety_checker = dspy.TypedPredictor(CodeSafetyCheck)
-        self.file_editor = FileEditor()
-        self.max_iterations = max_iterations
 
 
 def is_code_safe(code: str, safety_checker: dspy.TypedPredictor) -> Tuple[bool, str]:
