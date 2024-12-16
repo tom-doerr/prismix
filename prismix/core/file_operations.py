@@ -1,5 +1,9 @@
+"""
+Module for handling file operations and editing.
+"""
 from dataclasses import dataclass
 from typing import Optional, List, Union, Tuple
+from abc import ABC, abstractmethod
 import dspy
 
 
@@ -38,34 +42,43 @@ class FileEdit(dspy.Signature):
     )
 
 
-from abc import ABC, abstractmethod
-
-
 class FileOperations(ABC):
+    """Abstract base class for file operations."""
+
     @abstractmethod
     def read_file(self, filepath: str) -> str:
+        """Read the content of a file."""
         pass
 
     @abstractmethod
     def write_file(self, filepath: str, content: str) -> None:
+        """Write content to a file."""
         pass
 
 
 class DefaultFileOperations(FileOperations):
+    """Default implementation of file operations."""
+
     def read_file(self, filepath: str) -> str:
-        with open(filepath, "r") as f:
+        """Read the content of a file."""
+        with open(filepath, "r", encoding="utf-8") as f:
             return f.read()
 
     def write_file(self, filepath: str, content: str) -> None:
-        with open(filepath, "w") as f:
+        """Write content to a file."""
+        with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)
 
 
 class FileManager:
+    """Manages file operations using a provided FileOperations implementation."""
+
     def __init__(self, file_operations: FileOperations):
+        """Initialize the FileManager with a FileOperations instance."""
         self.file_operations = file_operations
 
     def read_file(self, filepath: str) -> FileContext:
+        """Read the content of a file and return a FileContext."""
         try:
             content = self.file_operations.read_file(filepath)
             return FileContext(filepath=filepath, content=content, changes=[])
@@ -77,6 +90,7 @@ class FileManager:
             return FileContext(filepath=filepath, content="", changes=[], error=str(e))
 
     def write_file(self, filepath: str, content: str) -> FileContext:
+        """Write content to a file and return a FileContext."""
         try:
             self.file_operations.write_file(filepath, content)
             return FileContext(
