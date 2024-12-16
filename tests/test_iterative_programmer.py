@@ -4,6 +4,17 @@ from prismix.core.iterative_programmer import IterativeProgrammer
 
 
 # Mock LM for testing
+class MockLM(dspy.LM):
+    def __init__(self, model="mock"):
+        super().__init__(model=model)
+
+    def __call__(self, prompt, **kwargs):
+        if "unsafe" in prompt.lower():
+            return dspy.Prediction(
+                is_safe=False,
+                safety_message="The code contains potentially unsafe operations.",
+            )
+        return dspy.Prediction(is_safe=True, safety_message="The code is safe.")
 
 
 @pytest.fixture(scope="function", autouse=True)
