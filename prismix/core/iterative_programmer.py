@@ -60,7 +60,7 @@ class IterativeProgrammer(dspy.Module):
             
             # Apply the changes to the original content
             file_editor = FileEditor()
-            modified_content = file_editor.apply_replacements(original_content, code)
+            modified_content, _ = file_editor._apply_line_edits(original_content, code)
 
             # Create a temporary file with the modified content
             with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as tmp_file:
