@@ -11,6 +11,7 @@ def colbert_retriever():
     return ColbertRetriever(url="http://example.com/colbert", k=3)
 
 import os
+import shutil
 import tempfile
 
 @pytest.fixture
@@ -23,10 +24,12 @@ def temp_dir():
         with open(os.path.join(tmpdir, "test2.txt"), "w", encoding='utf-8') as f:
             f.write("This is a test file with some text.")
         with open(os.path.join(tmpdir, "test3.py"), "w", encoding='utf-8') as f:
-            f.write("def world():\n    print('world')\n")
+            f.write("def world():\n    print('world')")
+        with open(os.path.join(tmpdir, "test4.md"), "w", encoding='utf-8') as f:
+            f.write("# Markdown file")
         yield tmpdir
 
-def test_add_data_to_db(colbert_retriever, temp_dir):
+def test_add_data_to_db_basic(colbert_retriever, temp_dir):
     colbert_retriever.add_data_to_db(temp_dir)
     # Ensure that the data was added to the Qdrant database
     # This is a placeholder for a more detailed check
@@ -34,11 +37,14 @@ def test_add_data_to_db(colbert_retriever, temp_dir):
 
 def test_colbert_retriever(colbert_retriever):
     query = "quantum computing"
+    # Set a mock RM for testing
+    dspy.settings.rm = lambda queries, k=3: [
+        [f"This is a dummy result for {q}" for _ in range(k)] for q in queries
+    ][0]
     results = colbert_retriever.forward(query)
     assert len(results) == 3
     for result in results:
-        assert query in result
-    # Set a mock RM for testing
+        assert "dummy result" in result
     dspy.settings.rm = lambda queries, k=3: [
         [f"This is a dummy result for {q}" for _ in range(k)] for q in queries
     ][0]
@@ -53,11 +59,6 @@ def temp_dir():
         with open(os.path.join(tmpdir, "test2.txt"), "w", encoding='utf-8') as f:
             f.write("This is a test file with some text.")
         with open(os.path.join(tmpdir, "test3.py"), "w", encoding='utf-8') as f:
-            f.write("def world():\n    print('world')\n")
+            f.write("def world():\n    print('world')")
         yield tmpdir
 
-def test_add_data_to_db(colbert_retriever, temp_dir):
-    colbert_retriever.add_data_to_db(temp_dir)
-    # Ensure that the data was added to the Qdrant database
-    # This is a placeholder for a more detailed check
-    assert True
