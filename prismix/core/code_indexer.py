@@ -4,6 +4,7 @@ from typing import List, Dict
 from dataclasses import dataclass
 from prismix.core.file_operations import FileManager
 
+
 @dataclass
 class IndexedCode:
     filepath: str
@@ -15,6 +16,7 @@ class CodeEmbedder:
     def embed_code(self, content: str) -> List[float]:
         # Placeholder for embedding logic
         return [0.0] * 128  # Dummy embedding
+
 
 class CodeIndexer:
     def __init__(self, embedder: CodeEmbedder, ignore_patterns: List[str] = None):
@@ -31,7 +33,9 @@ class CodeIndexer:
                         file_context = FileManager.read_file(filepath)
                         if file_context and file_context.content:
                             embedding = self.embedder.embed_code(file_context.content)
-                            indexed_code = IndexedCode(filepath, file_context.content, embedding)
+                            indexed_code = IndexedCode(
+                                filepath, file_context.content, embedding
+                            )
                             self.indexed_code[filepath] = indexed_code
                             print(f"Indexed: {filepath}")
                     except Exception as e:
@@ -56,9 +60,15 @@ class CodeIndexer:
                 if not self._is_ignored(filepath):
                     try:
                         file_context = FileManager.read_file(filepath)
-                        if file_context and file_context.content and query in file_context.content:
+                        if (
+                            file_context
+                            and file_context.content
+                            and query in file_context.content
+                        ):
                             embedding = self._embed_code(file_context.content)
-                            indexed_code = IndexedCode(filepath, file_context.content, embedding)
+                            indexed_code = IndexedCode(
+                                filepath, file_context.content, embedding
+                            )
                             results.append(indexed_code)
                     except Exception as e:
                         print(f"Error searching {filepath}: {e}")
@@ -67,6 +77,10 @@ class CodeIndexer:
     def _similarity(self, emb1: List[float], emb2: List[float]) -> float:
         """Calculate the similarity between two embeddings using cosine similarity."""
         dot_product = sum(x * y for x, y in zip(emb1, emb2))
-        magnitude1 = sum(x ** 2 for x in emb1) ** 0.5
-        magnitude2 = sum(y ** 2 for y in emb2) ** 0.5
-        return dot_product / (magnitude1 * magnitude2) if magnitude1 and magnitude2 else 0.0
+        magnitude1 = sum(x**2 for x in emb1) ** 0.5
+        magnitude2 = sum(y**2 for y in emb2) ** 0.5
+        return (
+            dot_product / (magnitude1 * magnitude2)
+            if magnitude1 and magnitude2
+            else 0.0
+        )
