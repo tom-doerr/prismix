@@ -9,9 +9,12 @@ def run_pylint():
     """Runs pylint on the entire project and captures the output."""
     try:
         result = subprocess.run(
-            ["pylint", "."], check=True, capture_output=True, text=True
+            ["pylint", "."],
+            check=True,
+            capture_output=True,  # Capture both stdout and stderr
+            text=True
         )
-        pylint_output = result.stdout
+        pylint_output = result.stdout + result.stderr  # Combine stdout and stderr
     except subprocess.CalledProcessError as e:
         pylint_output = f"Error running pylint: {e}\n{e.stdout}"
         return False, pylint_output
@@ -27,9 +30,12 @@ def run_random_pytest(n, all_files):
     for test_file in selected_test_files:
         try:
             result = subprocess.run(
-                ["pytest", test_file], check=True, capture_output=True, text=True
+                ["pytest", test_file],
+                check=True,
+                capture_output=True,  # Capture both stdout and stderr
+                text=True
             )
-            pytest_output += result.stdout + "\n"
+            pytest_output += result.stdout + result.stderr  # Combine stdout and stderr
         except subprocess.CalledProcessError as e:
             pytest_output += f"Error running pytest on {test_file}: {e}\n"
     return pytest_output
@@ -43,9 +49,12 @@ def run_random_pylint(n, all_files):
     for file_path in selected_files:
         try:
             result = subprocess.run(
-                ["pylint", file_path], check=True, capture_output=True, text=True
+                ["pylint", file_path],
+                check=True,
+                capture_output=True,  # Capture both stdout and stderr
+                text=True
             )
-            pylint_output += result.stdout + "\n"
+            pylint_output += result.stdout + result.stderr  # Combine stdout and stderr
         except subprocess.CalledProcessError as e:
             pylint_output += f"Error running pylint on {file_path}: {e}\n"
     return pylint_output
@@ -55,9 +64,12 @@ def run_ruff_fix():
     """Runs ruff to fix code style issues and captures the output."""
     try:
         result = subprocess.run(
-            ["ruff", ".", "--fix"], check=True, capture_output=True, text=True
+            ["ruff", ".", "--fix"],
+            check=True,
+            capture_output=True,  # Capture both stdout and stderr
+            text=True
         )
-        ruff_output = result.stdout
+        ruff_output = result.stdout + result.stderr  # Combine stdout and stderr
     except subprocess.CalledProcessError as e:
         ruff_output = f"Error running ruff fix: {e}\n{e.stdout}"
         return False, ruff_output
