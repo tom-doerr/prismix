@@ -14,9 +14,9 @@ def process_file(filepath: str) -> None:
         f.write(f"Word count: {word_count}")
 
 
-import sys
-
 def main():
+
+import sys
     """Main function to process a file."""
     if len(sys.argv) != 2:
         print("Usage: python file_processor.py <filepath>")
