@@ -82,6 +82,15 @@ def call_aider(file_paths, combined_output):
     except subprocess.CalledProcessError as e:
         print(f"Error calling aider on {', '.join(file_paths)}: {e}")
 
+def run_black(file_paths):
+    """Runs black on the specified files."""
+    for file_path in file_paths:
+        try:
+            subprocess.run(["black", file_path], check=True)
+            print(f"Formatted {file_path} with black.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error running black on {file_path}: {e}")
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run random pytest tests and pylint checks on specified number of files.")
     parser.add_argument("--pytest-files", type=int, default=3, help="Number of random pytest files to run.")
