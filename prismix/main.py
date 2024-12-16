@@ -118,12 +118,12 @@ def main() -> NoReturn:
             return
         query = sys.argv[2]
         print(f"Searching with Colbert for query: {query}")
-        colbert_retriever = ColbertRetriever(url="http://example.com/colbert")
-        results = colbert_retriever.forward(query)
+        indexer = CodeIndexer()
+        results = indexer.search_code(query)
         if results:
             print("Colbert search results:")
             for result in results:
-                print(f"- {result}")
+                print(f"- {result.filepath}: {result.content[:100]}...")  # Display first 100 chars
         else:
             print("No results found.")
     else:

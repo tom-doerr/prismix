@@ -64,9 +64,12 @@ class CodeIndexer:
     def search_code(self, query: str) -> List[IndexedCode]:
         """Search indexed code using a query."""
         query_embedding = self._embed_code(query)
-        # Placeholder for search logic
-        # In a real implementation, this would use a similarity search on the embeddings
-        return []  # Dummy return
+        results = []
+        for filepath, indexed_code in self.indexed_code.items():
+            similarity = self._similarity(query_embedding, indexed_code.embedding)
+            if similarity > 0.5:  # Arbitrary threshold for now
+                results.append(indexed_code)
+        return results
 
     def search_code_on_the_fly(self, directory: str, query: str) -> List[IndexedCode]:
         """Search code files in the given directory without using an index."""
