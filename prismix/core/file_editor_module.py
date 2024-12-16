@@ -10,6 +10,7 @@ import logging
 import tempfile
 import os
 
+
 class FileEditorModule(dspy.Module):
     def __init__(self):
         super().__init__()
@@ -23,24 +24,27 @@ class FileEditorModule(dspy.Module):
             return file_manager.read_file(filename)
         except FileNotFoundError:
             return FileContext(
-                filepath=filename,
-                content="",
-                changes=[],
-                error="File does not exist"
+                filepath=filename, content="", changes=[], error="File does not exist"
             )
 
     def apply_replacements(self, content: str, instruction: str) -> str:
         """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
-            content = self.apply_single_replacement(content, search_pattern, replacement_code)
+            content = self.apply_single_replacement(
+                content, search_pattern, replacement_code
+            )
         return content
 
-    def apply_single_replacement(self, content: str, search_pattern: str, replacement_code: str) -> str:
+    def apply_single_replacement(
+        self, content: str, search_pattern: str, replacement_code: str
+    ) -> str:
         """Applies a single replacement to the content."""
         return content.replace(search_pattern, replacement_code)
 
-    def apply_single_replacement(self, content: str, search_pattern: str, replacement_code: str) -> str:
+    def apply_single_replacement(
+        self, content: str, search_pattern: str, replacement_code: str
+    ) -> str:
         """Applies a single replacement to the content."""
         return content.replace(search_pattern, replacement_code)
 
@@ -48,12 +52,13 @@ class FileEditorModule(dspy.Module):
         """Parses the instruction string and returns a list of replacement pairs."""
         replacements = instruction.split(" and ")
         return [
-            (part.replace("Replace ", "").strip("'"), part.split(" with ")[1].strip("'"))
+            (
+                part.replace("Replace ", "").strip("'"),
+                part.split(" with ")[1].strip("'"),
+            )
             for part in replacements
             if "Replace" in part and len(part.split(" with ")) == 2
         ]
-
-
 
     def write_file(self, filename: str, content: str) -> FileContext:
         """Writes the updated content back to the file."""
@@ -81,6 +86,3 @@ class FileEditorModule(dspy.Module):
 
         # Write the updated content back to the file
         return self.write_file(filepath, updated_content)
-
-
-
