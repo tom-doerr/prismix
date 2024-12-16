@@ -31,6 +31,7 @@ def temp_dir():
 
 
 def test_add_data_to_db_basic(colbert_retriever, temp_dir):
+    """Test adding data to the database."""
     colbert_retriever.add_data_to_db(temp_dir)
     # Ensure that the data was added to the Qdrant database
     # This is a placeholder for a more detailed check
@@ -38,6 +39,7 @@ def test_add_data_to_db_basic(colbert_retriever, temp_dir):
 
 
 def test_colbert_retriever(colbert_retriever):
+    """Test the ColbertRetriever class."""
     query = "quantum computing"
     # Set a mock RM for testing
     dspy.settings.rm = lambda queries, k=3: [
