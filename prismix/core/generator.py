@@ -1,5 +1,6 @@
+"""Handles the iterative code generation process."""
 import dspy
-from .signatures import ProgramSpec, CodeImplementation, CodeReview
+from prismix.core.signatures import ProgramSpec, CodeImplementation, CodeReview
 
 from dataclasses import dataclass
 from typing import Optional

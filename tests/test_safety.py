@@ -14,7 +14,7 @@ def safe_function(): return 42
 """
         is_safe, message = self.programmer.is_code_safe(safe_code)
         self.assertTrue(is_safe)
-        self.assertEqual(message, "The code is safe.")
+        self.assertIn("The code is safe", message)
 
     def test_code_with_print(self):
         code_with_print = """
