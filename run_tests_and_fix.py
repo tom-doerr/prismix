@@ -4,10 +4,19 @@ import os
 
 
 def run_pylint():
-    """Runs pylint on the entire project."""
-    """Runs pylint on the entire project."""
+    """Runs pylint on the entire project and captures the output."""
     try:
-        subprocess.run(["pylint", "."], check=True, capture_output=True, text=True)
+        result = subprocess.run(
+            ["pylint", "."],
+            check=True,
+            capture_output=True,  # Capture both stdout and stderr
+            text=True
+        )
+        pylint_output = result.stdout + result.stderr  # Combine stdout and stderr
+    except subprocess.CalledProcessError as e:
+        pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
+        return False, pylint_output
+    return True, pylint_output
     except subprocess.CalledProcessError as e:
         print(f"Error running pylint: {e}")
         return False
@@ -15,12 +24,19 @@ def run_pylint():
 
 
 def run_ruff_fix():
-    """Runs ruff to fix code style issues."""
-    """Runs ruff to fix code style issues."""
+    """Runs ruff to fix code style issues and captures the output."""
     try:
-        subprocess.run(
-            ["ruff", ".", "--fix"], check=True, capture_output=True, text=True
+        result = subprocess.run(
+            ["ruff", ".", "--fix"],
+            check=True,
+            capture_output=True,  # Capture both stdout and stderr
+            text=True
         )
+        ruff_output = result.stdout + result.stderr  # Combine stdout and stderr
+    except subprocess.CalledProcessError as e:
+        ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
+        return False, ruff_output
+    return True, ruff_output
     except subprocess.CalledProcessError as e:
         print(f"Error running ruff fix: {e}")
         return False
@@ -48,9 +64,8 @@ def find_related_files(file_path):
     return [file_path]
 
 
-def call_aider(file_paths, ruff_output):
-    """Call aider to fix issues based on ruff output."""
-    """Call aider to fix issues based on ruff output."""
+def call_aider(file_paths, combined_output):
+    """Call aider to fix issues based on combined output."""
     try:
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
         command = (
@@ -63,7 +78,7 @@ def call_aider(file_paths, ruff_output):
                 "--no-suggest-shell-commands",
             ]
             + [item for file_path in file_paths for item in ["--file", file_path]]
-            + ["--message", f"Ruff output: {ruff_output}. Fix it"]
+            + ["--message", f"Output: {combined_output}. Fix it"]
         )
         print("Aider command:", " ".join(command))
         subprocess.run(command, check=True)
@@ -74,9 +89,10 @@ def call_aider(file_paths, ruff_output):
 
 if __name__ == "__main__":
     all_files = glob.glob("**/*.py", recursive=True)
-    pylint_success = run_pylint()
-    ruff_success = run_ruff_fix()
+    pylint_success, pylint_output = run_pylint()
+    ruff_success, ruff_output = run_ruff_fix()
+    combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
     for file_path in all_files:
-        call_aider(find_related_files(file_path), "")
+        call_aider(find_related_files(file_path), combined_output)
     if pylint_success and ruff_success:
-        print("Ruff and Pylint checks and fixes applied successfully.")
+        print("Pylint and Ruff checks and fixes applied successfully.")
