@@ -1,8 +1,15 @@
+"""
+Module for managing users.
+"""
+
 from dataclasses import dataclass
 
 
 @dataclass
 class User:
+    """
+    Represents a user with a username and email.
+    """
     username: str
     email: str
 
@@ -44,6 +51,9 @@ class UserManager:
 
 
 def main() -> None:
+    """
+    Main function to demonstrate user management.
+    """
     manager = UserManager()
     manager.add_user("alice", "alice@example.com")
     user = manager.get_user("alice")
