@@ -171,9 +171,9 @@ class FileEditor:
                                                     )
                                             except ValueError:
                                                 pass
-                    except (ValueError, IndexError) as e:
-                        changes.append(f"Failed to apply edit: Invalid line number {line_num}: {str(e)}")
-                        continue
+                except (ValueError, IndexError) as e:
+                    changes.append(f"Failed to apply edit: Invalid line number {line_num}: {str(e)}")
+                    continue
         else:
             # Handle direct mode/line/text tuples (from tests)
             for i, edit in enumerate(line_edits):
