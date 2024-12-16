@@ -1,0 +1,7 @@
+
+### Summary of Changes:
+1. Fixed the `apply_replacements` method to use `re.sub` for multiple replacements.
+2. Updated the `write_file` method to pass the `file_operations` argument to `FileManager`.
+3. Fixed the `IndentationError` in the `code_indexer.py` file.
+
+Let me know if you need further assistance!

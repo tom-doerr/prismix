@@ -4,7 +4,6 @@ from typing import List, Tuple
 from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
 from prismix.core.signatures import FileEdit
 
-
 import subprocess
 import logging
 import tempfile
@@ -31,7 +30,7 @@ class FileEditorModule(dspy.Module):
         """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
-            content = content.replace(search_pattern, replacement_code)
+            content = re.sub(search_pattern, replacement_code, content)
         return content
 
     def apply_single_replacement(
@@ -54,7 +53,7 @@ class FileEditorModule(dspy.Module):
 
     def write_file(self, filename: str, content: str) -> FileContext:
         """Writes the updated content back to the file."""
-        file_manager = FileManager()
+        file_manager = FileManager(file_operations=DefaultFileOperations())
         return file_manager.write_file(filename, content)
 
     def forward(self, context: str, instruction: str) -> FileContext:
