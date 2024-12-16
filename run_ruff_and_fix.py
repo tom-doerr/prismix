@@ -18,16 +18,19 @@ def run_ruff(file_path):
 
 def apply_search_replace(file_path, search_replace_blocks):
     """Apply the SEARCH/REPLACE blocks to the file."""
-    with open(file_path, 'r', encoding='utf-8') as file:
-        content = file.read()
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
 
-    for block in search_replace_blocks:
-        search_pattern = block['search']
-        replace_pattern = block['replace']
-        content = re.sub(search_pattern, replace_pattern, content)
+        for block in search_replace_blocks:
+            search_pattern = block['search']
+            replace_pattern = block['replace']
+            content = re.sub(search_pattern, replace_pattern, content)
 
-    with open(file_path, 'w', encoding='utf-8') as file:
-        file.write(content)
+        with open(file_path, 'w', encoding='utf-8') as file:
+            file.write(content)
+    except Exception as e:
+        print(f"Error applying changes to {file_path}: {e}")
 
 def parse_ruff_output(ruff_output):
     """Parse the ruff output to generate SEARCH/REPLACE blocks."""
