@@ -18,7 +18,7 @@ def get_all_files_to_index(directory: str) -> List[str]:
     for root, _, files in os.walk(directory):
         for file in files:
             filepath = os.path.join(root, file)
-            if indexer.is_ignored(filepath):
+            if not indexer._is_ignored(filepath):
                 files_to_index.append(filepath)
     return files_to_index
 

@@ -49,6 +49,3 @@ def test_colbert_retriever(colbert_retriever):
     assert len(results) == 3
     for result in results:
         assert "dummy result" in result
-    dspy.settings.rm = lambda queries, k=3: [
-        [f"This is a dummy result for {q}" for _ in range(k)] for q in queries
-    ][0]
