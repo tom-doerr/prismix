@@ -41,6 +41,7 @@ class FileEdit(dspy.Signature):
 
 from abc import ABC, abstractmethod
 
+
 class FileOperations(ABC):
     @abstractmethod
     def read_file(self, filepath: str) -> str:
@@ -49,6 +50,7 @@ class FileOperations(ABC):
     @abstractmethod
     def write_file(self, filepath: str, content: str) -> None:
         pass
+
 
 class DefaultFileOperations(FileOperations):
     def read_file(self, filepath: str) -> str:
@@ -59,6 +61,7 @@ class DefaultFileOperations(FileOperations):
         with open(filepath, "w") as f:
             f.write(content)
 
+
 class FileManager:
     def __init__(self, file_operations: FileOperations):
         self.file_operations = file_operations
@@ -68,16 +71,24 @@ class FileManager:
             content = self.file_operations.read_file(filepath)
             return FileContext(filepath=filepath, content=content, changes=[])
         except FileNotFoundError:
-            return FileContext(filepath=filepath, content="", changes=[], error="File does not exist")
+            return FileContext(
+                filepath=filepath, content="", changes=[], error="File does not exist"
+            )
         except Exception as e:
             return FileContext(filepath=filepath, content="", changes=[], error=str(e))
 
     def write_file(self, filepath: str, content: str) -> FileContext:
         try:
             self.file_operations.write_file(filepath, content)
-            return FileContext(filepath=filepath, content=content, changes=["File updated successfully"])
+            return FileContext(
+                filepath=filepath,
+                content=content,
+                changes=["File updated successfully"],
+            )
         except Exception as e:
-            return FileContext(filepath=filepath, content=content, changes=[], error=str(e))
+            return FileContext(
+                filepath=filepath, content=content, changes=[], error=str(e)
+            )
 
 
 class FileEditor:
@@ -111,18 +122,18 @@ class FileEditor:
                     mode_line = parts[0].strip().split()  # Split on whitespace
                     if len(mode_line) < 2:
                         mode = "REPLACE"  # Default mode
-                        line_num = -1 # Initialize to an invalid value
+                        line_num = -1  # Initialize to an invalid value
                         if mode_line:
                             try:
                                 line_num = int(mode_line[0])
                             except ValueError:
-                                pass # If not a number, keep it as -1
+                                pass  # If not a number, keep it as -1
                     else:
                         mode = mode_line[0].upper()
                         try:
                             line_num = int(mode_line[1])
                         except ValueError:
-                            line_num = -1 # If not a number, keep it as -1
+                            line_num = -1  # If not a number, keep it as -1
 
                     new_text = parts[1].strip() if len(parts) > 1 else ""
 
@@ -148,7 +159,9 @@ class FileEditor:
                                                 if line_num_j >= line_num:
                                                     mode_line_j[1] = str(line_num_j + 1)
                                                     edit_lines[j] = (
-                                                        " ".join(mode_line_j) + "|" + parts_j[1]
+                                                        " ".join(mode_line_j)
+                                                        + "|"
+                                                        + parts_j[1]
                                                     )
                                             except ValueError:
                                                 pass
@@ -167,12 +180,16 @@ class FileEditor:
                                                 if line_num_j > line_num:
                                                     mode_line_j[1] = str(line_num_j - 1)
                                                     edit_lines[j] = (
-                                                        " ".join(mode_line_j) + "|" + parts_j[1]
+                                                        " ".join(mode_line_j)
+                                                        + "|"
+                                                        + parts_j[1]
                                                     )
                                             except ValueError:
                                                 pass
                 except (ValueError, IndexError) as e:
-                    changes.append(f"Failed to apply edit: Invalid line number {line_num}: {str(e)}")
+                    changes.append(
+                        f"Failed to apply edit: Invalid line number {line_num}: {str(e)}"
+                    )
                     continue
         else:
             # Handle direct mode/line/text tuples (from tests)
