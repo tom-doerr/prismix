@@ -15,8 +15,7 @@ def process_file(filepath: str) -> None:
 
 
 def main():
-
-import sys
+    import sys
     """Main function to process a file."""
     if len(sys.argv) != 2:
         print("Usage: python file_processor.py <filepath>")
