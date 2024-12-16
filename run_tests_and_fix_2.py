@@ -169,6 +169,7 @@ if __name__ == "__main__":
     # Run black on the files
     run_black(files_to_fix)
     
+    # Only pass the directly involved files to aider
     call_aider(files_to_fix, combined_output)
 
     if pylint_success and ruff_success:
