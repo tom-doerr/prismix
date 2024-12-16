@@ -5,8 +5,7 @@ from prismix.core.iterative_programmer import IterativeProgrammer
 
 class TestSafetyCheck(unittest.TestCase):
     def setUp(self):
-        lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
-        dspy.configure(lm=lm)
+        dspy.configure(lm=dspy.LM(model="gpt-4o-mini", max_tokens=2000))
         self.programmer = IterativeProgrammer()
 
     def test_safe_code(self):

@@ -1,19 +1,20 @@
 import subprocess
-import os
 import glob
 
 
 def run_pylint():
     """Runs pylint on the entire project."""
+    """Runs pylint on the entire project."""
     try:
         subprocess.run(["pylint", "."], check=True, capture_output=True, text=True)
     except subprocess.CalledProcessError as e:
-        print(f"Error running ruff or pylint: {e}")
+        print(f"Error running pylint: {e}")
         return False
     return True
 
 
 def run_ruff_fix():
+    """Runs ruff to fix code style issues."""
     """Runs ruff to fix code style issues."""
     try:
         subprocess.run(
@@ -27,13 +28,15 @@ def run_ruff_fix():
 
 def is_test_file(file_path):
     """Checks if a file is a test file."""
-    return file_path.endswith("_test.py") or "tests" in file_path.split(os.sep)
+    """Checks if a file is a test file."""
+    return file_path.endswith("_test.py") or "tests" in file_path.split("/")
 
 
 MAX_RECURSION_DEPTH = 1
 
 
 def find_related_files(file_path):
+    """Finds related files for a given file."""
     """Finds related files for a given file."""
 
     if is_test_file(file_path):
@@ -45,6 +48,7 @@ def find_related_files(file_path):
 
 
 def call_aider(file_paths, ruff_output):
+    """Call aider to fix issues based on ruff output."""
     """Call aider to fix issues based on ruff output."""
     try:
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")

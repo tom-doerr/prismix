@@ -34,10 +34,12 @@ def test_factorial_negative():
         "Create a function that calculates factorial of a number"
     )
 
-    # Execute the generated code
-    local_vars = {}
-    exec(result.code, {}, local_vars)
-    factorial = local_vars["factorial"]
+    # Safer execution using CodeExecutor
+    code_result = CodeExecutor.execute(
+        result.code.replace("```python", "").replace("```", "")
+    )
+    assert code_result.success, f"Code execution failed: {code_result.error}"
+    factorial = locals().get("factorial")
 
     # Test negative input
     with pytest.raises(ValueError):
