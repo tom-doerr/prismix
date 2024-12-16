@@ -132,7 +132,7 @@ def main() -> NoReturn:
             return
         query = sys.argv[2]
         print(f"Searching Qdrant for query: {query}")
-        retriever = ColbertRetriever()
+        retriever = ColbertRetriever(url="http://example.com/colbert")
         results = retriever.forward(query)
         if results:
             print("Qdrant search results:")
