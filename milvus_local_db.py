@@ -3,10 +3,13 @@ import numpy as np
 import logging
 
 # Configure logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 # Path to the local database file
 DB_FILE = "./milvus_demo.db"
+
 
 def setup_milvus_local_db():
     """Setup the local Milvus database and create a collection."""
@@ -22,6 +25,7 @@ def setup_milvus_local_db():
     except Exception as e:
         logging.error(f"Error setting up Milvus local database: {e}")
 
+
 def insert_data_into_milvus():
     """Insert sample data into the Milvus collection."""
     try:
@@ -31,15 +35,16 @@ def insert_data_into_milvus():
             "Alan Turing war der erste Mensch, der umfangreiche Forschung in der KI durchführte.",
             "Turing wurde in Maida Vale, London, geboren und wuchs in Südengland auf.",
         ]
-        vectors = [[np.random.uniform(-1, 1) for _ in range(384)] for _ in range(len(docs))]
-        data = [
-            {"text": doc, "vector": vector} for doc, vector in zip(docs, vectors)
+        vectors = [
+            [np.random.uniform(-1, 1) for _ in range(384)] for _ in range(len(docs))
         ]
+        data = [{"text": doc, "vector": vector} for doc, vector in zip(docs, vectors)]
         client.insert(collection_name="demo_collection", data=data)
         logging.info("Data successfully inserted into the collection.")
         logging.info(f"Inserted {len(data)} documents.")
     except Exception as e:
         logging.error(f"Error inserting data into Milvus: {e}")
+
 
 def search_milvus_collection():
     """Search the Milvus collection for similar documents."""
@@ -62,6 +67,7 @@ def search_milvus_collection():
     except Exception as e:
         logging.error(f"Error searching Milvus collection: {e}")
 
+
 def main():
     """Main function to setup, insert data, and search in Milvus."""
     logging.info("Starting Milvus local database setup...")
@@ -74,6 +80,7 @@ def main():
     search_milvus_collection()
 
     print("Script execution completed.")
+
 
 if __name__ == "__main__":
     main()

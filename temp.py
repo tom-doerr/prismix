@@ -1,35 +1,40 @@
 n
 import os
-from collections import Counter
 
-def read_file(file_path):
-    """Read the content of a file and return it as a string."""
-    if not os.path.isfile(file_path):
-        raise FileNotFoundError(f"The file {file_path} does not exist.")
-    
-    with open(file_path, 'r', encoding='utf-8') as file:
-        return file.read()
 
-def process_text(text):
-    """Process the text to count word frequencies."""
-    words = text.split()
-    word_count = Counter(words)
-    return word_count
-
-def display_word_frequencies(word_count):
-    """Display the word frequencies in a sorted manner."""
-    for word, count in word_count.most_common():
-        print(f"{word}: {count}")
-
-def main(file_path):
-    """Main function to execute the text processing."""
+def count_words_in_file(input_file):
+    """Counts the number of words in a given text file."""
     try:
-        text = read_file(file_path)
-        word_count = process_text(text)
-        display_word_frequencies(word_count)
+        with open(input_file, "r", encoding="utf-8") as file:
+            content = file.read()
+            words = content.split()
+            return len(words)
+    except FileNotFoundError:
+        print(f"Error: The file '{input_file}' was not found.")
+        return None
     except Exception as e:
         print(f"An error occurred: {e}")
+        return None
+
+
+def write_word_count_to_file(output_file, word_count):
+    """Writes the word count to a specified output file."""
+    try:
+        with open(output_file, "w", encoding="utf-8") as file:
+            file.write(f"Word Count: {word_count}\n")
+    except Exception as e:
+        print(f"An error occurred while writing to the file: {e}")
+
+
+def main():
+    input_file = "input.txt"  # Specify the input file name
+    output_file = "output.txt"  # Specify the output file name
+
+    word_count = count_words_in_file(input_file)
+    if word_count is not None:
+        write_word_count_to_file(output_file, word_count)
+        print(f"The word count has been written to '{output_file}'.")
+
 
 if __name__ == "__main__":
-    # Example usage: replace 'example.txt' with your file path
-    main('example.txt')
+    main()

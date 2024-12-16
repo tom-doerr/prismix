@@ -1,9 +1,11 @@
 from dataclasses import dataclass
 
+
 @dataclass
 class User:
     username: str
     email: str
+
 
 class UserManager:
     """Manages a list of users."""
@@ -40,6 +42,7 @@ class UserManager:
         """
         return next((user for user in self.users if user.username == username), None)
 
+
 def main() -> None:
     manager = UserManager()
     manager.add_user("alice", "alice@example.com")
@@ -48,6 +51,7 @@ def main() -> None:
         print(f"User found: {user}")
     else:
         print("User not found")
+
 
 if __name__ == "__main__":
     main()

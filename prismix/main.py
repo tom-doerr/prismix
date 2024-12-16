@@ -62,13 +62,14 @@ def execute_instruction(instruction: str) -> None:
     print("----------")
 
 
-
 def main() -> NoReturn:
     """Main function to execute the Prismix application."""
     print("CodeWeaver - AI-powered iterative code generation tool")
 
     if len(sys.argv) < 2:
-        print("Usage: codeweaver '<instruction>' or 'index <path>' or 'index_debug <path>' or 'search_colbert <query>' or 'milvus_setup' or 'milvus_insert' or 'milvus_search'")
+        print(
+            "Usage: codeweaver '<instruction>' or 'index <path>' or 'index_debug <path>' or 'search_colbert <query>' or 'milvus_setup' or 'milvus_insert' or 'milvus_search'"
+        )
         print("Example: codeweaver 'create a hello world script'")
         print("Example: codeweaver index '.'")
         print("Example: codeweaver index_debug '.'")

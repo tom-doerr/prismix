@@ -20,11 +20,16 @@ class IterativeProgrammer(dspy.Module):
         self.file_editor = FileEditor()
         self.max_iterations = max_iterations
 
+
 def is_code_safe(code: str, safety_checker: dspy.TypedPredictor) -> Tuple[bool, str]:
     if "import os" in code or "os.system" in code:
-        return False, "The code contains potentially unsafe operations (e.g., import os, os.system)."
+        return (
+            False,
+            "The code contains potentially unsafe operations (e.g., import os, os.system).",
+        )
     safety_check = safety_checker(code=code)
     return safety_check.is_safe, safety_check.safety_message
+
 
 class IterativeProgrammer(dspy.Module):
     def __init__(self, max_iterations: int = 3) -> None:
@@ -58,13 +63,15 @@ class IterativeProgrammer(dspy.Module):
                     break
             if not file_path:
                 # If no file path is provided, use a temporary file
-                with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.py') as temp_file:
+                with tempfile.NamedTemporaryFile(
+                    mode="w", delete=False, suffix=".py"
+                ) as temp_file:
                     temp_file_path = temp_file.name
                     temp_file.write(code)
                 file_path = temp_file_path
 
             # Read the original file content
-            with open(file_path, 'r') as f:
+            with open(file_path, "r") as f:
                 original_content = f.read()
 
             # Apply the changes to the original content
@@ -72,7 +79,7 @@ class IterativeProgrammer(dspy.Module):
             modified_content, _ = file_editor._apply_line_edits(original_content, code)
 
             # Write the modified content back to the original file
-            with open(file_path, 'w') as f:
+            with open(file_path, "w") as f:
                 f.write(modified_content)
 
             # Capture stdout and stderr
@@ -90,25 +97,20 @@ class IterativeProgrammer(dspy.Module):
             output = redirected_output.getvalue()
             error = redirected_error.getvalue()
 
-            return CodeResult(
-                code=code,
-                success=True,
-                output=output,
-                error=error
-            )
+            return CodeResult(code=code, success=True, output=output, error=error)
         except subprocess.CalledProcessError as e:
             return CodeResult(
                 code=code,
                 success=False,
                 output="",
-                error=f"Function execution failed in {file_path}: {str(e.stderr)}"
+                error=f"Function execution failed in {file_path}: {str(e.stderr)}",
             )
         except Exception as e:
             return CodeResult(
                 code=code,
                 success=False,
                 output="",
-                error=f"Function execution failed in {file_path}: {str(e)}"
+                error=f"Function execution failed in {file_path}: {str(e)}",
             )
 
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
@@ -184,7 +186,7 @@ class IterativeProgrammer(dspy.Module):
             # Try to improve failed implementation
             print(f"Test failed: {result.error}")
             print("5. Reviewing and improving code...")
-            
+
             if i == self.max_iterations - 1:
                 return result
 
@@ -198,7 +200,7 @@ class IterativeProgrammer(dspy.Module):
 
         if not result.success:
             return result
-        
+
         return result
 
 

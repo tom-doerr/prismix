@@ -35,14 +35,10 @@ def add_data_to_db(directory: str):
             print(f"Error adding {filepath} to db: {e}")
 
 
-
-
-
-
-
 from prismix.core.qdrant_manager import QdrantManager
 
 import logging
+
 
 class DataInserter:
     def __init__(self, qdrant_manager: QdrantManager):
@@ -56,14 +52,19 @@ class DataInserter:
                 file_context = FileManager.read_file(filepath)
                 if file_context and file_context.content:
                     embedding = indexer._embed_code(file_context.content)
-                    self.qdrant_manager.insert_embeddings([{
-                        "id": filepath,
-                        "vector": embedding,
-                        "payload": {"content": file_context.content}
-                    }])
+                    self.qdrant_manager.insert_embeddings(
+                        [
+                            {
+                                "id": filepath,
+                                "vector": embedding,
+                                "payload": {"content": file_context.content},
+                            }
+                        ]
+                    )
                     logging.info(f"Added to Qdrant: {filepath}")
             except Exception as e:
                 logging.error(f"Error adding {filepath} to Qdrant: {e}")
+
 
 class ColbertRetriever(dspy.Retrieve):
     def __init__(self, url: str, k: int = 3):
@@ -76,32 +77,43 @@ class ColbertRetriever(dspy.Retrieve):
     def add_data_to_db(self, directory: str):
         self.data_inserter.add_data_to_db(directory)
 
+
 import logging
 
+
 def add_data_to_db(self, directory: str):
-        """Add data to the Qdrant database."""
-        indexer = CodeIndexer()
-        files_to_index = get_all_files_to_index(directory)
-        for filepath in files_to_index:
-            try:
-                file_context = FileManager.read_file(filepath)
-                if file_context and file_context.content:
-                    embedding = indexer._embed_code(file_context.content)
-                    self.qdrant_manager.insert_embeddings([{
-                        "id": filepath,
-                        "vector": embedding,
-                        "payload": {"content": file_context.content}
-                    }])
-                    logging.info(f"Added to Qdrant: {filepath}")
-                    # Check if the embedding was correctly inserted
-                    inserted_embedding = self.qdrant_manager.search_embeddings(embedding, top_k=1)
-                    if not inserted_embedding:
-                        logging.warning(f"Embedding for {filepath} not found in Qdrant after insertion.")
-            except Exception as e:
-                logging.error(f"Error adding {filepath} to Qdrant: {e}")
+    """Add data to the Qdrant database."""
+    indexer = CodeIndexer()
+    files_to_index = get_all_files_to_index(directory)
+    for filepath in files_to_index:
+        try:
+            file_context = FileManager.read_file(filepath)
+            if file_context and file_context.content:
+                embedding = indexer._embed_code(file_context.content)
+                self.qdrant_manager.insert_embeddings(
+                    [
+                        {
+                            "id": filepath,
+                            "vector": embedding,
+                            "payload": {"content": file_context.content},
+                        }
+                    ]
+                )
+                logging.info(f"Added to Qdrant: {filepath}")
+                # Check if the embedding was correctly inserted
+                inserted_embedding = self.qdrant_manager.search_embeddings(
+                    embedding, top_k=1
+                )
+                if not inserted_embedding:
+                    logging.warning(
+                        f"Embedding for {filepath} not found in Qdrant after insertion."
+                    )
+        except Exception as e:
+            logging.error(f"Error adding {filepath} to Qdrant: {e}")
+
 
 def forward(self, query: str, k: int = None) -> List[str]:
-        """Search for similar embeddings in Qdrant."""
-        query_embedding = self.qdrant_manager._embed_code(query)
-        results = self.qdrant_manager.search_embeddings(query_embedding, top_k=k or self.k)
-        return [result["payload"]["content"] for result in results]
+    """Search for similar embeddings in Qdrant."""
+    query_embedding = self.qdrant_manager._embed_code(query)
+    results = self.qdrant_manager.search_embeddings(query_embedding, top_k=k or self.k)
+    return [result["payload"]["content"] for result in results]

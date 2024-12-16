@@ -1,8 +1,10 @@
 from typing import List, Dict, Union
 
+
 def add_numbers(numbers: List[float]) -> float:
     """Add all numbers in the list."""
     return sum(numbers)
+
 
 def multiply_numbers(numbers: List[float]) -> float:
     """Multiply all numbers in the list."""
@@ -11,11 +13,13 @@ def multiply_numbers(numbers: List[float]) -> float:
         result *= num
     return result
 
+
 def calculate_average(numbers: List[float]) -> float:
     """Calculate the average of the numbers."""
     if not numbers:
         return 0
     return sum(numbers) / len(numbers)
+
 
 def calculate_stats(numbers: List[float]) -> Dict[str, float]:
     """Calculate the minimum, maximum, and average of the numbers."""
@@ -24,13 +28,12 @@ def calculate_stats(numbers: List[float]) -> Dict[str, float]:
     total = sum(numbers)
     minimum = min(numbers)
     maximum = max(numbers)
-    return {
-        "min": minimum,
-        "max": maximum,
-        "avg": total / len(numbers)
-    }
+    return {"min": minimum, "max": maximum, "avg": total / len(numbers)}
 
-def process_calculation(operation: str, numbers: List[float]) -> Union[float, Dict[str, float], None]:
+
+def process_calculation(
+    operation: str, numbers: List[float]
+) -> Union[float, Dict[str, float], None]:
     """Process the calculation based on the operation."""
     operations = {
         "add": add_numbers,
