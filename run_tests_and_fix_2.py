@@ -3,6 +3,7 @@ import subprocess
 import os
 import glob
 import random
+from tqdm import tqdm
 
 
 def run_pylint():
@@ -162,7 +163,7 @@ if __name__ == "__main__":
 
     all_files = glob.glob("**/*.py", recursive=True)
     
-    for iteration in range(args.iterations):
+    for iteration in tqdm(range(args.iterations), desc="Running iterations"):
         print(f"Starting iteration {iteration + 1} of {args.iterations}...")
         pylint_success, pylint_output = run_pylint()
         ruff_success, ruff_output = run_ruff_fix()
