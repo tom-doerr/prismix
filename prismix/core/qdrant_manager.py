@@ -2,6 +2,7 @@ import logging
 from qdrant_client import QdrantClient, models
 from typing import List, Dict
 
+
 class QdrantManager:
     """Manages Qdrant operations for storing and querying ColBERT embeddings."""
 
@@ -38,7 +39,9 @@ class QdrantManager:
         logging.info(f"Generated embedding for content: {content[:50]}...")
         return embedding
 
-    def search_embeddings(self, query_embedding: List[float], top_k: int = 3) -> List[Dict[str, any]]:
+    def search_embeddings(
+        self, query_embedding: List[float], top_k: int = 3
+    ) -> List[Dict[str, any]]:
         """Search for similar embeddings in the Qdrant collection."""
         results = self.client.search(
             collection_name=self.collection_name,
