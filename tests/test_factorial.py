@@ -16,9 +16,9 @@ def test_factorial_basic():
         "Create a function that calculates factorial of a number"
     )
 
-    code_result = CodeExecutor.execute(result.code)
-    assert code_result.success, f"Code execution failed: {code_result.error}"
-    factorial = locals().get("factorial")
+    # Execute the generated code in the global scope
+    exec(result.code, globals())
+    factorial = globals().get("factorial")
 
     # Test basic cases
     assert factorial(0) == 1
