@@ -28,6 +28,18 @@ class FileEditorModule(dspy.Module):
         """Applies the edit to the file content."""
         return content.replace(search_pattern, replacement_code)
 
+    def apply_replacements(self, content: str, instruction: str) -> str:
+        """Applies multiple replacements based on the instruction."""
+        replacements = instruction.split(" and ")
+        for replacement in replacements:
+            if "Replace" in replacement:
+                parts = replacement.split(" with ")
+                if len(parts) == 2:
+                    search_pattern = parts[0].replace("Replace ", "").strip("'")
+                    replacement_code = parts[1].strip("'")
+                    content = self.apply_edit(content, search_pattern, replacement_code)
+        return content
+
     def write_file(self, filename: str, content: str) -> FileContext:
         """Writes the updated content back to the file."""
         file_manager = FileManager()
@@ -64,17 +76,10 @@ class FileEditorModule(dspy.Module):
             updated_content = file_context.content
         else:
             # Handle multiple replacements
-            replacements = instruction.split(" and ")
-            updated_content = file_context.content
-            for replacement in replacements:
-                if "Replace" in replacement:
-                    parts = replacement.split(" with ")
-                    if len(parts) == 2:
-                        search_pattern = parts[0].replace("Replace ", "").strip("'")
-                        replacement_code = parts[1].strip("'")
-                        updated_content = self.apply_edit(updated_content, search_pattern, replacement_code)
+            updated_content = self.apply_replacements(file_context.content, instruction)
 
         logging.info(f"File content after update: {updated_content}")
+        logging.info(f"Applied replacements: {instruction}")
 
         write_result = self.write_file(filename, updated_content)
         if write_result.error:
