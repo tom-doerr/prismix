@@ -1,7 +1,7 @@
 import dspy
 import re
 from typing import List, Tuple
-from prismix.core.file_operations import FileManager, FileContext
+from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
 from prismix.core.signatures import FileEdit
 
 
