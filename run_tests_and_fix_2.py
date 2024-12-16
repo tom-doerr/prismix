@@ -170,9 +170,8 @@ if __name__ == "__main__":
         # Run n random pytest tests and n random pylint checks
         pytest_output = run_random_pytest(args.pytest_files, all_files)
         pylint_output = run_random_pylint(args.pylint_files, all_files)
-        
         # Combine the outputs
-        combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
+        combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
         
         # Filter files based on the output
         files_to_fix = filter_files_by_output(combined_output, all_files)
