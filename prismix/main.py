@@ -122,7 +122,7 @@ def main() -> NoReturn:
             return
         path = sys.argv[2]
         print(f"Inserting data into Qdrant from path: {path}")
-        retriever = ColbertRetriever()
+        retriever = ColbertRetriever(url="http://example.com/colbert")
         retriever.add_data_to_db(path)
         print("Insertion complete.")
 
