@@ -1,4 +1,3 @@
-import pytest
 from prismix.core.file_editor_module import FileEditorModule
 
 def test_apply_replacements():
