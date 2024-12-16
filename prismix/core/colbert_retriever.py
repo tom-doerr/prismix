@@ -1,10 +1,19 @@
 import dspy
+import os
 from typing import List
+from prismix.core.code_indexer import CodeIndexer
 
 
-
-
-# ai! add code that gets all files that should be added to the index
+def get_all_files_to_index(directory: str) -> List[str]:
+    """Get all files that should be added to the index."""
+    indexer = CodeIndexer()
+    files_to_index = []
+    for root, _, files in os.walk(directory):
+        for file in files:
+            filepath = os.path.join(root, file)
+            if not indexer._is_ignored(filepath):
+                files_to_index.append(filepath)
+    return files_to_index
 
 
 
