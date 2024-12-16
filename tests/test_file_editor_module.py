@@ -28,7 +28,7 @@ def temp_file():
     os.remove(temp_file_path)
 
 
-def test_file_edit_module(file_editor_module, temp_file):
+def test_file_edit_module(file_editor_module):
     # Test successful file edit
     result = file_editor_module.forward(
         context="def hello():\n    print('hello')\n",
@@ -42,7 +42,7 @@ def test_file_edit_module(file_editor_module, temp_file):
     assert result.replacement == "print('hi')"
 
 
-def test_file_edit_module_no_change(file_editor_module, temp_file):
+def test_file_edit_module_no_change(file_editor_module):
     # Test file edit with no change
     result = file_editor_module.forward(
         context="def hello():\n    print('hello')\n",
