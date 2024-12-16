@@ -5,7 +5,10 @@ from prismix.core.file_operations import FileManager, FileContext
 from prismix.core.signatures import FileEdit
 
 
+import subprocess
 import logging
+import tempfile
+import os
 
 class FileEditorModule(dspy.Module):
     def __init__(self):
@@ -69,6 +72,28 @@ class FileEditorModule(dspy.Module):
         file_manager = FileManager()
         return file_manager.write_file(filename, content)
 
+    def _run_lint(self, content: str) -> None:
+        """Runs ruff linter on the given content."""
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as tmp_file:
+            tmp_file.write(content)
+            tmp_file_path = tmp_file.name
+
+        try:
+            result = subprocess.run(
+                ["ruff", tmp_file_path],
+                capture_output=True,
+                text=True,
+                check=False
+            )
+            if result.returncode != 0:
+                logging.error(f"Linting failed:\n{result.stdout}\n{result.stderr}")
+                assert False, f"Linting failed:\n{result.stdout}\n{result.stderr}"
+            else:
+                logging.info("Linting passed.")
+        finally:
+            os.remove(tmp_file_path)
+
+
     def forward(self, context: str, instruction: str) -> FileEdit:
         """Edits a file based on context, instruction, and returns the FileEdit signature."""
         logging.info(f"Received context: {context}")
@@ -106,6 +131,9 @@ class FileEditorModule(dspy.Module):
 
         logging.info(f"File content after update: {updated_content}")
         logging.info(f"Applied replacements: {instruction}")
+
+        # Run linting
+        self._run_lint(updated_content)
 
         write_result = self.write_file(filename, updated_content)
         if write_result.error:
