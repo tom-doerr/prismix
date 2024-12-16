@@ -1,16 +1,9 @@
 """
 Test module for code safety checks.
 """
-"""
-Test module for code safety checks.
-"""
 
 import pytest
-from prismix.core.iterative_programmer import IterativeProgrammer, setup_agent
-
-"""
-Test module for code safety checks.
-"""
+from prismix.core.iterative_programmer import setup_agent
 
 @pytest.fixture
 def agent():
