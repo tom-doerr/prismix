@@ -51,12 +51,11 @@ class IterativeProgrammer(dspy.Module):
                     file_path = line.strip()[1:].strip()
                     break
             if not file_path:
-                return CodeResult(
-                    code=code,
-                    success=False,
-                    output="",
-                    error="Could not determine file path from code comment."
-                )
+                # If no file path is provided, use a temporary file
+                with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.py') as temp_file:
+                    temp_file_path = temp_file.name
+                    temp_file.write(code)
+                file_path = temp_file_path
 
             # Read the original file content
             with open(file_path, 'r') as f:

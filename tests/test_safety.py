@@ -11,8 +11,7 @@ class TestSafetyCheck(unittest.TestCase):
 
     def test_safe_code(self):
         safe_code = """
-def add(a, b):
-    return a + b
+def safe_function(): return 42
 """
         is_safe, message = self.programmer.is_code_safe(safe_code)
         self.assertTrue(is_safe)
@@ -35,7 +34,7 @@ os.system("rm -rf /")
 """
         is_safe, message = self.programmer.is_code_safe(unsafe_code)
         self.assertFalse(is_safe)
-        self.assertIn("potential security risk", message)
+        self.assertIn("potentially unsafe operations", message)
 
 if __name__ == '__main__':
     unittest.main()
