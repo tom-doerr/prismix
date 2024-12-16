@@ -42,7 +42,7 @@ def call_aider(file_paths, ruff_output):
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
         subprocess.run(
             ["aider", "--deepseek", "--edit-format", "diff", "--yes-always", "--no-suggest-shell-commands"] +
-            [f"--file", file_path for file_path in file_paths] +
+            ([f"--file", file_path for file_path in file_paths]) +
             ["--message", f"Ruff output: {ruff_output}. Fix it"],
             check=True
         )
