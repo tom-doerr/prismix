@@ -19,6 +19,32 @@ def run_ruff(file_path):
         print(f"Error running ruff on {file_path}: {e.stdout}")
         return e.stdout
 
+def fix_syntax_errors(file_path, ruff_output):
+    """Fix syntax errors in the file based on ruff output."""
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.readlines()
+
+        for line in ruff_output.splitlines():
+            if line.startswith("SyntaxError:"):
+                # Parse the error and attempt to fix it
+                # This is a simplified example and may need to be extended for complex cases
+                error_info = line.split(":")
+                line_number = int(error_info[1].strip()) - 1
+                error_type = error_info[2].strip()
+
+                if error_type == "Unexpected indentation":
+                    content[line_number] = content[line_number].lstrip()
+                elif error_type == "Expected a statement":
+                    content[line_number] = ""
+                elif error_type == "Got unexpected token":
+                    content[line_number] = content[line_number].replace("```", "")
+
+        with open(file_path, 'w', encoding='utf-8') as file:
+            file.writelines(content)
+    except Exception as e:
+        print(f"Error fixing syntax errors in {file_path}: {e}")
+
 def apply_search_replace(file_path, search_replace_blocks):
     """Apply the SEARCH/REPLACE blocks to the file."""
     try:
@@ -77,6 +103,7 @@ def main():
 
         if ruff_output.strip():
             print(f"Issues found in {file_path}. Fixing...")
+            fix_syntax_errors(file_path, ruff_output)
             search_replace_blocks = parse_ruff_output(ruff_output)
             if dry_run:
                 print(f"Dry run for {file_path}:")
