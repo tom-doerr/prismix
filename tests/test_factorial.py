@@ -1,6 +1,10 @@
 """
 Test module for factorial calculations.
 """
+"""
+Test module for factorial calculations.
+"""
+
 import pytest
 from prismix.core.iterative_programmer import setup_agent, CodeResult
 

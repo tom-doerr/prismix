@@ -1,6 +1,10 @@
 """
 Script to create sample files.
 """
+"""
+Script to create sample files.
+"""
+
 import os
 from pathlib import Path
 

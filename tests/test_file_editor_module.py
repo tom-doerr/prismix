@@ -1,3 +1,7 @@
+"""
+Test module for file editor module.
+"""
+
 import pytest
 import tempfile
 import dspy

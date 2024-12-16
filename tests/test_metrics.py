@@ -1,3 +1,7 @@
+"""
+Test module for metrics calculations.
+"""
+
 import pytest
 from prismix.core.metrics import (
     calculate_levenshtein_similarity,
