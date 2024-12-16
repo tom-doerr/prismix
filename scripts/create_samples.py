@@ -102,9 +102,7 @@ if __name__ == "__main__":
     complex_calc = samples_dir / "calculator.py"
     complex_calc.write_text(
         """
-"""
 Sample calculator module.
-"""
 
 def process_calculation(operation, numbers):
     """Process different types of calculations based on the operation."""
