@@ -82,24 +82,28 @@ def find_related_files(file_path):
     return [file_path]
 
 
+def filter_files_by_output(output, all_files):
+    """Filters files based on the output of pytest and pylint."""
+    files_to_fix = set()
+    for line in output.splitlines():
+        if "Error running" in line:
+            file_path = line.split(" ")[-1].strip("'")
+            if file_path in all_files:
+                files_to_fix.add(file_path)
+    return list(files_to_fix)
+
 def call_aider(file_paths, combined_output):
     """Call aider to fix issues based on combined output."""
     try:
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
-        command = (
-            [
-                "aider",
-                "--deepseek",
-                "--edit-format",
-                "diff",
-                "--yes-always",
-                "--no-suggest-shell-commands",
-            ]
-            + [item for file_path in file_paths for item in ["--file", file_path]]
-            + ["--message", f"Output: {combined_output}. Fix it"]
-        )
+        command = ["aider", "--deepseek", "--edit-format", "diff", "--yes-always", "--no-suggest-shell-commands"] + \
+            [item for file_path in file_paths for item in ["--file", file_path]] + \
+            ["--message", f"Output: {combined_output}. Fix it"]
         print("Aider command:", " ".join(command))
-        subprocess.run(command, check=True)
+        subprocess.run(
+            command,
+            check=True
+        )
         print(f"Aider fixed issues in {', '.join(file_paths)}.")
     except subprocess.CalledProcessError as e:
         print(f"Error calling aider on {', '.join(file_paths)}: {e}")
@@ -136,23 +140,20 @@ if __name__ == "__main__":
     all_files = glob.glob("**/*.py", recursive=True)
     pylint_success, pylint_output = run_pylint()
     ruff_success, ruff_output = run_ruff_fix()
-    files_to_aider = []
-    for file_path in all_files:
-        files_to_aider.extend(find_related_files(file_path))
-
     # Run n random pytest tests and n random pylint checks
     pytest_output = run_random_pytest(args.pytest_files, all_files)
     pylint_output = run_random_pylint(args.pylint_files, all_files)
-
+    
     # Combine the outputs
-    combined_output = (
-        f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
-    )
-
+    combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
+    
+    # Filter files based on the output
+    files_to_fix = filter_files_by_output(combined_output, all_files)
+    
     # Run black on the files
-    run_black(files_to_aider)
-
-    call_aider(files_to_aider, combined_output)
+    run_black(files_to_fix)
+    
+    call_aider(files_to_fix, combined_output)
 
     if pylint_success and ruff_success:
         print("Ruff and Pylint checks and fixes applied successfully.")
