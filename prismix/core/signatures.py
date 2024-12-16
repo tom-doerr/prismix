@@ -30,6 +30,9 @@ class FileEdit(dspy.Signature):
     """
     Signature for editing code in a file.
     """
-    filepath = dspy.InputField(desc="The path to the file to be edited.")
-    search_pattern = dspy.InputField(desc="The search pattern (code) to be replaced.")
-    replacement_code = dspy.InputField(desc="The code to replace the search pattern with.")
+    context = dspy.InputField(desc="The context for the edit operation.")
+    instruction = dspy.InputField(desc="The instruction for the edit operation.")
+    inputs = dspy.InputField(desc="Additional inputs for the edit operation.")
+    filename = dspy.OutputField(desc="The filename where the edit will be applied.")
+    search = dspy.OutputField(desc="The search pattern to be replaced.")
+    replace = dspy.OutputField(desc="The replacement code.")
