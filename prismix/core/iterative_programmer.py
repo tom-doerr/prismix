@@ -33,34 +33,49 @@ class IterativeProgrammer(dspy.Module):
                 output="",
                 error=f"Safety check failed: {safety_msg}",
             )
-        import tempfile
-        import importlib.util
         import sys
         from io import StringIO
-
+        import tempfile
+        import os
+        
         try:
-            # Create a temporary file
+            # Extract the file path from the code comment
+            lines = code.splitlines()
+            file_path = None
+            for line in lines:
+                if line.strip().startswith("#"):
+                    file_path = line.strip()[1:].strip()
+                    break
+            if not file_path:
+                return CodeResult(
+                    code=code,
+                    success=False,
+                    output="",
+                    error="Could not determine file path from code comment."
+                )
+            
+            # Read the original file content
+            with open(file_path, 'r') as f:
+                original_content = f.read()
+            
+            # Apply the changes to the original content
+            file_editor = FileEditor()
+            modified_content = file_editor.apply_replacements(original_content, code)
+
+            # Create a temporary file with the modified content
             with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as tmp_file:
                 tmp_file_path = tmp_file.name
-                tmp_file.write(code)
-
-            # Load the module from the temporary file
-            spec = importlib.util.spec_from_file_location("temp_module", tmp_file_path)
-            temp_module = importlib.util.module_from_spec(spec)
-            sys.modules["temp_module"] = temp_module
-            spec.loader.exec_module(temp_module)
-
+                tmp_file.write(modified_content)
+            
             # Capture stdout and stderr
             old_stdout = sys.stdout
             old_stderr = sys.stderr
             redirected_output = sys.stdout = StringIO()
             redirected_error = sys.stderr = StringIO()
 
-            # Execute the main function
-            if hasattr(temp_module, 'main') and callable(temp_module.main):
-                temp_module.main()
-            else:
-                print("Warning: No main function found in generated code.")
+            # Execute the modified file
+            import subprocess
+            subprocess.run([sys.executable, tmp_file_path], check=True)
 
             # Restore stdout and stderr
             sys.stdout = old_stdout
@@ -74,6 +89,13 @@ class IterativeProgrammer(dspy.Module):
                 output=output,
                 error=error
             )
+        except subprocess.CalledProcessError as e:
+            return CodeResult(
+                code=code,
+                success=False,
+                output="",
+                error=f"Function execution failed: {str(e.stderr)}"
+            )
         except Exception as e:
             return CodeResult(
                 code=code,
@@ -82,7 +104,6 @@ class IterativeProgrammer(dspy.Module):
                 error=f"Function execution failed: {str(e)}"
             )
         finally:
-            import os
             os.remove(tmp_file_path)
 
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
