@@ -4,20 +4,20 @@ import os
 import re
 
 def run_ruff(file_path):
-    """Run ruff on the given file and return the output."""
+    """Run ruff on the given file and return the output and exit code."""
     try:
         print(f"Executing ruff on {file_path}...")
         result = subprocess.run(
             ["ruff", "check", file_path],
             capture_output=True,
             text=True,
-            check=True
+            check=False  # Do not raise an exception on non-zero exit code
         )
         print(f"Raw ruff output for {file_path}:\n{result.stdout}")
-        return result.stdout
-    except subprocess.CalledProcessError as e:
-        print(f"Error running ruff on {file_path}: {e.stdout}")
-        return e.stdout
+        return result.stdout, result.returncode  # Return both output and exit code
+    except Exception as e:
+        print(f"Error running ruff on {file_path}: {e}")
+        return "", 1  # Return empty output and non-zero exit code in case of error
 
 def fix_syntax_errors(file_path, ruff_output):
     """Fix syntax errors in the file based on ruff output."""
@@ -110,10 +110,11 @@ def main():
         if test_mode:
             # Simulate ruff output with issues for testing
             ruff_output = "FIX: | old_code | new_code\nFIX: | another_old_code | another_new_code"
+            ruff_exit_code = 1  # Simulate non-zero exit code for testing
         else:
-            ruff_output = run_ruff(file_path)
+            ruff_output, ruff_exit_code = run_ruff(file_path)
 
-        if ruff_output.strip():  # Check if there are any issues in the ruff output
+        if ruff_exit_code != 0:  # Check if there are any issues based on exit code
             print(f"Issues found in {file_path}. Fixing...")
             if dry_run:
                 print(f"Dry run for {file_path}:")
