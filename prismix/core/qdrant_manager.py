@@ -11,14 +11,11 @@ class QdrantManager:
 
     def _create_collection(self):
         """Create a Qdrant collection with the appropriate configuration."""
-        self.client.create_collection(
+        self.client.recreate_collection(
             collection_name=self.collection_name,
             vectors_config=models.VectorParams(
                 size=128,
                 distance=models.Distance.COSINE,
-                multivector_config=models.MultiVectorConfig(
-                    comparator=models.MultiVectorComparator.MAX_SIM
-                ),
             ),
         )
 
