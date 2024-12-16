@@ -4,6 +4,7 @@ import sys
 import os
 from typing import NoReturn
 from prismix.core.iterative_programmer import setup_agent
+from prismix.core.code_indexer import CodeIndexer
 
 
 def execute_instruction(instruction: str) -> None:
@@ -65,12 +66,23 @@ def main() -> NoReturn:
     print("CodeWeaver - AI-powered iterative code generation tool")
 
     if len(sys.argv) < 2:
-        print("Usage: codeweaver '<instruction>'")
+        print("Usage: codeweaver '<instruction>' or 'index <path>'")
         print("Example: codeweaver 'create a hello world script'")
+        print("Example: codeweaver index '.'")
         return
 
-    instruction = sys.argv[1]
-    execute_instruction(instruction)
+    command = sys.argv[1]
+    if command == "index":
+        if len(sys.argv) < 3:
+            print("Usage: codeweaver index <path>")
+            return
+        path = sys.argv[2]
+        print(f"Indexing code at path: {path}")
+        indexer = CodeIndexer()
+        indexer.index_directory(path)
+        print("Indexing complete.")
+    else:
+        execute_instruction(command)
 
 
 if __name__ == "__main__":
