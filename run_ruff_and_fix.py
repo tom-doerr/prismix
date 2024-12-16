@@ -6,14 +6,17 @@ import re
 def run_ruff(file_path):
     """Run ruff on the given file and return the output."""
     try:
+        print(f"Executing ruff on {file_path}...")
         result = subprocess.run(
             ["ruff", file_path],
             capture_output=True,
             text=True,
             check=True
         )
+        print(f"Raw ruff output for {file_path}:\n{result.stdout}")
         return result.stdout
     except subprocess.CalledProcessError as e:
+        print(f"Error running ruff on {file_path}: {e.stdout}")
         return e.stdout
 
 def apply_search_replace(file_path, search_replace_blocks):
