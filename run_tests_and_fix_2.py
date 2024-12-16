@@ -13,7 +13,7 @@ def run_pylint():
             ["pylint", "."],
             check=True,
             capture_output=True,  # Capture both stdout and stderr
-            text=True
+            text=True,
         )
         pylint_output = result.stdout + result.stderr  # Combine stdout and stderr
     except subprocess.CalledProcessError as e:
@@ -34,7 +34,7 @@ def run_random_pytest(n, all_files):
                 ["pytest", test_file],
                 check=True,
                 capture_output=True,  # Capture both stdout and stderr
-                text=True
+                text=True,
             )
             pytest_output += result.stdout + result.stderr  # Combine stdout and stderr
         except subprocess.CalledProcessError as e:
@@ -56,7 +56,7 @@ def run_random_pylint(files):
                 ["pylint", file_path],
                 check=True,
                 capture_output=True,  # Capture both stdout and stderr
-                text=True
+                text=True,
             )
             pylint_output += result.stdout + result.stderr  # Combine stdout and stderr
         except subprocess.CalledProcessError as e:
@@ -72,7 +72,7 @@ def run_ruff_fix(files):
             ["ruff", "check", files_str, "--fix"],
             check=True,
             capture_output=True,  # Capture both stdout and stderr
-            text=True
+            text=True,
         )
         ruff_output = result.stdout + result.stderr  # Combine stdout and stderr
     except subprocess.CalledProcessError as e:
@@ -103,7 +103,7 @@ def filter_files_by_output(output, all_files):
     """Filters files based on the output of pytest and pylint."""
     files_to_fix = set()
     for line in output.splitlines():
-    # if "Error running" in line:
+        # if "Error running" in line:
         # file_path = line.split(" ")[-1].strip("'")
         # better way to get file path
         # file_path = line.split(" ")[-1].split(":")[0]
@@ -113,20 +113,23 @@ def filter_files_by_output(output, all_files):
             files_to_fix.add(file_path)
     return list(files_to_fix)
 
+
 def call_aider(file_paths, combined_output):
     """Call aider to fix issues based on combined output."""
     try:
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
-        command = [
-            "aider",
-            "--deepseek",
-            # "--architect",
-            "--yes-always",
-            "--no-detect-urls",
-            "--no-suggest-shell-commands"
-        ] + [item for file_path in file_paths for item in ["--file", file_path]] + [
-            "--message", f"Output: {combined_output}. What should we do next?"
-        ]
+        command = (
+            [
+                "aider",
+                "--deepseek",
+                "--architect",
+                "--yes-always",
+                "--no-detect-urls",
+                "--no-suggest-shell-commands",
+            ]
+            + [item for file_path in file_paths for item in ["--file", file_path]]
+            + ["--message", f"Output: {combined_output}. What should we do next?"]
+        )
         print("Aider command:", " ".join(command))
         subprocess.run(command, check=True)
         print(f"Aider fixed issues in {', '.join(file_paths)}.")
@@ -145,7 +148,7 @@ def run_black(file_paths):
 
 
 if __name__ == "__main__":
-    print('Starting ...')
+    print("Starting ...")
     parser = argparse.ArgumentParser(
         description="Run random pytest tests and pylint checks on specified number of files."
     )
@@ -170,12 +173,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     all_files = glob.glob("**/*.py", recursive=True)
-    
+
     for iteration in tqdm(range(args.iterations), desc="Running iterations"):
         print(f"Starting iteration {iteration + 1} of {args.iterations}...")
         pylint_success, pylint_output = run_pylint()
         random.shuffle(all_files)
-        selected_files = all_files[:args.lint_files]
+        selected_files = all_files[: args.lint_files]
         ruff_success, ruff_output = run_ruff_fix(selected_files)
         # Run n random pytest tests and n random pylint checks
         pytest_output = run_random_pytest(args.pytest_files, all_files)
@@ -185,16 +188,18 @@ if __name__ == "__main__":
         # Combine the outputs
         # combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
         # combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
-        combined_output = f"Pylint output:\n{pylint_output}\nPytest output:\n{pytest_output}"
-        if not 'All checks passed' in ruff_output:
+        combined_output = (
+            f"Pylint output:\n{pylint_output}\nPytest output:\n{pytest_output}"
+        )
+        if "All checks passed" not in ruff_output:
             combined_output += f"\nRuff output:\n{ruff_output}"
-        
+
         # Filter files based on the output
         files_to_fix = filter_files_by_output(combined_output, all_files)
-        
+
         # Run black on the files
         run_black(files_to_fix)
-        
+
         # Only pass the directly involved files to aider
         call_aider(files_to_fix, combined_output)
 
