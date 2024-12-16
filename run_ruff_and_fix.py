@@ -103,14 +103,12 @@ def main():
 
         if ruff_output.strip():
             print(f"Issues found in {file_path}. Fixing...")
-            fix_syntax_errors(file_path, ruff_output)
-            search_replace_blocks = parse_ruff_output(ruff_output)
             if dry_run:
                 print(f"Dry run for {file_path}:")
-                for block in search_replace_blocks:
-                    print(f"Search: {block['search']} -> Replace: {block['replace']}")
+                print(f"Ruff output: {ruff_output}")
             else:
-                apply_search_replace(file_path, search_replace_blocks)
+                # Call aider to fix the issues
+                call_aider(file_path, ruff_output)
                 print(f"Fixed issues in {file_path}.")
         else:
             print(f"No issues found in {file_path}. Skipping...")
