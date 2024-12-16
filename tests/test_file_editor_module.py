@@ -35,6 +35,7 @@ def test_file_edit_module(file_editor_module, temp_file):
     file_context = file_manager.read_file(result.filename)
     assert file_context.content == "def hello():\n    print('hi')\n"
     assert result.error is None
+    assert result.replacement == "print('hi')"
 
 
 def test_file_edit_module_no_change(file_editor_module, temp_file):
