@@ -1,6 +1,12 @@
-import pytest
-import tempfile
+"""
+Test module for the CodeIndexer class.
+"""
+
 import os
+import tempfile
+
+import pytest
+
 from prismix.core.code_indexer import CodeIndexer
 from prismix.core.file_operations import FileManager
 
@@ -14,16 +20,17 @@ def code_indexer():
 def temp_dir():
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create some dummy files
-        with open(os.path.join(tmpdir, "test1.py"), "w") as f:
+        with open(os.path.join(tmpdir, "test1.py"), "w", encoding='utf-8') as f:
             f.write("def hello():\n    print('hello')\n")
-        with open(os.path.join(tmpdir, "test2.txt"), "w") as f:
+        with open(os.path.join(tmpdir, "test2.txt"), "w", encoding='utf-8') as f:
             f.write("This is a test file with some text.")
-        with open(os.path.join(tmpdir, "test3.py"), "w") as f:
+        with open(os.path.join(tmpdir, "test3.py"), "w", encoding='utf-8') as f:
             f.write("def world():\n    print('world')\n")
         yield tmpdir
 
 
 def test_search_code_on_the_fly(code_indexer, temp_dir):
+    """Test the search_code_on_the_fly method."""
     # Test search with a query that exists in some files
     results = code_indexer.search_code_on_the_fly(temp_dir, "print")
     assert len(results) == 2
