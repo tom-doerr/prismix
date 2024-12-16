@@ -1,6 +1,9 @@
 from typing import Tuple, Union
 import dspy
 import tempfile  # Add this import
+import sys
+import subprocess
+from io import StringIO
 from .signatures import CodeSafetyCheck
 from .executor import CodeResult, CodeExecutor
 from .generator import CodeGenerator, GenerationContext
