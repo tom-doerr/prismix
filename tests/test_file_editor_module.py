@@ -22,35 +22,35 @@ def temp_file():
 
 def test_file_edit_module(file_editor_module, temp_file):
     # Test successful file edit
-    updated_content = file_editor_module.forward(
-        filepath=temp_file,
-        search_pattern="print('hello')",
-        replacement_code="print('hi')"
+    result = file_editor_module.forward(
+        context="Edit the hello function to print 'hi' instead of 'hello'.",
+        instruction="Replace 'print('hello')' with 'print('hi')'.",
+        inputs="def hello():\n    print('hello')\n"
     )
     
     file_manager = FileManager()
-    file_context = file_manager.read_file(temp_file)
+    file_context = file_manager.read_file(result.filename)
     assert file_context.content == "def hello():\n    print('hi')\n"
-    assert "Error" not in updated_content
+    assert result.error is None
 
 def test_file_edit_module_no_change(file_editor_module, temp_file):
     # Test file edit with no change
-    updated_content = file_editor_module.forward(
-        filepath=temp_file,
-        search_pattern="print('world')",
-        replacement_code="print('hi')"
+    result = file_editor_module.forward(
+        context="Do not change the hello function.",
+        instruction="Do not change 'print('hello')'.",
+        inputs="def hello():\n    print('hello')\n"
     )
     
     file_manager = FileManager()
-    file_context = file_manager.read_file(temp_file)
+    file_context = file_manager.read_file(result.filename)
     assert file_context.content == "def hello():\n    print('hello')\n"
-    assert "Error" not in updated_content
+    assert result.error is None
 
 def test_file_edit_module_file_not_found(file_editor_module):
     # Test file edit with file not found
-    updated_content = file_editor_module.forward(
-        filepath="non_existent_file.py",
-        search_pattern="print('hello')",
-        replacement_code="print('hi')"
+    result = file_editor_module.forward(
+        context="Edit a non-existent file.",
+        instruction="Replace 'print('hello')' with 'print('hi')'.",
+        inputs="def hello():\n    print('hello')\n"
     )
-    assert "Error reading file" in updated_content
+    assert "Error reading file" in result.error
