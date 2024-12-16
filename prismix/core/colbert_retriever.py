@@ -1,7 +1,8 @@
 import dspy
 import os
 from typing import List
-from prismix.core.code_indexer import CodeIndexer
+from prismix.core.code_indexer import CodeIndexer, IndexedCode
+from prismix.core.file_operations import FileManager
 
 
 def get_all_files_to_index(directory: str) -> List[str]:
