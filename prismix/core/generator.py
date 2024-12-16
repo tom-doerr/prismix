@@ -36,10 +36,10 @@ class CodeGenerator:
             approach=context.approach,
             previous_attempt=context.previous_code or "",
         )
-        
+
         # Wrap the generated code in a main function and call it
         code = implementation.code
-        
+
         # Extract the file path from the code comment
         lines = code.splitlines()
         file_path = None
