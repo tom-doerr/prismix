@@ -29,9 +29,12 @@ class FileEditorModule(dspy.Module):
                 error="File does not exist"
             )
 
-    def apply_edit(self, content: str, search_pattern: str, replacement_code: str) -> str:
-        """Applies the edit to the file content."""
-        return content.replace(search_pattern, replacement_code)
+    def apply_replacements(self, content: str, instruction: str) -> str:
+        """Applies multiple replacements based on the instruction."""
+        replacements = self.parse_instructions(instruction)
+        for search_pattern, replacement_code in replacements:
+            content = self.apply_single_replacement(content, search_pattern, replacement_code)
+        return content
 
     def parse_instructions(self, instruction: str) -> List[Tuple[str, str]]:
         """Parses the instruction string and returns a list of replacement pairs."""
