@@ -21,11 +21,11 @@ def temp_dir():
     """Fixture to create a temporary directory with dummy files."""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create some dummy files
-        with open(os.path.join(tmpdir, "test1.py"), "w", encoding='utf-8') as f:
+        with open(os.path.join(tmpdir, "test1.py"), "w", encoding="utf-8") as f:
             f.write("def hello():\n    print('hello')\n")
-        with open(os.path.join(tmpdir, "test2.txt"), "w", encoding='utf-8') as f:
+        with open(os.path.join(tmpdir, "test2.txt"), "w", encoding="utf-8") as f:
             f.write("This is a test file with some text.")
-        with open(os.path.join(tmpdir, "test3.py"), "w", encoding='utf-8') as f:
+        with open(os.path.join(tmpdir, "test3.py"), "w", encoding="utf-8") as f:
             f.write("def world():\n    print('world')\n")
         yield tmpdir
 

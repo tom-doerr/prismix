@@ -2,6 +2,7 @@ import pytest
 import dspy
 from prismix.core.iterative_programmer import IterativeProgrammer
 
+
 # Mock LM for testing
 class MockLM(dspy.LM):
     def __init__(self, model="mock"):
@@ -11,12 +12,10 @@ class MockLM(dspy.LM):
         if "unsafe" in prompt.lower():
             return dspy.Prediction(
                 is_safe=False,
-                safety_message="The code contains potentially unsafe operations."
+                safety_message="The code contains potentially unsafe operations.",
             )
-        return dspy.Prediction(
-            is_safe=True,
-            safety_message="The code is safe."
-        )
+        return dspy.Prediction(is_safe=True, safety_message="The code is safe.")
+
 
 @pytest.fixture(scope="function", autouse=True)
 def setup_dspy():
@@ -24,17 +23,20 @@ def setup_dspy():
     lm = MockLM()
     dspy.configure(lm=lm)
 
+
 def test_is_code_safe_safe():
     programmer = IterativeProgrammer()
     code = "def hello():\n    print('hello')\n"
     is_safe, _ = programmer.is_code_safe(code)
     assert is_safe
 
+
 def test_is_code_safe_unsafe():
     programmer = IterativeProgrammer()
     code = "import os\n os.system('rm -rf /')"
     is_safe, _ = programmer.is_code_safe(code)
     assert not is_safe
+
 
 def test_execute_code_success():
     programmer = IterativeProgrammer()
@@ -53,6 +55,7 @@ if __name__ == "__main__":
     result = programmer.execute_code(code)
     assert result.success
     assert "Sum: 8" in result.output
+
 
 def test_execute_code_fail():
     programmer = IterativeProgrammer()

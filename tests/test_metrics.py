@@ -13,6 +13,7 @@ from prismix.core.metrics import (
 Test module for metrics calculations.
 """
 
+
 def test_levenshtein_similarity():
     """Test Levenshtein similarity calculation"""
     # Identical texts

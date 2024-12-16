@@ -26,14 +26,13 @@ def temp_file():
     os.remove(temp_file_path)
 
 
-
 def test_file_edit_module_no_change(file_editor_module, temp_file):
     # Test file edit with no change
     updated_content = file_editor_module.edit_file(
         context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
         instruction="Do not change 'print('hello')'.",
     )
-    
+
     # Ensure the file was written
     assert updated_content.content == "def hello():\n    print('hello')\n"
     assert updated_content.changes == []
@@ -91,7 +90,6 @@ def test_file_edit_module_empty_file(file_editor_module):
     assert final_content == ""
 
 
-
 def test_file_edit_module_file_not_found(file_editor_module):
     # Test file edit with file not found
     result = file_editor_module.forward(
@@ -110,7 +108,6 @@ def test_apply_single_replacement_function_def(file_editor_module):
         content, search_pattern, replacement_code
     )
     assert updated_content == "def greet():\n    print('hi')\n"
-    
 
 
 def test_apply_single_replacement_simple(file_editor_module):
@@ -192,9 +189,14 @@ def test_forward_with_multiline_replacement(file_editor_module, temp_file):
         context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
         instruction="Replace 'def hello():\\n    print(\\'hello\\')' with 'def greet():\\n    print(\\'hi\\')\\n    print(\\'there\\')'",
     )
-    assert updated_content.content == "def greet():\n    print('hi')\n    print('there')\n"
+    assert (
+        updated_content.content == "def greet():\n    print('hi')\n    print('there')\n"
+    )
     assert updated_content.changes == [
-        ("def hello():\n    print('hello')", "def greet():\n    print('hi')\n    print('there')")
+        (
+            "def hello():\n    print('hello')",
+            "def greet():\n    print('hi')\n    print('there')",
+        )
     ]
 
 
@@ -232,9 +234,7 @@ def test_forward_with_edge_cases(file_editor_module):
         instruction="Replace '# This is a comment' with '# New comment'",
     )
     assert updated_content_comment.content == "# New comment\n"
-    assert updated_content_comment.changes == [
-        ("# This is a comment", "# New comment")
-    ]
+    assert updated_content_comment.changes == [("# This is a comment", "# New comment")]
     os.remove(temp_file_path_comment)
 
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
