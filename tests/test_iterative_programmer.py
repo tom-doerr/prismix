@@ -1,6 +1,29 @@
 import pytest
+import dspy
 from prismix.core.iterative_programmer import IterativeProgrammer
 from prismix.core.executor import CodeResult
+
+# Mock LM for testing
+class MockLM(dspy.LM):
+    def __init__(self, model_name="mock"):
+        super().__init__(model_name=model_name)
+
+    def __call__(self, prompt, **kwargs):
+        if "unsafe" in prompt.lower():
+            return dspy.Prediction(
+                is_safe=False,
+                safety_message="The code contains potentially unsafe operations."
+            )
+        return dspy.Prediction(
+            is_safe=True,
+            safety_message="The code is safe."
+        )
+
+@pytest.fixture(scope="function", autouse=True)
+def setup_dspy():
+    """Set up dspy with a mock LM for each test."""
+    lm = MockLM()
+    dspy.configure(lm=lm)
 
 def test_is_code_safe_safe():
     programmer = IterativeProgrammer()
