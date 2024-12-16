@@ -99,10 +99,14 @@ def filter_files_by_output(output, all_files):
     """Filters files based on the output of pytest and pylint."""
     files_to_fix = set()
     for line in output.splitlines():
-        if "Error running" in line:
-            file_path = line.split(" ")[-1].strip("'")
-            if file_path in all_files:
-                files_to_fix.add(file_path)
+    # if "Error running" in line:
+        # file_path = line.split(" ")[-1].strip("'")
+        # better way to get file path
+        # file_path = line.split(" ")[-1].split(":")[0]
+        file_path = line.split(":")[0].strip()
+
+        if file_path in all_files:
+            files_to_fix.add(file_path)
     return list(files_to_fix)
 
 def call_aider(file_paths, combined_output):
@@ -112,6 +116,7 @@ def call_aider(file_paths, combined_output):
         command = [
             "aider",
             "--deepseek",
+            "--architect",
             "--yes-always",
             "--no-suggest-shell-commands"
         ] + [item for file_path in file_paths for item in ["--file", file_path]] + [
@@ -142,13 +147,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pytest-files",
         type=int,
-        default=3,
+        default=1,
         help="Number of random pytest files to run.",
     )
     parser.add_argument(
         "--pylint-files",
         type=int,
-        default=3,
+        default=1,
         help="Number of random pylint files to run.",
     )
     parser.add_argument(
