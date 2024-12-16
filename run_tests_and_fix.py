@@ -56,9 +56,7 @@ if __name__ == "__main__":
     all_files = glob.glob("**/*.py", recursive=True)
     pylint_success = run_pylint()
     ruff_success = run_ruff_fix()
-    files_to_aider = []
     for file_path in all_files:
-        files_to_aider.extend(find_related_files(file_path))
-    call_aider(files_to_aider, "")
+        call_aider(find_related_files(file_path), "")
     if pylint_success and ruff_success:
         print("Ruff and Pylint checks and fixes applied successfully.")
