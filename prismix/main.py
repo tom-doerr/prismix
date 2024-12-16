@@ -66,10 +66,11 @@ def main() -> NoReturn:
     print("CodeWeaver - AI-powered iterative code generation tool")
 
     if len(sys.argv) < 2:
-        print("Usage: codeweaver '<instruction>' or 'index <path>' or 'index_debug <path>'")
+        print("Usage: codeweaver '<instruction>' or 'index <path>' or 'index_debug <path>' or 'search_colbert <query>'")
         print("Example: codeweaver 'create a hello world script'")
         print("Example: codeweaver index '.'")
         print("Example: codeweaver index_debug '.'")
+        print("Example: codeweaver search_colbert 'quantum computing'")
         return
 
     command = sys.argv[1]
@@ -108,6 +109,20 @@ def main() -> NoReturn:
             print("Search results:")
             for result in results:
                 print(f"- {result.filepath}")
+        else:
+            print("No results found.")
+    elif command == "search_colbert":
+        if len(sys.argv) < 3:
+            print("Usage: codeweaver search_colbert <query>")
+            return
+        query = sys.argv[2]
+        print(f"Searching with Colbert for query: {query}")
+        colbert_retriever = ColbertRetriever(url="http://example.com/colbert")
+        results = colbert_retriever.forward(query)
+        if results:
+            print("Colbert search results:")
+            for result in results:
+                print(f"- {result}")
         else:
             print("No results found.")
     else:
