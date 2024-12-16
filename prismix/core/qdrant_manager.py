@@ -1,7 +1,10 @@
+"""
+Manages Qdrant operations for storing and querying ColBERT embeddings.
+"""
+
 import logging
 from qdrant_client import QdrantClient, models
 from typing import List, Dict
-
 
 class QdrantManager:
     """Manages Qdrant operations for storing and querying ColBERT embeddings."""
@@ -22,9 +25,9 @@ class QdrantManager:
                     distance=models.Distance.COSINE,
                 ),
             )
-            logging.info(f"Collection '{self.collection_name}' created.")
+            logging.info("Collection '%s' created.", self.collection_name)
         else:
-            logging.info(f"Collection '{self.collection_name}' already exists.")
+            logging.info("Collection '%s' already exists.", self.collection_name)
 
     def insert_embeddings(self, embeddings: List[Dict[str, any]]):
         """Insert embeddings into the Qdrant collection."""
@@ -32,14 +35,14 @@ class QdrantManager:
             collection_name=self.collection_name,
             points=embeddings,
         )
-        logging.info(f"Embeddings inserted into collection '{self.collection_name}'.")
+        logging.info("Embeddings inserted into collection '%s'.", self.collection_name)
 
     def _embed_code(self, content: str) -> List[float]:
         """Embed code content using a suitable embedding model."""
         # Placeholder for embedding logic
         # In a real implementation, this would use a model like SentenceTransformers
         embedding = [0.0] * 128  # Dummy embedding
-        logging.info(f"Generated embedding for content: {content[:50]}...")
+        logging.info("Generated embedding for content: %s...", content[:50])
         return embedding
 
     def search_embeddings(
@@ -52,7 +55,7 @@ class QdrantManager:
             limit=top_k,
         )
         if not results:
-            logging.warning(f"No results found for query embedding: {query_embedding}")
+            logging.warning("No results found for query embedding: %s", query_embedding)
         else:
-            logging.info(f"Found {len(results)} results for query embedding.")
+            logging.info("Found %d results for query embedding.", len(results))
         return results
