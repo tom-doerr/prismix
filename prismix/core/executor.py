@@ -1,3 +1,5 @@
+import ast
+
 """
 This module provides a safe execution environment for code generation and execution.
 """
