@@ -1,3 +1,4 @@
+import argparse
 import subprocess
 import os
 import glob
@@ -13,7 +14,7 @@ def run_pylint():
         return False, pylint_output
     return True, pylint_output
 
-def run_random_pytest(n):
+def run_random_pytest(n, all_files):
     """Runs n random pytest tests and captures the output."""
     test_files = [file_path for file_path in all_files if is_test_file(file_path)]
     random.shuffle(test_files)
@@ -27,7 +28,7 @@ def run_random_pytest(n):
             pytest_output += f"Error running pytest on {test_file}: {e}\n"
     return pytest_output
 
-def run_random_pylint(n):
+def run_random_pylint(n, all_files):
     """Runs pylint on n random files and captures the output."""
     random.shuffle(all_files)
     selected_files = all_files[:n]
@@ -83,21 +84,26 @@ def call_aider(file_paths, ruff_output):
         print(f"Error calling aider on {', '.join(file_paths)}: {e}")
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run random pytest tests and pylint checks on specified number of files.")
+    parser.add_argument("--pytest-files", type=int, default=3, help="Number of random pytest files to run.")
+    parser.add_argument("--pylint-files", type=int, default=3, help="Number of random pylint files to run.")
+    args = parser.parse_args()
+
     all_files = glob.glob("**/*.py", recursive=True)
     pylint_success, pylint_output = run_pylint()
     ruff_success, ruff_output = run_ruff_fix()
     files_to_aider = []
     for file_path in all_files:
         files_to_aider.extend(find_related_files(file_path))
+    
     # Combine the outputs
     combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
     
     call_aider(files_to_aider, combined_output)
     
     # Run n random pytest tests and n random pylint checks
-    n = 3  # Number of random tests and pylint checks to run
-    pytest_output = run_random_pytest(n)
-    pylint_output = run_random_pylint(n)
+    pytest_output = run_random_pytest(args.pytest_files, all_files)
+    pylint_output = run_random_pylint(args.pylint_files, all_files)
     
     # Combine the outputs
     combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
