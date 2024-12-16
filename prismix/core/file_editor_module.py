@@ -1,5 +1,5 @@
 import dspy
-from prismix.core.file_operations import FileManager
+from prismix.core.file_operations import FileManager, FileContext
 from prismix.core.signatures import FileEdit
 
 
