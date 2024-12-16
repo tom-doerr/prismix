@@ -38,11 +38,6 @@ class IterativeProgrammer(dspy.Module):
                 output="",
                 error=f"Safety check failed: {safety_msg}",
             )
-        import sys
-        from io import StringIO
-        import os
-        import subprocess
-        
         try:
             # Extract the file path from the code comment
             lines = code.splitlines()
@@ -57,18 +52,6 @@ class IterativeProgrammer(dspy.Module):
                     temp_file_path = temp_file.name
                     temp_file.write(code)
                 file_path = temp_file_path
-
-            # Read the original file content
-            with open(file_path, 'r') as f:
-                original_content = f.read()
-
-            # Apply the changes to the original content
-            file_editor = FileEditor()
-            modified_content, _ = file_editor._apply_line_edits(original_content, code)
-
-            # Write the modified content back to the original file
-            with open(file_path, 'w') as f:
-                f.write(modified_content)
 
             # Read the original file content
             with open(file_path, 'r') as f:
