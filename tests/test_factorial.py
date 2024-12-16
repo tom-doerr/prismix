@@ -10,6 +10,7 @@ from prismix.core.iterative_programmer import setup_agent, CodeResult
 
 
 def test_factorial_basic():
+    """Test basic factorial calculation."""
     programmer = setup_agent()
     result = programmer.forward(
         "Create a function that calculates factorial of a number"
@@ -27,6 +28,7 @@ def test_factorial_basic():
 
 
 def test_factorial_negative():
+    """Test factorial calculation with negative input."""
     programmer = setup_agent()
     result = programmer.forward(
         "Create a function that calculates factorial of a number"
@@ -43,6 +45,7 @@ def test_factorial_negative():
 
 
 def test_code_result_structure():
+    """Test the structure of the CodeResult object."""
     programmer = setup_agent()
     result = programmer.forward(
         "Create a function that calculates factorial of a number"

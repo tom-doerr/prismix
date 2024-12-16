@@ -10,6 +10,9 @@ from prismix.core.metrics import (
     evaluate_edit,
 )
 
+"""
+Test module for metrics calculations.
+"""
 
 def test_levenshtein_similarity():
     """Test Levenshtein similarity calculation"""

@@ -9,6 +9,9 @@ import pytest
 
 from prismix.core.code_indexer import CodeIndexer
 
+"""
+Test module for the CodeIndexer class.
+"""
 
 @pytest.fixture
 def code_indexer():
