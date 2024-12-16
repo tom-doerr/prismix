@@ -11,6 +11,28 @@ class FileEditorModule(dspy.Module):
         self.file_edit_predictor = dspy.Predict(FileEdit)
         logging.basicConfig(level=logging.INFO)
 
+    def read_file(self, filename: str) -> FileContext:
+        """Reads the file and returns its content."""
+        file_manager = FileManager()
+        try:
+            return file_manager.read_file(filename)
+        except FileNotFoundError:
+            return FileContext(
+                filepath=filename,
+                content="",
+                changes=[],
+                error="File does not exist"
+            )
+
+    def apply_edit(self, content: str, search_pattern: str, replacement_code: str) -> str:
+        """Applies the edit to the file content."""
+        return content.replace(search_pattern, replacement_code)
+
+    def write_file(self, filename: str, content: str) -> FileContext:
+        """Writes the updated content back to the file."""
+        file_manager = FileManager()
+        return file_manager.write_file(filename, content)
+
     def forward(self, context: str, instruction: str) -> FileEdit:
         """Edits a file based on context, instruction, and returns the FileEdit signature."""
         logging.info(f"Received context: {context}")
@@ -29,28 +51,22 @@ class FileEditorModule(dspy.Module):
         logging.info(f"Predicted search pattern: {search_pattern}")
         logging.info(f"Predicted replacement code: {replacement_code}")
 
-        file_manager = FileManager()
-        try:
-            file_context = file_manager.read_file(filename)
-            if file_context.error:
-                result.error = f"Error reading file: {file_context.error}"
-                logging.error(f"Error reading file: {file_context.error}")
-                return result
-        except FileNotFoundError:
-            result.error = f"Error reading file: File does not exist"
-            logging.error(f"Error reading file: File does not exist")
+        file_context = self.read_file(filename)
+        if file_context.error:
+            result.error = f"Error reading file: {file_context.error}"
+            logging.error(f"Error reading file: {file_context.error}")
             return result
 
         logging.info(f"File content before update: {file_context.content}")
 
-        updated_content = file_context.content.replace(search_pattern, replacement_code)
+        updated_content = self.apply_edit(file_context.content, search_pattern, replacement_code)
 
         logging.info(f"File content after update: {updated_content}")
 
-        file_context = file_manager.write_file(filename, updated_content)
-        if file_context.error:
-            result.error = f"Error writing file: {file_context.error}"
-            logging.error(f"Error writing file: {file_context.error}")
+        write_result = self.write_file(filename, updated_content)
+        if write_result.error:
+            result.error = f"Error writing file: {write_result.error}"
+            logging.error(f"Error writing file: {write_result.error}")
             return result
 
         result.content = updated_content

@@ -48,25 +48,45 @@ def test_file_edit_module_no_change(file_editor_module, temp_file):
     # Ensure the file was written
     assert updated_content == "def hello():\n    print('hello')\n"
 
-def test_file_edit_module_complex_file(file_editor_module):
-    # Test file edit with a more complex file
+def test_file_edit_module_multiple_edits(file_editor_module):
+    # Test file edit with multiple edits
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
         f.write("def complex_function():\n    print('complex')\n    if True:\n        print('nested')\n")
         temp_file_path = f.name
 
     updated_content = file_editor_module.forward(
         context=f"File: {temp_file_path}\nContent: def complex_function():\n    print('complex')\n    if True:\n        print('nested')\n",
-        instruction="Replace 'print('complex')' with 'print('edited')'.",
+        instruction="Replace 'print('complex')' with 'print('edited')' and 'print('nested')' with 'print('inner')'.",
     )
     
     # Ensure the file was written
-    assert updated_content == "def complex_function():\n    print('edited')\n    if True:\n        print('nested')\n"
+    assert updated_content == "def complex_function():\n    print('edited')\n    if True:\n        print('inner')\n"
 
     # Read the file again to ensure the changes were written
     with open(temp_file_path, "r") as f:
         final_content = f.read()
     
-    assert final_content == "def complex_function():\n    print('edited')\n    if True:\n        print('nested')\n"
+    assert final_content == "def complex_function():\n    print('edited')\n    if True:\n        print('inner')\n"
+
+def test_file_edit_module_empty_file(file_editor_module):
+    # Test file edit with an empty file
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+        f.write("")
+        temp_file_path = f.name
+
+    updated_content = file_editor_module.forward(
+        context=f"File: {temp_file_path}\nContent: ",
+        instruction="Replace 'print('hello')' with 'print('hi')'.",
+    )
+    
+    # Ensure the file remains empty
+    assert updated_content == ""
+
+    # Read the file again to ensure the changes were written
+    with open(temp_file_path, "r") as f:
+        final_content = f.read()
+    
+    assert final_content == ""
 
 
 def test_file_edit_module_file_not_found(file_editor_module):
