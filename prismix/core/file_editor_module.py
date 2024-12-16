@@ -30,7 +30,7 @@ class FileEditorModule(dspy.Module):
         """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
-            content = re.sub(search_pattern, replacement_code, content)
+            content = content.replace(search_pattern, replacement_code)
         return content
 
     def apply_single_replacement(
@@ -44,7 +44,7 @@ class FileEditorModule(dspy.Module):
         replacements = instruction.split(" and ")
         return [
             (
-                part.replace("Replace ", "").strip("'"),
+                part.split(" with ")[0].strip("'"),
                 part.split(" with ")[1].strip("'"),
             )
             for part in replacements
