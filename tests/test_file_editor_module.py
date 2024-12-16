@@ -37,7 +37,7 @@ def test_file_edit_module_no_change(file_editor_module, temp_file):
     )
     
     # Ensure the file was written
-    assert updated_content == "def hello():\n    print('hello')\n"
+    assert updated_content.content == "def hello():\n    print('hello')\n"
 
 def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
     # Test file edit with multiple replacements
@@ -47,7 +47,7 @@ def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
     )
     
     # Ensure the file was written
-    assert updated_content == "def greet():\n    print('hi')\n"
+    assert updated_content.content == "def greet():\n    print('hi')\n"
 
 def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file):
     # Test file edit with overlapping replacements
@@ -57,7 +57,7 @@ def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file
     )
     
     # Ensure the file was written
-    assert updated_content == "def greet():\n    print('hi')\n"
+    assert updated_content.content == "def greet():\n    print('hi')\n"
 
 
 def test_file_edit_module_empty_file(file_editor_module):
@@ -72,7 +72,7 @@ def test_file_edit_module_empty_file(file_editor_module):
     )
     
     # Ensure the file remains empty
-    assert updated_content == ""
+    assert updated_content.content == ""
 
     # Read the file again to ensure the changes were written
     with open(temp_file_path, "r") as f:
