@@ -66,9 +66,10 @@ def main() -> NoReturn:
     print("CodeWeaver - AI-powered iterative code generation tool")
 
     if len(sys.argv) < 2:
-        print("Usage: codeweaver '<instruction>' or 'index <path>'")
+        print("Usage: codeweaver '<instruction>' or 'index <path>' or 'index_debug <path>'")
         print("Example: codeweaver 'create a hello world script'")
         print("Example: codeweaver index '.'")
+        print("Example: codeweaver index_debug '.'")
         return
 
     command = sys.argv[1]
@@ -80,6 +81,19 @@ def main() -> NoReturn:
         print(f"Indexing code at path: {path}")
         indexer = CodeIndexer()
         indexer.index_directory(path)
+        print("Indexing complete.")
+    elif command == "index_debug":
+        if len(sys.argv) < 3:
+            print("Usage: codeweaver index_debug <path>")
+            return
+        path = sys.argv[2]
+        print(f"Debugging indexer with path: {path}")
+        indexer = CodeIndexer()
+        print("Ignore patterns:", indexer.ignore_patterns)
+        indexer.index_directory(path)
+        print("Indexed files:")
+        for filepath in indexer.indexed_code:
+            print(f"- {filepath}")
         print("Indexing complete.")
     else:
         execute_instruction(command)
