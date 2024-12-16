@@ -1,6 +1,20 @@
 import dspy
 from typing import List
 
+
+
+
+# ai! add code that gets all files that should be added to the index
+
+
+
+
+
+
+
+
+
+
 class ColbertRetriever(dspy.Retrieve):
     def __init__(self, url: str, k: int = 3):
         super().__init__(k=k)
