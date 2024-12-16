@@ -179,6 +179,9 @@ class IterativeProgrammer(dspy.Module):
             # Try to improve failed implementation
             print(f"Test failed: {result.error}")
             print("5. Reviewing and improving code...")
+            
+            if i == self.max_iterations - 1:
+                return result
 
             improved_code = self.generator.improve_implementation(code, result.error)
             context.previous_code = code
