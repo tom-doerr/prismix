@@ -174,6 +174,7 @@ class FileEditor:
                     else:
                         changes.append(f"Failed to apply edit: Invalid line number {line_num}")
                         continue
+            
         else:
             # Handle direct mode/line/text tuples (from tests)
             for i, edit in enumerate(line_edits):
