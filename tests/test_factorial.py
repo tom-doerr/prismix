@@ -16,8 +16,9 @@ def test_factorial_basic():
 
     # Safer execution using CodeExecutor
     # Wrap the generated code in a callable function
-    wrapped_code = f"def main():\n{result.code.replace('```python', '').replace('```', '')}\nmain()"
+    wrapped_code = f"def main():\n    {result.code.replace('```python', '').replace('```', '').strip()}\nmain()"
     code_result = CodeExecutor.execute(wrapped_code)
+    assert code_result.success, f"Code execution failed: {code_result.error}"
     assert code_result.success, f"Code execution failed: {code_result.error}"
     # Retrieve the factorial function from the locals
     factorial = locals().get("factorial") or locals().get("main")
@@ -36,9 +37,9 @@ def test_factorial_negative():
     )
 
     # Safer execution using CodeExecutor
-    code_result = CodeExecutor.execute(
-        result.code.replace("```python", "").replace("```", "")
-    )
+    wrapped_code = f"def main():\n    {result.code.replace('```python', '').replace('```', '').strip()}\nmain()"
+    code_result = CodeExecutor.execute(wrapped_code)
+    assert code_result.success, f"Code execution failed: {code_result.error}"
     assert code_result.success, f"Code execution failed: {code_result.error}"
     factorial = locals().get("factorial")
 
