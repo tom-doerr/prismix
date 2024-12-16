@@ -38,14 +38,14 @@ class CodeExecutor:
             # Set up isolated execution environment
             local_vars = {}
             exec(code, {"__builtins__": CodeExecutor.get_safe_builtins()}, local_vars)
-            
+
             # Get the main function from the generated code
             main_func = None
             for _, obj in local_vars.items():
                 if callable(obj):
                     main_func = obj
                     break
-            
+
             if main_func is None:
                 return CodeResult(
                     code=code,
@@ -53,7 +53,7 @@ class CodeExecutor:
                     output="",
                     error="No callable function found in generated code"
                 )
-            
+
             # Test the function with a sample input
             try:
                 result = main_func(5)  # Test with simple input
