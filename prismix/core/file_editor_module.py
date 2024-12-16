@@ -19,7 +19,7 @@ class FileEditorModule(dspy.Module):
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the file and returns its content."""
-        file_manager = FileManager()
+        file_manager = FileManager(file_operations=DefaultFileOperations())
         try:
             return file_manager.read_file(filename)
         except FileNotFoundError:
@@ -31,16 +31,8 @@ class FileEditorModule(dspy.Module):
         """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
-            content = self.apply_single_replacement(
-                content, search_pattern, replacement_code
-            )
+            content = content.replace(search_pattern, replacement_code)
         return content
-
-    def apply_single_replacement(
-        self, content: str, search_pattern: str, replacement_code: str
-    ) -> str:
-        """Applies a single replacement to the content."""
-        return content.replace(search_pattern, replacement_code)
 
     def apply_single_replacement(
         self, content: str, search_pattern: str, replacement_code: str
