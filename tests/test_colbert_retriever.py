@@ -34,14 +34,14 @@ def test_add_data_to_db(colbert_retriever, temp_dir):
 
 def test_colbert_retriever(colbert_retriever):
     query = "quantum computing"
-    # Set a mock RM for testing
-    dspy.settings.rm = lambda queries, k=3: [
-        [f"This is a dummy result for {q}" for _ in range(k)] for q in queries
-    ][0]
     results = colbert_retriever.forward(query)
     assert len(results) == 3
     for result in results:
         assert query in result
+    # Set a mock RM for testing
+    dspy.settings.rm = lambda queries, k=3: [
+        [f"This is a dummy result for {q}" for _ in range(k)] for q in queries
+    ][0]
 
 @pytest.fixture
 def temp_dir():
