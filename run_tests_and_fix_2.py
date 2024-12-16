@@ -120,7 +120,7 @@ def call_aider(file_paths, combined_output):
         command = [
             "aider",
             "--deepseek",
-            "--architect",
+            # "--architect",
             "--yes-always",
             "--no-detect-urls",
             "--no-suggest-shell-commands"
