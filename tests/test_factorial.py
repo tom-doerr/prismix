@@ -12,7 +12,7 @@ def test_factorial_basic():
     result = programmer.forward("Create a function that calculates factorial of a number")
 
     # Safer execution using CodeExecutor
-    code_result = CodeExecutor.execute(result.code)
+    code_result = CodeExecutor.execute(result.code.replace('```python', '').replace('```', ''))
     assert code_result.success, f"Code execution failed: {code_result.error}"
     factorial = locals().get("factorial")
 

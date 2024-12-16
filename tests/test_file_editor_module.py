@@ -30,7 +30,7 @@ def temp_file():
 
 def test_file_edit_module_no_change(file_editor_module, temp_file):
     # Test file edit with no change
-    updated_content = file_editor_module.forward(
+    updated_content = file_editor_module.edit_file(
         context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
         instruction="Do not change 'print('hello')'.",
     )
@@ -129,7 +129,7 @@ def test_read_file(file_editor_module, temp_file):
     assert file_context.content == "def hello():\n    print('hello')\n"
     assert file_context.filepath == temp_file
     assert not file_context.error
-    assert file_context.changes == []
+    assert file_context.changes == [], f"Unexpected changes: {file_context.changes}"
 
 
 def test_read_file_not_found(file_editor_module):

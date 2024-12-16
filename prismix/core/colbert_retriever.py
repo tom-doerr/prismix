@@ -48,7 +48,7 @@ class ColbertRetriever(dspy.Retrieve):
         self.url = url
         self.qdrant_manager = QdrantManager(collection_name="colbert_embeddings")
         # Ensure the retrieval model (RM) is loaded
-        dspy.settings.configure(lm=dspy.GPT3(api_key="your_openai_api_key"))
+        dspy.settings.configure(lm=dspy.OpenAI(api_key="your_openai_api_key"))
 
 import logging
 

@@ -21,7 +21,7 @@ def test_safe_code(agent):
     """Test safe code execution."""
     code = "def safe_function(): return 42"
     result = agent.execute_code(code)
-    assert result.success is True
+    assert result.success is True, f"Code execution failed: {result.error}"
 
 def test_unsafe_code(agent):
     """Test unsafe code execution."""
