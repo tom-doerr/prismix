@@ -32,8 +32,6 @@ class FileEditorModule(dspy.Module):
     def apply_replacements(self, content: str, instruction: str) -> str:
         """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
-        if not replacements:
-            return content
         for search_pattern, replacement_code in replacements:
             content = self.apply_single_replacement(content, search_pattern, replacement_code)
         return content
