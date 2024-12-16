@@ -75,11 +75,11 @@ class FileEditorModule(dspy.Module):
         logging.info(f"Received instruction: {instruction}")
 
         result = self.file_edit_predictor(
+            filename=filename,
             context=context,
             instruction=instruction,
         )
 
-        filename = result.filename
         search_pattern = result.search
         replacement_code = result.replacement
 
