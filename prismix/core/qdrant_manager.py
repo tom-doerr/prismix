@@ -14,14 +14,17 @@ class QdrantManager:
 
     def _create_collection(self):
         """Create a Qdrant collection with the appropriate configuration."""
-        self.client.recreate_collection(
-            collection_name=self.collection_name,
-            vectors_config=models.VectorParams(
-                size=128,
-                distance=models.Distance.COSINE,
-            ),
-        )
-        logging.info(f"Collection '{self.collection_name}' created.")
+        if not self.client.collection_exists(self.collection_name):
+            self.client.create_collection(
+                collection_name=self.collection_name,
+                vectors_config=models.VectorParams(
+                    size=128,
+                    distance=models.Distance.COSINE,
+                ),
+            )
+            logging.info(f"Collection '{self.collection_name}' created.")
+        else:
+            logging.info(f"Collection '{self.collection_name}' already exists.")
 
     def insert_embeddings(self, embeddings: List[Dict[str, any]]):
         """Insert embeddings into the Qdrant collection."""

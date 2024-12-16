@@ -19,6 +19,8 @@ class CodeEmbedder:
 
 
 class CodeIndexer:
+    DEFAULT_IGNORE_PATTERNS = ["*.pyc", "__pycache__"]
+
     def __init__(self, embedder: CodeEmbedder = None, ignore_patterns: List[str] = None):
         if embedder is None:
             embedder = CodeEmbedder()
