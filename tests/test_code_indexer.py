@@ -7,7 +7,7 @@ import tempfile
 
 import pytest
 
-from prismix.core.code_indexer import CodeIndexer
+from prismix.core.code_indexer import CodeIndexer, IndexedCode
 
 
 @pytest.fixture
