@@ -6,7 +6,7 @@ class User:
     email: str
 
 class UserManager:
-    def __init__(self):
+    def __init__(self) -> None:
         self.users: list[User] = []
 
     def add_user(self, username: str, email: str) -> bool:
@@ -16,10 +16,7 @@ class UserManager:
         return True
 
     def get_user(self, username: str) -> User | None:
-        for user in self.users:
-            if user.username == username:
-                return user
-        return None
+        return next((user for user in self.users if user.username == username), None)
 
 def main() -> None:
     manager = UserManager()
