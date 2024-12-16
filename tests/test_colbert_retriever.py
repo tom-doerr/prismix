@@ -4,15 +4,13 @@ Test module for the ColbertRetriever class.
 
 import pytest
 import dspy
+import os
+import tempfile
 from prismix.core.colbert_retriever import ColbertRetriever
 
 @pytest.fixture
 def colbert_retriever():
     return ColbertRetriever(url="http://example.com/colbert", k=3)
-
-import os
-import shutil
-import tempfile
 
 @pytest.fixture
 def temp_dir():
