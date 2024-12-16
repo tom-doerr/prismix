@@ -62,16 +62,21 @@ def execute_instruction(instruction: str) -> None:
     print("----------")
 
 
+from prismix.core.milvus_local_db import setup_milvus_local_db, insert_data_into_milvus, search_milvus_collection
+
 def main() -> NoReturn:
     """Main function to execute the Prismix application."""
     print("CodeWeaver - AI-powered iterative code generation tool")
 
     if len(sys.argv) < 2:
-        print("Usage: codeweaver '<instruction>' or 'index <path>' or 'index_debug <path>' or 'search_colbert <query>'")
+        print("Usage: codeweaver '<instruction>' or 'index <path>' or 'index_debug <path>' or 'search_colbert <query>' or 'milvus_setup' or 'milvus_insert' or 'milvus_search'")
         print("Example: codeweaver 'create a hello world script'")
         print("Example: codeweaver index '.'")
         print("Example: codeweaver index_debug '.'")
         print("Example: codeweaver search_colbert 'quantum computing'")
+        print("Example: codeweaver milvus_setup")
+        print("Example: codeweaver milvus_insert")
+        print("Example: codeweaver milvus_search")
         return
 
     command = sys.argv[1]
@@ -126,6 +131,12 @@ def main() -> NoReturn:
                 print(f"- {result.filepath}: {result.content[:100]}...")  # Display first 100 chars
         else:
             print("No results found.")
+    elif command == "milvus_setup":
+        setup_milvus_local_db()
+    elif command == "milvus_insert":
+        insert_data_into_milvus()
+    elif command == "milvus_search":
+        search_milvus_collection()
     else:
         execute_instruction(command)
 
