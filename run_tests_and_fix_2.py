@@ -13,25 +13,31 @@ def run_pylint():
     return True
 
 def run_random_pytest(n):
-    """Runs n random pytest tests."""
+    """Runs n random pytest tests and captures the output."""
     test_files = [file_path for file_path in all_files if is_test_file(file_path)]
     random.shuffle(test_files)
     selected_test_files = test_files[:n]
+    pytest_output = ""
     for test_file in selected_test_files:
         try:
-            subprocess.run(["pytest", test_file], check=True, capture_output=True, text=True)
+            result = subprocess.run(["pytest", test_file], check=True, capture_output=True, text=True)
+            pytest_output += result.stdout + "\n"
         except subprocess.CalledProcessError as e:
-            print(f"Error running pytest on {test_file}: {e}")
+            pytest_output += f"Error running pytest on {test_file}: {e}\n"
+    return pytest_output
 
 def run_random_pylint(n):
-    """Runs pylint on n random files."""
+    """Runs pylint on n random files and captures the output."""
     random.shuffle(all_files)
     selected_files = all_files[:n]
+    pylint_output = ""
     for file_path in selected_files:
         try:
-            subprocess.run(["pylint", file_path], check=True, capture_output=True, text=True)
+            result = subprocess.run(["pylint", file_path], check=True, capture_output=True, text=True)
+            pylint_output += result.stdout + "\n"
         except subprocess.CalledProcessError as e:
-            print(f"Error running pylint on {file_path}: {e}")
+            pylint_output += f"Error running pylint on {file_path}: {e}\n"
+    return pylint_output
 
 def run_ruff_fix():
     """Runs ruff to fix code style issues."""
@@ -85,8 +91,13 @@ if __name__ == "__main__":
     
     # Run n random pytest tests and n random pylint checks
     n = 3  # Number of random tests and pylint checks to run
-    run_random_pytest(n)
-    run_random_pylint(n)
+    pytest_output = run_random_pytest(n)
+    pylint_output = run_random_pylint(n)
+    
+    # Combine the outputs
+    combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
+    
+    call_aider(files_to_aider, combined_output)
     
     if pylint_success and ruff_success:
         print("Ruff and Pylint checks and fixes applied successfully.")
