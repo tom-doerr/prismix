@@ -96,6 +96,7 @@ class FileEditor:
 
     def __init__(self):
         self.edit_generator = dspy.ChainOfThought(FileEdit)
+        self.file_manager = FileManager(DefaultFileOperations())
 
     def _number_lines(self, content: str) -> str:
         """Add line numbers to content"""
