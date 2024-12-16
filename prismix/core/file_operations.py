@@ -268,7 +268,9 @@ class FileEditor:
         )
 
         # Write updated content
-        result = self.file_manager.write_file(filepath, new_content)  # Use the instance here
+        result = self.file_manager.write_file(
+            filepath, new_content
+        )  # Use the instance here
 
         if not result.error:
             result.changes = changes
