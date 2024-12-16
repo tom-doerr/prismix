@@ -62,7 +62,6 @@ def execute_instruction(instruction: str) -> None:
     print("----------")
 
 
-from prismix.core.milvus_local_db import setup_milvus_local_db, insert_data_into_milvus, search_milvus_collection
 
 def main() -> NoReturn:
     """Main function to execute the Prismix application."""
