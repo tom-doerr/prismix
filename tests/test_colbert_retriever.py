@@ -2,14 +2,6 @@
 Test module for the ColbertRetriever class.
 """
 
-"""
-Test module for the ColbertRetriever class.
-"""
-
-"""
-Test module for the ColbertRetriever class.
-"""
-
 import pytest
 from prismix.core.colbert_retriever import ColbertRetriever
 
