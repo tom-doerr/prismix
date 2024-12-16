@@ -37,7 +37,17 @@ class FileEditorModule(dspy.Module):
                 if len(parts) == 2:
                     search_pattern = parts[0].replace("Replace ", "").strip("'")
                     replacement_code = parts[1].strip("'")
-                    content = self.apply_edit(content, search_pattern, replacement_code)
+                    # Handle function definitions correctly
+                    if search_pattern.startswith("def "):
+                        # Replace the entire function definition
+                        content = re.sub(
+                            r"^(\s*)" + re.escape(search_pattern) + r"[\s\S]*?^(\s*)",
+                            r"\1" + replacement_code + "\n",
+                            content,
+                            flags=re.MULTILINE
+                        )
+                    else:
+                        content = self.apply_edit(content, search_pattern, replacement_code)
         return content
 
     def write_file(self, filename: str, content: str) -> FileContext:
