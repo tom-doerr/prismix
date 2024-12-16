@@ -2,6 +2,7 @@ import unittest
 import dspy
 from prismix.core.iterative_programmer import IterativeProgrammer
 
+
 class TestSafetyCheck(unittest.TestCase):
     def setUp(self):
         lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
@@ -35,5 +36,6 @@ os.system("rm -rf /")
         self.assertFalse(is_safe)
         self.assertIn("potentially unsafe operations", message)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
