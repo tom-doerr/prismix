@@ -32,7 +32,6 @@ class FileEdit(dspy.Signature):
     """
     context = dspy.InputField(desc="The context for the edit operation.")
     instruction = dspy.InputField(desc="The instruction for the edit operation.")
-    inputs = dspy.InputField(desc="Additional inputs for the edit operation.")
     filename = dspy.OutputField(desc="The filename where the edit will be applied.")
     search = dspy.OutputField(desc="The search pattern to be replaced.")
     replace = dspy.OutputField(desc="The replacement code.")
