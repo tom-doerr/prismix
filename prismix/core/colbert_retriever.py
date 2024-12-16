@@ -50,7 +50,7 @@ class ColbertRetriever(dspy.Retrieve):
 
 import logging
 
-    def add_data_to_db(self, directory: str):
+def add_data_to_db(self, directory: str):
         """Add data to the Qdrant database."""
         indexer = CodeIndexer()
         files_to_index = get_all_files_to_index(directory)
