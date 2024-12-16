@@ -48,6 +48,8 @@ class ColbertRetriever(dspy.Retrieve):
         self.url = url
         self.qdrant_manager = QdrantManager(collection_name="colbert_embeddings")
 
+import logging
+
     def add_data_to_db(self, directory: str):
         """Add data to the Qdrant database."""
         indexer = CodeIndexer()
@@ -62,9 +64,13 @@ class ColbertRetriever(dspy.Retrieve):
                         "vector": embedding,
                         "payload": {"content": file_context.content}
                     }])
-                    print(f"Added to Qdrant: {filepath}")
+                    logging.info(f"Added to Qdrant: {filepath}")
+                    # Check if the embedding was correctly inserted
+                    inserted_embedding = self.qdrant_manager.search_embeddings(embedding, top_k=1)
+                    if not inserted_embedding:
+                        logging.warning(f"Embedding for {filepath} not found in Qdrant after insertion.")
             except Exception as e:
-                print(f"Error adding {filepath} to Qdrant: {e}")
+                logging.error(f"Error adding {filepath} to Qdrant: {e}")
 
     def forward(self, query: str, k: int = None) -> List[str]:
         """Search for similar embeddings in Qdrant."""
