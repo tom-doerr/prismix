@@ -74,6 +74,9 @@
 - Steps taken to resolve:
   - Checked and updated versions of `pytest` and `pytest-asyncio`.
   - Re-ran tests to verify the fix.
+- Steps taken to resolve:
+  - Checked and updated versions of `pytest` and `pytest-asyncio`.
+  - Re-ran tests to verify the fix.
 
 ### Resolved Issues
 - **Fixed W0122 (exec-used) Warning**: Refactored `prismix/core/executor.py` to avoid using `exec`.
