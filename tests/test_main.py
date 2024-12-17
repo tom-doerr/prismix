@@ -3,8 +3,8 @@ Test suite for the main functionality of the Prismix application.
 """
 
 import sys
-from unittest.mock import patch
 from io import StringIO
+from unittest.mock import patch
 
 from prismix.main import execute_instruction
 
@@ -28,5 +28,7 @@ def test_execute_instruction_file_edit():
         )
         execute_instruction(instruction)
         assert "Changes made:" in mock_stdout.getvalue()
-        assert "Replace 'print(f\"Calculated sum: {a + b + c}\")' with 'print(f\"The sum is: {a + b + c}\")'" \
+        assert (
+            "Replace 'print(f\"Calculated sum: {a + b + c}\")' with 'print(f\"The sum is: {a + b + c}\")'"
             in mock_stdout.getvalue()
+        )
