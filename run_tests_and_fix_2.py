@@ -21,7 +21,6 @@ def run_pylint():
             capture_output=True,
             text=True,
         )
-        pylint_result_output_inner = result.stdout + result.stderr
     except subprocess.CalledProcessError as e:
         pylint_output = (
             f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
