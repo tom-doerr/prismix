@@ -141,7 +141,7 @@ def filter_files_by_output(output, all_files):
     return list(files_to_fix)
 
 
-import requests  # Move this to the top of the module
+import requests
 
 DEBUGGING_AND_TESTING_FILE_URL = (
     "https://gist.githubusercontent.com/mwanginjuguna/545f983b12c76af238861d9af2e551a5/"
@@ -165,7 +165,7 @@ except FileNotFoundError:
     DEBUGGING_AND_TESTING_CONTENT = ""
 
 
-def call_aider(file_paths, model):  # Remove 'combined_output'
+def call_aider(file_paths, model):
     """Call aider to fix issues based on combined output."""
     try:
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
@@ -185,12 +185,14 @@ def call_aider(file_paths, model):  # Remove 'combined_output'
             + ["--file", "questions.md"]
             + [
                 "--message",
-                f"{DEBUGGING_AND_TESTING_CONTENT}\n\n\nDon't work on too many things at the same time. "
-                "There are multiple LLMs working on this project, if you have information that could be useful for others, "
-                "please update notes.md. If you have questions, please write them into questions.md. "
-                "I might update the notes.md with answers to those questions. If you have commands I should run, "
-                "please put them into commands.sh. Refactor notes.md and questions.md when necessary to avoid redundancy "
-                "and to reduce length. Output: {combined_output}. What should we do next?",
+                (
+                    f"{DEBUGGING_AND_TESTING_CONTENT}\n\n\nDon't work on too many things at the same time. "
+                    "There are multiple LLMs working on this project, if you have information that could be useful for others, "
+                    "please update notes.md. If you have questions, please write them into questions.md. "
+                    "I might update the notes.md with answers to those questions. If you have commands I should run, "
+                    "please put them into commands.sh. Refactor notes.md and questions.md when necessary to avoid redundancy "
+                    "and to reduce length. Output: {combined_output}. What should we do next?"
+                ),
             ]
         )
         print("Aider command:", " ".join(command))
@@ -288,7 +290,7 @@ if __name__ == "__main__":
         run_black(files_to_fix)
         files_to_fix = []
         if COMBINED_OUTPUT:
-            call_aider(files_to_fix, COMBINED_OUTPUT, args.model)
+            call_aider(files_to_fix, args.model)
         if pylint_success and ruff_success and not files_to_fix:
             print("No more issues found. Stopping early.")
             break
