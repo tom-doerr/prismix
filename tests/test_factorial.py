@@ -30,13 +30,11 @@ def test_factorial_basic():
 
     code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
-
+    
     # Execute the factorial function directly
-    loc = {}
-    exec(function_code, globals(), loc)
-    factorial = loc.get("factorial")
-
-    factorial = globals().get("factorial")
+    local_vars = {}
+    exec(function_code, globals(), local_vars)
+    factorial = local_vars.get("factorial")
 
     # Test basic cases
     assert factorial(0) == 1

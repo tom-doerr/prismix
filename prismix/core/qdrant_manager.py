@@ -38,8 +38,8 @@ class QdrantManager:
         )
         logging.info("Embeddings inserted into collection '%s'.", self.collection_name)
 
-    def embed_code(self, content: str) -> List[float]:
-        """Implement embedding logic here."""
+    def embed_code(self) -> List[float]:
+        """Implement embedding logic here. The content is not used."""
         return [0.0] * 128  # Placeholder for embedding
 
     def search_embeddings(

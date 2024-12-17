@@ -1,7 +1,7 @@
 """
 Module for retrieving and managing code embeddings using Qdrant and CodeIndexer.
 """
-
+import uuid
 import logging
 import os
 from typing import List
@@ -69,7 +69,7 @@ class DataInserter:
                 if file_context and file_context.content:
                     embedding = indexer.embed_code(file_context.content)
                     point = models.PointStruct(
-                        id=filepath,
+                        id=str(uuid.uuid4()),
                         vector=embedding,
                         payload={"content": file_context.content},
                     )
