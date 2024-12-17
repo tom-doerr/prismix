@@ -1,12 +1,11 @@
 from pymilvus import MilvusClient
-
 """
 Module for setting up and interacting with a local Milvus database.
 """
 
-from pymilvus import MilvusClient
 import numpy as np
 import logging
+from pymilvus import MilvusClient
 
 # Configure logging
 logging.basicConfig(
@@ -15,7 +14,6 @@ logging.basicConfig(
 
 # Path to the local database file
 DB_FILE = "./milvus_demo.db"
-
 
 def setup_milvus_local_db():
     """Setup the local Milvus database and create a collection."""
@@ -30,7 +28,6 @@ def setup_milvus_local_db():
         logging.info("Milvus local database setup complete.")
     except Exception as e:
         logging.error("Error setting up Milvus local database: %s", e)
-
 
 def insert_data_into_milvus():
     """Insert sample data into the Milvus collection."""
@@ -50,7 +47,6 @@ def insert_data_into_milvus():
         logging.info("Inserted %d documents.", len(data))
     except Exception as e:
         logging.error("Error inserting data into Milvus: %s", e)
-
 
 def search_milvus_collection():
     """Search the Milvus collection for similar documents."""
@@ -73,7 +69,6 @@ def search_milvus_collection():
     except Exception as e:
         logging.error("Error searching Milvus collection: %s", e)
 
-
 def main():
     """Main function to setup, insert data, and search in Milvus."""
     logging.info("Starting Milvus local database setup...")
@@ -86,7 +81,6 @@ def main():
     search_milvus_collection()
 
     print("Script execution completed.")
-
 
 if __name__ == "__main__":
     main()
