@@ -4,6 +4,7 @@ import os
 import sys
 from typing import NoReturn
 
+import re
 from prismix.core.code_indexer import CodeIndexer
 from prismix.core.colbert_retriever import ColbertRetriever  # Add this import
 from prismix.core.iterative_programmer import setup_agent

@@ -51,7 +51,7 @@ def test_search_code_on_the_fly(code_indexer_fixture: CodeIndexer, temp_dir: str
     assert len(results) == 0
 
     # Test search with a query that exists in a specific file
-    results = code_indexer.search_code_on_the_fly(temp_dir, "test file")
+    results = code_indexer_fixture.search_code_on_the_fly(temp_dir, "test file")
     assert len(results) == 1
     assert any("test2.txt" in r.filepath for r in results)
 
