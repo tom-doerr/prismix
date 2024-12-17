@@ -178,7 +178,7 @@ def call_aider(file_paths, combined_output, model):
             + ["--file", "questions.md"]
             + [
                 "--message",
-                f"{debugging_and_testing_content}\n\n\nDon't work on too many things at the same time. There are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. Refactor notes.md and questions.md when necessary to avoid redundancy and to reduce length. Output: {combined_output}. What should we do next?",
+                f"{debugging_and_testing_content}\n\n\nDon't work on too many things at the same time. There are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. If you have commands I should run, please put them into commands.sh. Refactor notes.md and questions.md when necessary to avoid redundancy and to reduce length. Output: {combined_output}. What should we do next?",
             ]
         )
         print("Aider command:", " ".join(command))
