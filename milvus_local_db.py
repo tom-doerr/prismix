@@ -8,7 +8,7 @@ import numpy as np
 try:
     from pymilvus import MilvusClient
 except ImportError as e:
-    logging.error(f"Failed to import pymilvus: {e}")
+    logging.error("Failed to import pymilvus: %s", e)
     raise
 
 # Configure logging
