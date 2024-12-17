@@ -230,30 +230,30 @@ class FileEditor:
                         lines.insert(line_num - 1, new_text)
                         changes.append(f"Inserted at line {line_num}: '{new_text}'")
                         # Update subsequent line numbers
-                        for j in range(i + 1, len(line_edits)):
-                            if isinstance(line_edits[j], tuple):
-                                if len(line_edits[j]) == 3:
-                                    mode_j, num_j, text_j = line_edits[j]
+                        for j, edit_j in enumerate(line_edits[i + 1:]):
+                            if isinstance(edit_j, tuple):
+                                if len(edit_j) == 3:
+                                    mode_j, num_j, text_j = edit_j
                                     if num_j >= line_num:
-                                        line_edits[j] = (mode_j, num_j + 1, text_j)
+                                        line_edits[i + 1 + j] = (mode_j, num_j + 1, text_j)
                                 else:
-                                    num_j, text_j = line_edits[j]
+                                    num_j, text_j = edit_j
                                     if num_j >= line_num:
-                                        line_edits[j] = (num_j + 1, text_j)
+                                        line_edits[i + 1 + j] = (num_j + 1, text_j)
                     elif mode == "DELETE" and 1 <= line_num <= len(lines):
                         old_text = lines.pop(line_num - 1)
                         changes.append(f"Deleted line {line_num}: '{old_text}'")
                         # Update subsequent line numbers
-                        for j in range(i + 1, len(line_edits)):
-                            if isinstance(line_edits[j], tuple):
-                                if len(line_edits[j]) == 3:
-                                    mode_j, num_j, text_j = line_edits[j]
+                        for j, edit_j in enumerate(line_edits[i + 1:]):
+                            if isinstance(edit_j, tuple):
+                                if len(edit_j) == 3:
+                                    mode_j, num_j, text_j = edit_j
                                     if num_j > line_num:
-                                        line_edits[j] = (mode_j, num_j - 1, text_j)
+                                        line_edits[i + 1 + j] = (mode_j, num_j - 1, text_j)
                                 else:
-                                    num_j, text_j = line_edits[j]
+                                    num_j, text_j = edit_j
                                     if num_j > line_num:
-                                        line_edits[j] = (num_j - 1, text_j)
+                                        line_edits[i + 1 + j] = (num_j - 1, text_j)
                 except (ValueError, IndexError) as e:
                     changes.append(
                         f"Failed to apply {mode} at line {line_num}: {str(e)}"
