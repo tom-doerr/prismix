@@ -68,7 +68,9 @@ class CodeIndexer:
                                 filepath, file_context.content, embedding
                             )
                             self.indexed_code[filepath] = indexed_code
-                            print(f"Indexed: {filepath}")  # Consider logging instead of printing
+                            print(
+                                f"Indexed: {filepath}"
+                            )  # Consider logging instead of printing
                     except FileNotFoundError as e:
                         print(f"File not found: {filepath}: {e}")
                     except PermissionError as e:
@@ -78,7 +80,9 @@ class CodeIndexer:
                     except PermissionError as e:
                         print(f"Permission error accessing {filepath}: {e}")
                     except Exception as e:
-                        print(f"Unexpected error indexing {filepath}: {e}")  # Consider logging instead of printing
+                        print(
+                            f"Unexpected error indexing {filepath}: {e}"
+                        )  # Consider logging instead of printing
 
     def search_code(self, query: str) -> List[IndexedCode]:
         """Search indexed code using a query."""
