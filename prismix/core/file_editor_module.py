@@ -34,28 +34,41 @@ class FileEditorModule:
         ]
 
     def apply_single_replacement(
-        self, content: str, search_pattern: str, replacement_code: str
+        self, content: str, search_pattern: str, replacement_code: str,
     ) -> str:
-        """Applies a single replacement to the content."""
-        return content.replace(search_pattern, replacement_code)
+        """Apply a single replacement in the content."""
+        updated_content = content.replace(search_pattern, replacement_code)
+
+        return updated_content
 
     def apply_replacements(self, content: str, instruction: str) -> FileContext:
-        """Applies replacements based on the instruction."""
-        replacements = self.parse_instructions(instruction)
-        changes = []
-        for search_pattern, replacement_code in replacements:
-            original_content = content
-            content = self.apply_single_replacement(
-                content, search_pattern, replacement_code.replace("\\n", "\n")
+        """Apply multiple replacements based on the instruction."""
+        changes: List[Tuple[str, str]] = []
+        try:
+            # Use regex to find all replacement instructions
+            matches = re.findall(r"Replace\s+'([^']*)'\s+with\s+'([^']*)'", instruction)
+            for search_pattern, replacement_code in matches:
+                if search_pattern in content:
+                    original_content = content
+                    content = self.apply_single_replacement(
+                        content, search_pattern, replacement_code
+                    )
+                    changes.append((search_pattern, replacement_code))  # Store the changes
+
+                    if original_content == content:
+                        print(
+                            f"No change was made for pattern: '{search_pattern}' with replacement: '{replacement_code}'"
+                        )
+
+        except Exception as e:
+            return FileContext(
+                filepath="", content=content, error=f"Error applying replacements: {e}"
             )
-            if original_content != content:
-                changes.append((search_pattern, replacement_code))
-        return FileContext(
-            filepath="",
-            content=content,
-            changes=changes,
-            error=None,
-        )
+
+        if not changes:
+            return FileContext(filepath="", content=content, changes=changes)
+
+        return FileContext(filepath="", content=content, changes=changes)
 
     def forward(self, context: str, instruction: str) -> FileContext:
         """Edit the file based on the context and instruction."""
@@ -72,19 +85,12 @@ class FileEditorModule:
             except IndexError:
                 pass
 
-        if not content and filepath:
-            file_context = self.read_file(filepath)
-            if file_context.error:
-                return file_context
-            content = file_context.content
-
-        # Apply replacements
-        file_context = self.apply_replacements(content, instruction)
-
-        # Return a FileContext object with changes
+        if not os.path.exists(filepath):
+            return FileContext(
+                filepath=filepath, content="", error="File does not exist"
+            )  # Return FileContext with error
+        file_context = self.read_file(filepath)
+        updated_file_context = self.apply_replacements(file_context.content, instruction)
         return FileContext(
-            filepath=filepath,
-            content=file_context.content,  # Use the content from file_context
-            changes=file_context.changes,
-            error=file_context.error,  # Use the error from file_context
+            filepath=filepath, content=updated_file_context.content, changes=updated_file_context.changes
         )

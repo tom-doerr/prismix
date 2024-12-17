@@ -67,7 +67,9 @@ def execute_instruction(instruction: str) -> None:
 def print_usage():
     """Print usage instructions."""
     print(
-        "Usage: codeweaver '<instruction>' or 'index <path>' or 'index_debug <path>' or 'search_colbert <query>' or 'milvus_setup' or 'milvus_insert' or 'milvus_search'"
+        "Usage: codeweaver '<instruction>' or 'index <path>' or 'index_debug <path>'"
+        " or 'search_colbert <query>' or 'milvus_setup' or 'milvus_insert'"
+        " or 'milvus_search'"
     )
     print("Example: codeweaver 'create a hello world script'")
     print("Example: codeweaver index '.'")
