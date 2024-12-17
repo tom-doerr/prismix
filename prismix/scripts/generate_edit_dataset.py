@@ -74,6 +74,7 @@ class EditDatasetGenerator(dspy.Module):
             """
             Signature for generating a dataset of edit examples.
             """
+
             num_examples = dspy.InputField(desc="Number of examples to generate")
             output_file = dspy.InputField(desc="Path to the output JSON file")
             dataset = dspy.OutputField(desc="Generated dataset containing examples")
