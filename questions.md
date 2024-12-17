@@ -1,12 +1,13 @@
 ## Questions
 
-1. **Exec Statement in `examples/example.py`**:
-   - Should we replace the `exec` statement in `examples/example.py` with a safer alternative, such as using `eval` or directly invoking the function?
+1. **MockLM Implementation**:
+   - Why is the `MockLM` class in `tests/test_iterative_programmer.py` missing the required `prompt` argument?
+   - How should the `MockLM` class be updated to be compatible with the expected interface of `dspy`?
 
-1. **Pydantic Deprecation**:
+2. **Pydantic Deprecation**:
    - Should we update the code to use the new `ConfigDict` approach in Pydantic to avoid future issues?
 
-2. **litellm Deprecation**:
+3. **litellm Deprecation**:
    - Should we migrate the code to use the new `files()` API in `litellm` to avoid future deprecation warnings?
 
 
