@@ -1,14 +1,21 @@
+"""
+Test suite for the safety checks in the IterativeProgrammer module.
+"""
+
 import unittest
 import dspy
 from prismix.core.iterative_programmer import IterativeProgrammer
 
 
 class TestSafetyCheck(unittest.TestCase):
+    """Test class for safety checks in the IterativeProgrammer module."""
     def setUp(self):
+        """Set up the test environment with a mock language model."""
         dspy.configure(lm=dspy.LM(model="gpt-4o-mini", max_tokens=2000))
         self.programmer = IterativeProgrammer()
 
     def test_safe_code(self):
+        """Test that safe code is identified as safe."""
         safe_code = """
 def safe_function(): return 42
 """
@@ -20,6 +27,7 @@ def safe_function(): return 42
         )
 
     def test_code_with_print(self):
+        """Test that code with print is identified as safe."""
         code_with_print = """
 def add(a, b):
     print(f"The sum is {a + b}")
@@ -33,6 +41,7 @@ def add(a, b):
         )
 
     def test_unsafe_code(self):
+        """Test that unsafe code is identified as unsafe."""
         unsafe_code = """
 import os
 os.system("rm -rf /")
