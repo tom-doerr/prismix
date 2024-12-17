@@ -80,6 +80,10 @@ def search_milvus_collection():
         logging.error("File not found: %s", e)
     except PermissionError as e:
         logging.error("Permission denied: %s", e)
+    except FileNotFoundError as e:
+        logging.error("File not found: %s", e)
+    except PermissionError as e:
+        logging.error("Permission denied: %s", e)
     except Exception as e:
         logging.error("Error searching Milvus collection: %s", e)
 

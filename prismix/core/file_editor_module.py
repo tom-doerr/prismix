@@ -59,12 +59,8 @@ class FileEditorModule:
             for search_pattern, replacement_code in matches:
                 if search_pattern in content:
                     original_content = content
-                    content = self.apply_single_replacement(
-                        content, search_pattern, replacement_code
-                    )
-                    changes.append(
-                        (search_pattern, replacement_code)
-                    )  # Store the changes
+                    content = content.replace(search_pattern, replacement_code)
+                    changes.append((search_pattern, replacement_code))  # Store the changes
 
                     if original_content == content:
                         print(
