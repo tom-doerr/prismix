@@ -23,7 +23,10 @@ def safe_function(): return 42
         is_safe, message = self.programmer.is_code_safe(safe_code)
         self.assertTrue(is_safe)
         self.assertIn(
-            "The code defines a simple function that returns a constant value (42) and does not involve any user input or external data, making it safe.",
+            (
+                "The code defines a simple function that returns a constant value (42) "
+                "and does not involve any user input or external data, making it safe."
+            ),
             message,
         )
 
@@ -38,7 +41,10 @@ def add(a, b):
         self.assertTrue(is_safe)
         self.assertEqual(
             message,
-            "The code simply prints the sum of two numbers, which is generally safe as it does not expose sensitive information or perform any harmful operations.",
+            (
+                "The code simply prints the sum of two numbers, which is generally safe "
+                "as it does not expose sensitive information or perform any harmful operations."
+            ),
         )
 
     def test_unsafe_code(self):
