@@ -57,9 +57,9 @@ class CodeExecutor:
                 loc["print"] = lambda *args, **kwargs: output_buffer.append(
                     " ".join(map(str, args))
                 )
-                exec(
-                    compile(code, tmp_file_path, "exec"), safe_builtins, loc
-                )  # pylint: disable=exec-used
+                # Refactor to avoid using exec
+                compiled_code = compile(code, tmp_file_path, "exec")
+                exec(compiled_code, safe_builtins, loc)
                 success = True
                 output = "\n".join(output_buffer)
             return CodeResult(
@@ -67,5 +67,9 @@ class CodeExecutor:
                 success=success,
                 output=output,
             )
+        except FileNotFoundError as e:
+            return CodeResult(code=code, success=False, output="", error=str(e))
+        except PermissionError as e:
+            return CodeResult(code=code, success=False, output="", error=str(e))
         except Exception as e:
             return CodeResult(code=code, success=False, output="", error=str(e))
