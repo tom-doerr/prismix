@@ -78,9 +78,9 @@ class CodeIndexer:
                             f"Unexpected error indexing {filepath}: {e}"
                         )  # Consider logging instead of printing
 
-    def embed_code(self, content: str) -> List[float]:
+    def embed_code(self) -> List[float]:
         """Embed the given code content into a vector."""
-        return self.embedder.embed_code(content)
+        return self.embedder.embed_code()
 
     def search_code(self, query: str) -> List[IndexedCode]:
         """Search indexed code using a query."""
