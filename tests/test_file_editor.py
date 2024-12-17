@@ -1,3 +1,7 @@
+"""
+Test module for the FileEditorModule class.
+"""
+
 import os
 from prismix.core.file_editor_module import FileEditorModule
 

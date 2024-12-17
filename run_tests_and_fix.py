@@ -44,6 +44,7 @@ def run_ruff_fix():
 def is_test_file(file_path):
     return file_path.endswith("_test.py") or "tests" in file_path.split("/")
 
+
 def ensure_file_exists(file_path):
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
