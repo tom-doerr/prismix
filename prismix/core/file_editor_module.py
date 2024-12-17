@@ -7,6 +7,8 @@ import re
 from importlib import resources
 from typing import List, Tuple
 
+from pydantic import ConfigDict
+
 from prismix.core.file_operations import (
     DefaultFileOperations,
     FileContext,
