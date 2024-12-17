@@ -39,7 +39,7 @@ def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir):
     """Test adding data to the database."""
     retriever = colbert_retriever_fixture
     temp_directory = temp_dir
-    retriever.add_data_to_db(directory)
+    retriever.add_data_to_db(temp_dir)
 
     # Ensure that the data was added to the Qdrant database
     assert (
