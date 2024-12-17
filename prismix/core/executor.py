@@ -64,11 +64,8 @@ class CodeExecutor:
         try:
             spec = importlib.util.spec_from_loader("temp_module", loader=None)
             temp_module = importlib.util.module_from_spec(spec)
-            # Safer alternative to exec
             compiled_code = compile(code, "<string>", "exec")
-            spec = importlib.util.spec_from_loader("temp_module", loader=None)
-            temp_module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(temp_module)
+            exec(compiled_code, temp_module.__dict__)
             return CodeResult(code=code, success=True, output="", error="")
         except (SyntaxError, NameError) as e:
             return CodeResult(code=code, success=False, output="", error=str(e))
