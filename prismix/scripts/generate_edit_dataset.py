@@ -55,11 +55,6 @@ class EditDataPoint:
 
 
 class EditDatasetGenerator(dspy.Module):
-    """
-    Module to generate edit dataset examples.
-    This class generates datasets for training purposes by creating original and edited scripts,
-    along with corresponding edit instructions and hindsight commands.
-    """
 
     """
     Module to generate edit dataset examples.
