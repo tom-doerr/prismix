@@ -171,13 +171,13 @@ if __name__ == "__main__":
     for iteration in tqdm(range(args.iterations), desc="Running iterations"):
         print(f"Starting iteration {iteration + 1} of {args.iterations}...")
         pylint_success, pylint_output = run_pylint()
-        random.shuffle(all_files)
-        selected_files = all_files[: args.lint_files]
+        random.shuffle(all_python_files)
+        selected_files = all_python_files[: args.lint_files]
         ruff_success, ruff_output = run_ruff_fix(selected_files)
-        pytest_output = run_random_pytest(args.pytest_files, all_files)
+        pytest_output = run_random_pytest(args.pytest_files, all_python_files)
         pylint_result_output = run_random_pylint(selected_files)
         combined_output = (
-            f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_result_output}"
+            f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_output}"
         )
         if "All checks passed" not in ruff_output:
             combined_output += f"\nRuff output:\n{ruff_output}"
