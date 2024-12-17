@@ -9,8 +9,6 @@ from typing import Dict, Any
 
 @dataclass
 class CodeResult:
-    """Result of code generation and execution"""
-
     code: str
     success: bool
     output: str
