@@ -22,33 +22,22 @@ class FileEditorModule:
         self.model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def read_file(self, filename: str) -> FileContext:
-        """Reads the content of the file."""
+        """Read the content of a file."""
         try:
-            with open(filename, "r") as file:
-                content = file.read()
-            return FileContext(
-                filepath=filename, content=content, changes=[], error=None
-            )
+            with open(filename, "r", encoding="utf-8") as f:
+                content = f.read()
+            return FileContext(filepath=filename, content=content, changes=[], error=None)
         except FileNotFoundError:
-            return FileContext(
-                filepath=filename, content="", changes=[], error="File does not exist"
-            )
+            return FileContext(filepath=filename, content="", changes=[], error="File does not exist")
 
     def write_file(self, filename: str, content: str) -> FileContext:
-        """Writes the updated content back to the file."""
+        """Write content to a file."""
         try:
-            with open(filename, "w") as file:
-                file.write(content)
-            return FileContext(
-                filepath=filename,
-                content=content,
-                changes=["File updated successfully"],
-                error=None,
-            )
+            with open(filename, "w", encoding="utf-8") as f:
+                f.write(content)
+            return FileContext(filepath=filename, content=content, changes=["File updated successfully"], error=None)
         except Exception as e:
-            return FileContext(
-                filepath=filename, content=content, changes=[], error=str(e)
-            )
+            return FileContext(filepath=filename, content="", changes=[], error=str(e))
 
     def parse_instructions(self, instruction: str) -> List[Tuple[str, str]]:
         """Parses the instruction string and returns a list of replacement pairs."""
@@ -62,12 +51,9 @@ class FileEditorModule:
             if "Replace" in part and len(part.split(" with ")) == 2
         ]
 
-    def apply_single_replacement(
-        self, content: str, search_pattern: str, replacement_code: str
-    ) -> str:
-        """Apply a single replacement in the content."""
-        # Use regex to find and replace the search pattern
-        return re.sub(search_pattern, replacement_code, content)
+    def apply_single_replacement(self, content: str, search_pattern: str, replacement_code: str) -> str:
+        """Apply a single replacement to the content."""
+        return content.replace(search_pattern, replacement_code)
 
     def apply_replacements(self, content: str, instruction: str) -> FileContext:
         """Apply multiple replacements based on the instruction."""
@@ -107,15 +93,19 @@ class FileEditorModule:
         )
 
     def forward(self, context: str, instruction: str) -> FileContext:
-        """Edit the file based on the context and instruction."""
-        # Parse the context to extract the file path and content
-        file_path, content = self._parse_context(context)
+        """Apply the given instruction to the file content."""
+        # Parse the context to get the file content
+        file_content = context.split("Content: ")[1]
 
-        # Apply the instructions to the content
-        updated_content = self._apply_instructions(content, instruction)
+        # Parse the instruction to get the replacements
+        replacements = self.parse_instructions(instruction)
 
-        # Write the updated content back to the file
-        return self.write_file(file_path, updated_content)
+        # Apply each replacement to the file content
+        for search_pattern, replacement_code in replacements:
+            file_content = self.apply_single_replacement(file_content, search_pattern, replacement_code)
+
+        # Return the updated file content
+        return FileContext(filepath="", content=file_content, changes=replacements, error=None)
 
     def _parse_context(self, context: str) -> Tuple[str, str]:
         """Parses the context to extract the file path and content."""
