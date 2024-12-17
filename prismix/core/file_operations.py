@@ -133,142 +133,61 @@ class FileEditor:
         lines = content.splitlines()
         changes = []
 
+        def apply_edit(mode, line_num, new_text):
+            if mode == "REPLACE" and 1 <= line_num <= len(lines):
+                old_text = lines[line_num - 1]
+                lines[line_num - 1] = new_text
+                changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
+            elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
+                lines.insert(line_num - 1, new_text)
+                changes.append(f"Inserted at line {line_num}: '{new_text}'")
+            elif mode == "DELETE" and 1 <= line_num <= len(lines):
+                old_text = lines.pop(line_num - 1)
+                changes.append(f"Deleted line {line_num}: '{old_text}'")
+
         if isinstance(line_edits, str):
-            # Parse string format (from LLM)
             edit_lines = line_edits.splitlines()
             for edit in edit_lines:
                 try:
-                    # Parse "MODE LINE_NUM | NEW_TEXT" format
-                    parts = edit.split("|", 1)  # Split on first | only
+                    parts = edit.split("|", 1)
                     if not parts:
                         continue
 
-                    mode_line = parts[0].strip().split()  # Split on whitespace
+                    mode_line = parts[0].strip().split()
                     if len(mode_line) < 2:
-                        mode = "REPLACE"  # Default mode
-                        line_num = -1  # Initialize to an invalid value
+                        mode = "REPLACE"
+                        line_num = -1
                         if mode_line:
                             try:
                                 line_num = int(mode_line[0])
                             except ValueError:
-                                pass  # If not a number, keep it as -1
+                                pass
                     else:
                         mode = mode_line[0].upper()
                         try:
                             line_num = int(mode_line[1])
                         except ValueError:
-                            line_num = -1  # If not a number, keep it as -1
+                            line_num = -1
 
                     new_text = parts[1].strip() if len(parts) > 1 else ""
 
                     if line_num != -1:
-                        if mode == "REPLACE" and 1 <= line_num <= len(lines):
-                            old_text = lines[line_num - 1]
-                            lines[line_num - 1] = new_text
-                            changes.append(
-                                f"Replaced line {line_num}: '{old_text}' -> '{new_text}'"
-                            )
-                        elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
-                            lines.insert(line_num - 1, new_text)
-                            changes.append(f"Inserted at line {line_num}: '{new_text}'")
-                            # Adjust line numbers for subsequent edits after insert
-                            for j in range(len(edit_lines)):
-                                if j > edit_lines.index(edit):
-                                    parts_j = edit_lines[j].split("|", 1)
-                                    if len(parts_j) > 0:
-                                        mode_line_j = parts_j[0].strip().split()
-                                        if len(mode_line_j) >= 2:
-                                            try:
-                                                line_num_j = int(mode_line_j[1])
-                                                if line_num_j >= line_num:
-                                                    mode_line_j[1] = str(line_num_j + 1)
-                                                    edit_lines[j] = (
-                                                        " ".join(mode_line_j)
-                                                        + "|"
-                                                        + parts_j[1]
-                                                    )
-                                            except ValueError:
-                                                pass
-                        elif mode == "DELETE" and 1 <= line_num <= len(lines):
-                            old_text = lines.pop(line_num - 1)
-                            changes.append(f"Deleted line {line_num}: '{old_text}'")
-                            # Adjust line numbers for subsequent edits after delete
-                            for j in range(len(edit_lines)):
-                                if j > edit_lines.index(edit):
-                                    parts_j = edit_lines[j].split("|", 1)
-                                    if len(parts_j) > 0:
-                                        mode_line_j = parts_j[0].strip().split()
-                                        if len(mode_line_j) >= 2:
-                                            try:
-                                                line_num_j = int(mode_line_j[1])
-                                                if line_num_j > line_num:
-                                                    mode_line_j[1] = str(line_num_j - 1)
-                                                    edit_lines[j] = (
-                                                        " ".join(mode_line_j)
-                                                        + "|"
-                                                        + parts_j[1]
-                                                    )
-                                            except ValueError:
-                                                pass
+                        apply_edit(mode, line_num, new_text)
                 except (ValueError, IndexError) as e:
                     changes.append(
                         f"Failed to apply edit: Invalid line number {line_num}: {str(e)}"
                     )
                     continue
         else:
-            # Handle direct mode/line/text tuples (from tests)
             for i, edit in enumerate(line_edits):
                 if len(edit) == 2:
-                    # Simple line number + text format
                     line_num, new_text = edit
                     mode = "REPLACE"
                 else:
-                    # Full mode + line + text format
                     mode, line_num, new_text = edit
                 mode = mode.upper()
                 try:
-                    if mode == "REPLACE" and 1 <= line_num <= len(lines):
-                        old_text = lines[line_num - 1]
-                        lines[line_num - 1] = new_text
-                        changes.append(
-                            f"Replaced line {line_num}: '{old_text}' -> '{new_text}'"
-                        )
-                    elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
-                        lines.insert(line_num - 1, new_text)
-                        changes.append(f"Inserted at line {line_num}: '{new_text}'")
-                        # Update subsequent line numbers
-                        for j, edit_j in enumerate(line_edits[i + 1 :]):
-                            if isinstance(edit_j, tuple):
-                                if len(edit_j) == 3:
-                                    mode_j, num_j, text_j = edit_j
-                                    if num_j >= line_num:
-                                        line_edits[i + 1 + j] = (
-                                            mode_j,
-                                            num_j + 1,
-                                            text_j,
-                                        )
-                                else:
-                                    num_j, text_j = edit_j
-                                    if num_j >= line_num:
-                                        line_edits[i + 1 + j] = (num_j + 1, text_j)
-                    elif mode == "DELETE" and 1 <= line_num <= len(lines):
-                        old_text = lines.pop(line_num - 1)
-                        changes.append(f"Deleted line {line_num}: '{old_text}'")
-                        # Update subsequent line numbers
-                        for j, edit_j in enumerate(line_edits[i + 1 :]):
-                            if isinstance(edit_j, tuple):
-                                if len(edit_j) == 3:
-                                    mode_j, num_j, text_j = edit_j
-                                    if num_j > line_num:
-                                        line_edits[i + 1 + j] = (
-                                            mode_j,
-                                            num_j - 1,
-                                            text_j,
-                                        )
-                                else:
-                                    num_j, text_j = edit_j
-                                    if num_j > line_num:
-                                        line_edits[i + 1 + j] = (num_j - 1, text_j)
+                    apply_edit(mode, line_num, new_text)
                 except (ValueError, IndexError) as e:
                     changes.append(
                         f"Failed to apply {mode} at line {line_num}: {str(e)}"
