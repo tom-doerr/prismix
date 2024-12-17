@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Script to run random pytest tests and pylint checks on specified number of files.
 """
@@ -47,6 +49,7 @@ def run_random_pytest(files):
             pytest_output += f"Error running pytest on {test_file}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
     return pytest_output
 
+
 def run_pytest():
     pytest_output = ""
     try:
@@ -58,7 +61,9 @@ def run_pytest():
         )
         pytest_output += result.stdout + result.stderr
     except subprocess.CalledProcessError as e:
-        pytest_output += f"Error running pytest: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
+        pytest_output += (
+            f"Error running pytest: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
+        )
     return pytest_output
 
 
@@ -143,7 +148,7 @@ def call_aider(file_paths, combined_output):
             + [item for file_path in file_paths for item in ["--file", file_path]]
             + [
                 "--message",
-                f"There are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. Refactor notes.md and questions.md when necessary. Output: {combined_output}. What should we do next?",
+                f"There are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. Refactor notes.md and questions.md when necessary to avoid redundancy and to reduce length. Output: {combined_output}. What should we do next?",
             ]
         )
         print("Aider command:", " ".join(command))
