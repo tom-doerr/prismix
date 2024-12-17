@@ -2,4 +2,4 @@
 This module contains generated code examples.
 """
 
-dummy_code = "dummy_code"
+DUMMY_CODE = "dummy_code"

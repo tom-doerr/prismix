@@ -70,6 +70,13 @@
   2. **DeprecationWarning from litellm**: The `open_text` API is deprecated. The warning recommends migrating to the new `files()` API.
 
 ### Resolved Issues
+- **Fixed Pylint Warning in `output/generated_code.py`**:
+  - Renamed `dummy_code` to `DUMMY_CODE` to conform to the `UPPER_CASE` naming style.
+- **Fixed Pytest Failures in `tests/test_file_operations.py`**:
+  - Fixed `TypeError` in `test_file_read` by correcting the assertion.
+  - Updated the assertion in `test_multiple_edit_modes` to correctly check for deleted lines.
+- **Deprecation Warnings**:
+  - Added notes about updating Pydantic to use `ConfigDict` and migrating litellm to the new `files()` API.
 1. **Fixed Pylint Warnings in `executor.py`**:
    - Added class docstring to `CodeExecutor`.
    - Removed pointless string statement.

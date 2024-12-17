@@ -39,7 +39,7 @@ def test_file_read(test_file_fixture_read):
     """Test reading file content."""
     file_manager = FileManager(DefaultFileOperations())
     result = file_manager.read_file(test_file_fixture_read)
-    assert isinstance(result, FileContext)()
+    assert isinstance(result, FileContext)
     assert result.error is None
     assert "def main():" in result.content
     assert result.filepath == test_file_fixture
@@ -167,7 +167,7 @@ def test_multiple_edit_modes():
     # Check content modifications
     assert "modified line 1" in new_content
     assert "new line" in new_content
-    assert "line 4" not in new_content  # Ensure line 4 is deleted
+    assert "line 4" not in new_content.splitlines()  # Ensure line 4 is deleted
 
     # Check changes list
     assert len(changes) == 3

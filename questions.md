@@ -1,4 +1,6 @@
 ## Questions
+- **Why is `agent.forward` returning `None` in `test_file_edit` and `test_invalid_edit_command`?**
+- **How should the `agent.forward` method handle invalid edit commands?**
 
 1. **ImportError in `tests/test_code_indexer.py`**:
    - Why is `CodeEmbedder` not being imported correctly?
