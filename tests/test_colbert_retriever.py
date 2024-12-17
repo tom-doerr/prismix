@@ -37,7 +37,7 @@ def temp_dir():
 
 def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir):
     """Test adding data to the database."""
-    colbert_retriever_fixture.add_data_to_db(temp_dir_fixture)
+    colbert_retriever_fixture.add_data_to_db(temp_dir)
 
     # Ensure that the data was added to the Qdrant database
     assert (
@@ -48,7 +48,7 @@ def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir):
     )
 
 
-def test_colbert_retriever(colbert_retriever_fixture_test, temp_dir_test):
+def test_colbert_retriever(colbert_retriever_fixture, temp_dir):
     """Test the ColbertRetriever class."""
     query = "quantum computing"
     colbert_retriever_fixture.forward = lambda q: [

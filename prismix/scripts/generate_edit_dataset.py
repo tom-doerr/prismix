@@ -205,8 +205,7 @@ class EditDatasetGenerator(dspy.Module):
 
         if editor_script and 0.3 < editor_similarity < 0.9:
             return editor_script
-        else:
-            return generated_script
+        return generated_script
 
     def _generate_hindsight_command(
         self, original_script: str, edited_script: str

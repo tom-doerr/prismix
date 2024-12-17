@@ -3,6 +3,7 @@ CodeIndexer module: Indexes and searches code files using embeddings.
 """
 
 import fnmatch
+import logging
 import os
 from dataclasses import dataclass
 from typing import Dict, List
@@ -22,7 +23,7 @@ class IndexedCode:
 class CodeEmbedder:
     """Class responsible for embedding code content into vectors."""
 
-    def embed_code(self, content: str) -> List[float]:
+    def embed_code(self) -> List[float]:
         """Embed the given code content into a vector."""
         # Placeholder for embedding logic
         return [0.0] * 128  # Dummy embedding
@@ -73,8 +74,10 @@ class CodeIndexer:
                             logging.info(f"Indexed: {filepath}")
                     except (FileNotFoundError, PermissionError) as e:
                         logging.error(f"Error accessing {filepath}: {e}")
-                    except Exception as e:
-                        logging.error(f"Unexpected error indexing {filepath}: {e}")
+                    except FileNotFoundError as e:
+                        logging.error(f"Error accessing {filepath}: {e}")
+                    except PermissionError as e:
+                        logging.error(f"Error accessing {filepath}: {e}")
 
     def embed_code(self, content: str) -> List[float]:
         """Embed the given code content into a vector."""
@@ -113,8 +116,10 @@ class CodeIndexer:
                             results.append(indexed_code)
                     except (FileNotFoundError, PermissionError) as e:
                         logging.error(f"Error accessing {filepath}: {e}")
-                    except Exception as e:
-                        logging.error(f"Unexpected error searching {filepath}: {e}")
+                    except FileNotFoundError as e:
+                        logging.error(f"Error accessing {filepath}: {e}")
+                    except PermissionError as e:
+                        logging.error(f"Error accessing {filepath}: {e}")
         return results
 
     def _is_ignored(self, filepath: str) -> bool:
