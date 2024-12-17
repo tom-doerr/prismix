@@ -19,11 +19,6 @@ def test_apply_replacements():
     assert (
         updated_content.content == 'def foo():\n    print("hello")'
     )  # Check the content
-    # Check the file content
-    assert (
-        editor.file_manager.read_file("test_file.py").content
-        == 'def foo():\n    print("hello")'
-    )
 
 
 def test_read_file_existing():

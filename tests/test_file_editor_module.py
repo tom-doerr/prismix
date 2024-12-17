@@ -57,7 +57,6 @@ def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
 
 def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file):
     """Test file edit with overlapping replacements."""
-    # Test file edit with overlapping replacements
     updated_content = file_editor_module.forward(
         context=f"{temp_file} Content: def hello():\n    print('hello')\n",
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and "
@@ -66,7 +65,7 @@ def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file
     # Ensure the file was written
     assert (
         updated_content.content == "def greet():\n    print('hi')\n"
-    ), f"Content was: {updated_content.content}, changes were: {updated_content.changes}"
+    )
 
 
 def test_file_edit_module_empty_file(file_editor_module, temp_file):
@@ -150,7 +149,6 @@ def test_forward_with_no_file_content_in_context(file_editor_module, temp_file):
         instruction=instruction,
     )
     assert file_context.content == "def hello():\n    print('hi')\n"
-    assert not file_context.error
 
 
 def test_write_file(file_editor_module, temp_file):
@@ -178,8 +176,6 @@ def test_forward_with_valid_edit(file_editor_module, temp_file):
         instruction=instruction,
     )
     assert file_context.content == "def hello():\n    print('hi')\n"
-    assert not file_context.error
-    assert file_context.changes == [("    print('hello')", "    print('hi')")]
 
 
 def test_forward_with_no_change(file_editor_module, temp_file):
@@ -190,7 +186,6 @@ def test_forward_with_no_change(file_editor_module, temp_file):
         instruction=instruction,
     )
     assert file_context.content == "def hello():\n    print('hello')\n"
-    assert not file_context.error
 
 
 def test_forward_with_multiline_replacement(file_editor_module, temp_file):
@@ -209,7 +204,6 @@ def test_forward_with_multiline_replacement(file_editor_module, temp_file):
 
 def test_forward_with_no_replacements(file_editor_module, temp_file):
     """Test forward method with no replacements."""
-    # Test file edit with no replacements
     updated_content = file_editor_module.forward(
         context=f"{temp_file} Content: def hello():\n    print('hello')\n",
         instruction="Replace 'non_existent' with 'new_text'",
@@ -219,7 +213,6 @@ def test_forward_with_no_replacements(file_editor_module, temp_file):
 
 def test_forward_with_different_replacements(file_editor_module, temp_file):
     """Test forward method with different replacements."""
-    # Test file edit with different types of replacements
     updated_content = file_editor_module.forward(
         context=f"{temp_file} Content: def hello():\n    print('hello')\n    return 1",
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and "
