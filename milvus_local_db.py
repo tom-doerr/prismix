@@ -1,6 +1,15 @@
+"""
+Module for setting up and interacting with a local Milvus database.
+"""
+
 import logging
 import numpy as np
-from pymilvus import MilvusClient
+
+try:
+    from pymilvus import MilvusClient
+except ImportError as e:
+    logging.error(f"Failed to import pymilvus: {e}")
+    raise
 
 """
 Module for setting up and interacting with a local Milvus database.
