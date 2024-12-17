@@ -59,10 +59,10 @@ def test_file_edit_module_multiple_replacements(file_editor_module):
 def test_file_edit_module_overlapping_replacements(file_editor_module):
     """Test file edit with overlapping replacements."""
     """Test file edit with overlapping replacements."""
-   # Test file edit with overlapping replacements
-   updated_content = file_editor_module.forward(
-       context=f"File: {str(temp_file)}\nContent: def hello():\n    print('hello')\n",
-       instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and Replace 'hello' with 'greet'",
+    # Test file edit with overlapping replacements
+    updated_content = file_editor_module.forward(
+        context=f"File: {str(temp_file)}\nContent: def hello():\n    print('hello')\n",
+        instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and Replace 'hello' with 'greet'",
     )
 
     # Ensure the file was written
