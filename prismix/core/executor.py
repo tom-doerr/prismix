@@ -21,6 +21,7 @@ class CodeResult:
 
 class FileContext(BaseModel):
     model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid")
     filepath: str
     content: str
     changes: List[str]

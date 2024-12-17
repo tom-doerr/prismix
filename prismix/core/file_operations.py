@@ -19,6 +19,8 @@ class FileContext(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
 
 class FileEdit(dspy.Signature):
     """Analyze file and propose line-by-line edits"""
