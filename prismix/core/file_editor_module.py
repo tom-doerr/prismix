@@ -60,7 +60,9 @@ class FileEditorModule:
                 if search_pattern in content:
                     original_content = content
                     content = content.replace(search_pattern, replacement_code)
-                    changes.append((search_pattern, replacement_code))  # Store the changes
+                    changes.append(
+                        (search_pattern, replacement_code)
+                    )  # Store the changes
 
                     if original_content == content:
                         print(
@@ -75,9 +77,7 @@ class FileEditorModule:
             )
 
         if not changes:
-            return FileContext(
-                filepath="", content=content, changes=changes
-            )
+            return FileContext(filepath="", content=content, changes=changes)
 
         return FileContext(filepath="", content=content, changes=changes)
 
