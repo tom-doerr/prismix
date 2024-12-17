@@ -10,6 +10,7 @@ class SomeModel(BaseModel):
     """
     A sample model class using Pydantic.
     """
+
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
