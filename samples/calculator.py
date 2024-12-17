@@ -1,3 +1,7 @@
+"""
+This module contains basic arithmetic functions for adding, multiplying, and calculating averages.
+"""
+
 from typing import List, Dict, Union
 
 
