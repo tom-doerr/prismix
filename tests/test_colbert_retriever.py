@@ -45,7 +45,7 @@ def test_colbert_retriever(colbert_retriever):
     dspy.settings.rm = lambda queries, k=3: [
         [{"long_text": f"This is a dummy result for {q}"} for _ in range(k)]
         for q in queries
-    ][0]
+    ]
     results = colbert_retriever.forward(query)
     assert len(results) == 3
     for result in results:
