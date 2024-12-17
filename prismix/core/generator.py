@@ -2,8 +2,10 @@
 
 from dataclasses import dataclass
 from typing import Optional
+
 import dspy
-from prismix.core.signatures import ProgramSpec, CodeImplementation, CodeReview
+
+from prismix.core.signatures import CodeImplementation, CodeReview, ProgramSpec
 
 
 @dataclass

@@ -27,8 +27,6 @@ class FileContext(BaseModel):
     error: Optional[str]
 
 
-
-
 class CodeExecutor:
     """
     Handles safe code execution in isolated environment.
@@ -36,6 +34,7 @@ class CodeExecutor:
     This class provides methods to execute code in a controlled and safe environment,
     ensuring that only a limited set of built-in functions are available to the executed code.
     """
+
     """
     Handles safe code execution in isolated environment.
 
