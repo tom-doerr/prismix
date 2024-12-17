@@ -21,6 +21,10 @@ def execute_instruction(instruction: str) -> None:
     print("-----------------")
     result = agent.forward(instruction)
 
+    if result is None:
+        print("Error: No result returned from the agent.")
+        return
+
     # Create output directory if it doesn't exist
     os.makedirs("output", exist_ok=True)
 

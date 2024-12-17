@@ -11,7 +11,7 @@ class CodeEmbedder:
     def __init__(self):
         pass
 
-    def embed_code(self, content: str) -> List[float]:
+    def embed_code(self) -> List[float]:
         """Embed the given code content into a vector."""
         # Use the content argument for embedding logic
         # For example, you can process the content and return a dummy embedding

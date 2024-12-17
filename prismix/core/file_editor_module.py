@@ -45,7 +45,9 @@ class FileEditorModule:
                 changes=["File updated successfully"],
                 error=None,
             )
-        except Exception as e:
+        except FileNotFoundError:
+            return FileContext(filepath=filename, content="", changes=[], error="File does not exist")
+        except IOError as e:
             return FileContext(filepath=filename, content="", changes=[], error=str(e))
 
     def parse_instructions(self, instruction: str) -> List[Tuple[str, str]]:
