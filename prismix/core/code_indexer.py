@@ -119,7 +119,7 @@ class CodeIndexer:
                         logging.error(f"Error accessing {filepath}: {e}")
         return results
 
-    def _is_ignored(self, filepath: str) -> bool:
+    def is_ignored(self, filepath: str) -> bool:
         """Check if the file should be ignored based on the ignore patterns."""
         for pattern in self.ignore_patterns:
             if fnmatch.fnmatch(filepath, pattern):
