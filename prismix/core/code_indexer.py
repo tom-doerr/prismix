@@ -22,6 +22,7 @@ class IndexedCode:
 
 class CodeEmbedder:
     """Handles the embedding of code content."""
+
     """Handles the embedding of code content."""
 
     def embed_code(self) -> List[float]:
