@@ -66,3 +66,4 @@ def test_code_result_structure():
     assert isinstance(result.output, str)
     assert result.success is True
     assert "factorial" in result.code
+from prismix.core.executor import CodeExecutor

@@ -44,15 +44,15 @@ def test_execute_code_success():
     """Test successful execution of code."""
     programmer = IterativeProgrammer()
     code = """
-    def calculate_sum(a, b, c):
-        print(f"Calculated sum: {a + b + c}")
-        return a + b + c
-    def main():
-        result = calculate_sum(5, 3, 0)
-        print(f"Sum: {result}")
-    if __name__ == "__main__":
-        main()
-    """
+def calculate_sum(a, b, c):
+    print(f"Calculated sum: {a + b + c}")
+    return a + b + c
+def main():
+    result = calculate_sum(5, 3, 0)
+    print(f"Sum: {result}")
+if __name__ == "__main__":
+    main()
+"""
     result = programmer.execute_code(code)
     assert result.success
     assert "Sum: 8" in result.output
