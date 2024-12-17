@@ -50,7 +50,7 @@ class FileEditorModule:
             )
             if original_content != content:
                 changes.append((search_pattern, replacement_code))
-        return FileContext(content=content, changes=changes, error=None)
+        return FileContext(filepath="", content=content, changes=changes, error=None)
 
     def forward(self, context: str, instruction: str) -> FileContext:
         """Edit the file based on the context and instruction."""

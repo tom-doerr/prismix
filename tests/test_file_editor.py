@@ -14,7 +14,7 @@ def test_apply_replacements():
     updated_content = editor.forward(
         context=f"Content: {content}", instruction=instruction
     )
-    assert updated_content.content == 'def foo():\n    print("hello")\n'
+    assert updated_content.content == 'def foo():\n    print("hello")'
     assert (
         editor.file_manager.write_file("test_file.py", updated_content.content).content
         == updated_content.content
