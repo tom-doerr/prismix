@@ -50,7 +50,9 @@ class FileEditorModule:
         replacement_code: str,
     ) -> str:
         """Apply a single replacement in the content."""
-        with resources.files("litellm.llms.tokenizers").joinpath("anthropic_tokenizer.json").open() as f:
+        with resources.files("litellm.llms.tokenizers").joinpath(
+            "anthropic_tokenizer.json"
+        ).open() as f:
             updated_content = content.replace(search_pattern, replacement_code)
 
         return updated_content
