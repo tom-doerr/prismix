@@ -19,7 +19,9 @@ def test_factorial_basic():
     wrapped_code = f"""def main():
     {result.code.replace('```python', '').replace('```', '').strip().replace('\\n', '\n    ').replace('{', '{{').replace('}', '}}')}
 main()"""
-    wrapped_code = f"def main():\n    {result.code.replace('```python', '').replace('```', '').strip().replace('\\n', '\n    ').replace('{', '{{').replace('}', '}}')}\nmain()"
+    wrapped_code = f"""def main():
+        {result.code.replace('```python', '').replace('```', '').strip().replace('\\n', '\n    ')}
+    main()"""
     code_result = CodeExecutor.execute(wrapped_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
     assert code_result.success, f"Code execution failed: {code_result.error}"

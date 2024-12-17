@@ -2,10 +2,11 @@
 Test module for file editor module.
 """
 
-import pytest
-import tempfile
-import dspy
 import os
+import tempfile
+
+import dspy
+import pytest
 from prismix.core.file_editor_module import FileEditorModule
 
 lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)

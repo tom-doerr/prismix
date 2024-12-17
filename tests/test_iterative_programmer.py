@@ -2,14 +2,8 @@
 Test suite for the IterativeProgrammer module.
 """
 
-import pytest
 import dspy
-from prismix.core.iterative_programmer import IterativeProgrammer
-
-
-# Mock LM for testing
 import pytest
-import dspy
 from prismix.core.iterative_programmer import IterativeProgrammer
 
 
@@ -20,6 +14,13 @@ class MockLM(dspy.LM):
         super().__init__(model=model)
 
     def __call__(self, prompt, **kwargs):
+        """Mock implementation of the __call__ method."""
+        if "unsafe" in prompt.lower():
+            return dspy.Prediction(
+                is_safe=False,
+                safety_message="The code contains potentially unsafe operations.",
+            )
+        return dspy.Prediction(is_safe=True, safety_message="The code is safe.")
         """Mock implementation of the __call__ method."""
         if "unsafe" in prompt.lower():
             return dspy.Prediction(
