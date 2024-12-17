@@ -143,6 +143,7 @@ def test_read_file(file_editor_module_fixture):
     assert not file_context.error
     assert file_context.changes == []
 
+
 def test_read_file_not_found(file_editor_module_fixture):
     """Test reading a non-existing file."""
     """Test reading a non-existing file."""
