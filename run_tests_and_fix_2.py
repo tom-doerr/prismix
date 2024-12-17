@@ -141,11 +141,12 @@ def filter_files_by_output(output, all_files):
     return list(files_to_fix)
 
 
+import requests
+
 debugging_and_testing_file_url = "https://gist.githubusercontent.com/mwanginjuguna/545f983b12c76af238861d9af2e551a5/raw/9d8a8d47ca64cc340db69960011b368ab00179a9/introduction-to-debugging-and-testing-software.md"
 debugging_and_testing_file = (
     "prompt_text/introduction-to-debugging-and-testing-software.md"
 )
-import requests
 
 if not os.path.exists(debugging_and_testing_file):
     os.makedirs(os.path.dirname(debugging_and_testing_file), exist_ok=True)
