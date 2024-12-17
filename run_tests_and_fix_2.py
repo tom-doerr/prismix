@@ -275,7 +275,7 @@ if __name__ == "__main__":
         ).strip()
         if "All checks passed" not in ruff_output:
             COMBINED_OUTPUT += f"\nRuff output:\n{ruff_output}"
-        files_to_fix = filter_files_by_output(combined_output, all_python_files)
+        files_to_fix = filter_files_by_output(COMBINED_OUTPUT, all_python_files)
         files_to_fix.extend(files_potentially_being_tested)
         files_to_fix.extend(selected_files)
         files_to_fix.extend(selected_test_files)
@@ -286,8 +286,8 @@ if __name__ == "__main__":
         run_black(files_to_fix)
         files_to_fix = []
         (
-            call_aider(files_to_fix, combined_output, args.model)
-            if combined_output
+            call_aider(files_to_fix, COMBINED_OUTPUT, args.model)
+            if COMBINED_OUTPUT
             else None
         )
         if pylint_success and ruff_success and not files_to_fix:
