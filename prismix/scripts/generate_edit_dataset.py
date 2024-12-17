@@ -4,7 +4,6 @@ Script to generate an edit dataset for training purposes.
 
 import json
 import random
-import re
 import tempfile
 from pathlib import Path
 from dataclasses import dataclass
@@ -16,6 +15,7 @@ from prismix.core.metrics import calculate_levenshtein_similarity
 
 class GenerateScript(dspy.Signature):
     """Generate a Python script based on a theme"""
+
     """Generate a Python script based on a theme"""
 
     theme = dspy.InputField(
@@ -26,6 +26,7 @@ class GenerateScript(dspy.Signature):
 
 class GenerateEditInstruction(dspy.Signature):
     """Generate an edit instruction for a script"""
+
     """Generate an edit instruction for a script"""
 
     script = dspy.InputField(desc="Original Python script")
@@ -36,6 +37,7 @@ class GenerateEditInstruction(dspy.Signature):
 
 class GenerateHindsightEdit(dspy.Signature):
     """Generate precise edit command that describes transformation between two scripts"""
+
     """Generate precise edit command that describes transformation between two scripts"""
 
     original = dspy.InputField(desc="Original script content")
@@ -48,6 +50,7 @@ class GenerateHindsightEdit(dspy.Signature):
 @dataclass
 class EditDataPoint:
     """Represents a single edit transformation example"""
+
     """Represents a single edit transformation example"""
 
     original_script: str
@@ -58,6 +61,7 @@ class EditDataPoint:
 
 class EditDatasetGenerator(dspy.Module):
     """Module to generate edit dataset examples"""
+
     def __init__(self):
         super().__init__()
 
@@ -130,7 +134,6 @@ class EditDatasetGenerator(dspy.Module):
         # 3. Apply edit instruction using FileEditor
         print("\nApplying edits...")
         editor = FileEditor()
-        import tempfile
 
         with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
             temp_file = f.name
