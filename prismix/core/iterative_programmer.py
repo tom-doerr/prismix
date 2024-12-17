@@ -3,11 +3,13 @@ Module for iterative programming and code generation.
 """
 
 from typing import Tuple, Union
-import dspy
 import subprocess
 import sys
 import tempfile
 from io import StringIO
+
+import dspy
+
 from prismix.core.signatures import CodeSafetyCheck
 from prismix.core.executor import CodeResult
 from prismix.core.generator import CodeGenerator
@@ -96,6 +98,27 @@ class IterativeProgrammer(dspy.Module):
             error = redirected_error.getvalue()
 
             return CodeResult(code=code, success=True, output=output, error=error)
+        except subprocess.CalledProcessError as e:
+            return CodeResult(
+                code=code,
+                success=False,
+                output="",
+                error=f"Function execution failed in {file_path}: {str(e.stderr)}",
+            )
+        except FileNotFoundError as e:
+            return CodeResult(
+                code=code,
+                success=False,
+                output="",
+                error=f"File not found: {str(e)}",
+            )
+        except PermissionError as e:
+            return CodeResult(
+                code=code,
+                success=False,
+                output="",
+                error=f"Permission error: {str(e)}",
+            )
         except subprocess.CalledProcessError as e:
             return CodeResult(
                 code=code,

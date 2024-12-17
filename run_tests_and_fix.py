@@ -44,16 +44,22 @@ def run_ruff_fix():
 def is_test_file(file_path):
     return file_path.endswith("_test.py") or "tests" in file_path.split("/")
 
+def ensure_file_exists(file_path):
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"File not found: {file_path}")
+
 
 MAX_RECURSION_DEPTH = 1
 
 
 def find_related_files(file_path):
+    ensure_file_exists(file_path)
 
     if is_test_file(file_path):
         base_name = os.path.basename(file_path).replace("_test.py", ".py")
         potential_related_file = os.path.join(os.path.dirname(file_path), base_name)
         if os.path.exists(potential_related_file):
+            ensure_file_exists(potential_related_file)
             return [file_path, potential_related_file]
     return [file_path]
 
