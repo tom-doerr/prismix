@@ -60,6 +60,11 @@ class EditDatasetGenerator(dspy.Module):
     This class generates datasets for training purposes by creating original and edited scripts,
     along with corresponding edit instructions and hindsight commands.
     """
+    """
+    Module to generate edit dataset examples.
+    This class generates datasets for training purposes by creating original and edited scripts,
+    along with corresponding edit instructions and hindsight commands.
+    """
 
     def __init__(self):
         super().__init__()
@@ -195,11 +200,10 @@ class EditDatasetGenerator(dspy.Module):
         if file_context.error:
             print("Editor error:", file_context.error)
             return None
-        else:
-            print("Editor changes:", len(file_context.changes), "modifications")
-            for change in file_context.changes:
-                print(f"- {change}")
-            return file_context.content
+        print("Editor changes:", len(file_context.changes), "modifications")
+        for change in file_context.changes:
+            print(f"- {change}")
+        return file_context.content
 
     def _generate_alternative_version(self, theme: str, edit_instruction: str) -> str:
         """Generate an alternative version of the script."""
