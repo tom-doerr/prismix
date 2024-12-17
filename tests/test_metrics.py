@@ -1,6 +1,3 @@
-"""
-Test module for metrics calculations.
-"""
 
 from prismix.core.metrics import (
     calculate_levenshtein_similarity,
