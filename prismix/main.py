@@ -62,21 +62,80 @@ def execute_instruction(instruction: str) -> None:
     print("----------")
 
 
+def print_usage():
+    """Print usage instructions."""
+    print(
+        "Usage: codeweaver '<instruction>' or 'index <path>' or 'index_debug <path>' or 'search_colbert <query>' or 'milvus_setup' or 'milvus_insert' or 'milvus_search'"
+    )
+    print("Example: codeweaver 'create a hello world script'")
+    print("Example: codeweaver index '.'")
+    print("Example: codeweaver index_debug '.'")
+    print("Example: codeweaver search_colbert 'quantum computing'")
+    print("Example: codeweaver milvus_setup")
+    print("Example: codeweaver milvus_insert")
+    print("Example: codeweaver milvus_search")
+
+
+def handle_index_command(path):
+    """Handle the 'index' command."""
+    print(f"Indexing code at path: {path}")
+    indexer = CodeIndexer()
+    indexer.index_directory(path)
+    print("Indexing complete.")
+
+
+def handle_index_debug_command(path):
+    """Handle the 'index_debug' command."""
+    print(f"Debugging indexer with path: {path}")
+    indexer = CodeIndexer()
+    print("Ignore patterns:", indexer.ignore_patterns)
+    indexer.index_directory(path)
+    print("Indexed files:")
+    for filepath in indexer.indexed_code:
+        print(f"- {filepath}")
+    print("Indexing complete.")
+
+
+def handle_search_command(path, query):
+    """Handle the 'search' command."""
+    print(f"Searching code at path: {path} for query: {query}")
+    indexer = CodeIndexer()
+    results = indexer.search_code_on_the_fly(path, query)
+    if results:
+        print("Search results:")
+        for result in results:
+            print(f"- {result.filepath}")
+    else:
+        print("No results found.")
+
+
+def handle_qdrant_insert_command(path):
+    """Handle the 'qdrant_insert' command."""
+    print(f"Inserting data into Qdrant from path: {path}")
+    retriever = ColbertRetriever(url="http://example.com/colbert")
+    retriever.add_data_to_db(path)
+    print("Insertion complete.")
+
+
+def handle_qdrant_search_command(query):
+    """Handle the 'qdrant_search' command."""
+    print(f"Searching Qdrant for query: {query}")
+    retriever = ColbertRetriever(url="http://example.com/colbert")
+    results = retriever.forward(query)
+    if results:
+        print("Qdrant search results:")
+        for result in results:
+            print(f"- {result[:100]}...")  # Display first 100 chars
+    else:
+        print("No results found.")
+
+
 def main() -> NoReturn:
     """Main function to execute the Prismix application."""
     print("CodeWeaver - AI-powered iterative code generation tool")
 
     if len(sys.argv) < 2:
-        print(
-            "Usage: codeweaver '<instruction>' or 'index <path>' or 'index_debug <path>' or 'search_colbert <query>' or 'milvus_setup' or 'milvus_insert' or 'milvus_search'"
-        )
-        print("Example: codeweaver 'create a hello world script'")
-        print("Example: codeweaver index '.'")
-        print("Example: codeweaver index_debug '.'")
-        print("Example: codeweaver search_colbert 'quantum computing'")
-        print("Example: codeweaver milvus_setup")
-        print("Example: codeweaver milvus_insert")
-        print("Example: codeweaver milvus_search")
+        print_usage()
         return
 
     command = sys.argv[1]
@@ -85,62 +144,32 @@ def main() -> NoReturn:
             print("Usage: codeweaver index <path>")
             return
         path = sys.argv[2]
-        print(f"Indexing code at path: {path}")
-        indexer = CodeIndexer()
-        indexer.index_directory(path)
-        print("Indexing complete.")
+        handle_index_command(path)
     elif command == "index_debug":
         if len(sys.argv) < 3:
             print("Usage: codeweaver index_debug <path>")
             return
         path = sys.argv[2]
-        print(f"Debugging indexer with path: {path}")
-        indexer = CodeIndexer()
-        print("Ignore patterns:", indexer.ignore_patterns)
-        indexer.index_directory(path)
-        print("Indexed files:")
-        for filepath in indexer.indexed_code:
-            print(f"- {filepath}")
-        print("Indexing complete.")
+        handle_index_debug_command(path)
     elif command == "search":
         if len(sys.argv) < 4:
             print("Usage: codeweaver search <path> <query>")
             return
         path = sys.argv[2]
         query = sys.argv[3]
-        print(f"Searching code at path: {path} for query: {query}")
-        indexer = CodeIndexer()
-        results = indexer.search_code_on_the_fly(path, query)
-        if results:
-            print("Search results:")
-            for result in results:
-                print(f"- {result.filepath}")
-        else:
-            print("No results found.")
+        handle_search_command(path, query)
     elif command == "qdrant_insert":
         if len(sys.argv) < 3:
             print("Usage: codeweaver qdrant_insert <path>")
             return
         path = sys.argv[2]
-        print(f"Inserting data into Qdrant from path: {path}")
-        retriever = ColbertRetriever(url="http://example.com/colbert")
-        retriever.add_data_to_db(path)
-        print("Insertion complete.")
-
+        handle_qdrant_insert_command(path)
     elif command == "qdrant_search":
         if len(sys.argv) < 3:
             print("Usage: codeweaver qdrant_search <query>")
             return
         query = sys.argv[2]
-        print(f"Searching Qdrant for query: {query}")
-        retriever = ColbertRetriever(url="http://example.com/colbert")
-        results = retriever.forward(query)
-        if results:
-            print("Qdrant search results:")
-            for result in results:
-                print(f"- {result[:100]}...")  # Display first 100 chars
-        else:
-            print("No results found.")
+        handle_qdrant_search_command(query)
     else:
         execute_instruction(command)
 
