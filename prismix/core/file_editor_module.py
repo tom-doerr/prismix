@@ -41,7 +41,7 @@ class FileEditorModule:
 
     def apply_replacements(
         self, content: str, instruction: str
-    ) -> Tuple[str, List[Tuple[str, str]]]:
+    ) -> FileContext:
         """Applies replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
         changes = []
@@ -52,7 +52,7 @@ class FileEditorModule:
             )
             if original_content != content:
                 changes.append((search_pattern, replacement_code))
-        return content, changes
+        return FileContext(content=content, changes=changes, error=None)
 
     def forward(self, context: str, instruction: str) -> FileContext:
         """Edit the file based on the context and instruction."""
