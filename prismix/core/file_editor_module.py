@@ -24,11 +24,11 @@ class FileEditorModule:
     def apply_replacements(self, content: str, instruction: str) -> FileContext:
         """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
-+        changes = []
-+        for search_pattern, replacement_code in replacements:
-+            changes.append(f"{search_pattern} -> {replacement_code}")
-+            content = content.replace(search_pattern, replacement_code)
-+        return FileContext(
+        changes = []
+        for search_pattern, replacement_code in replacements:
+            changes.append(f"{search_pattern} -> {replacement_code}")
+            content = content.replace(search_pattern, replacement_code)
+        return FileContext(
 +            filepath="",
 +            content=content,
 +            changes=changes,
