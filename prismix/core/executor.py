@@ -12,8 +12,8 @@ from pydantic import BaseModel, ConfigDict
 
 
 @dataclass
-"""Represents the result of code execution."""
 class CodeResult:
+    """Represents the result of code execution."""
     code: str
     success: bool
     output: str
