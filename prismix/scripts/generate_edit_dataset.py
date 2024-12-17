@@ -67,7 +67,6 @@ class EditDatasetGenerator(dspy.Module):
     along with corresponding edit instructions and hindsight commands.
     """
 
-
     def __init__(self):
         super().__init__()
 
