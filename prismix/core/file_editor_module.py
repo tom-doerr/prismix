@@ -12,12 +12,12 @@ class FileEditorModule:
         self.file_manager = FileManager(file_operations=DefaultFileOperations())
         self.config_dict = ConfigDict(arbitrary_types_allowed=True)
 
-    def apply_replacements(self, content: str, instruction: str) -> str:
-        """Applies multiple replacements based on the instruction."""
+    def apply_replacements(self, content: str, instruction: str) -> FileContext:
+        """Applies multiple replacements based on the instruction and returns a FileContext object."""
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
             content = content.replace(search_pattern, replacement_code)
-        return content
+        return FileContext(filepath="", content=content, changes=replacements, error=None)
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the content of the file."""
@@ -62,25 +62,18 @@ class FileEditorModule:
 
     def forward(self, context: str, instruction: str) -> FileContext:
         """Edit the file based on the context and instruction."""
-        # Extract filepath from context
         filepath = ""
         content = ""
         if "File: " in context:
-            try:
-                filepath = context.split("File: ")[1].split("\n")[0].strip()
-            except IndexError:
-                pass
+            filepath = context.split("File: ")[1].split("\n")[0].strip()
         if "Content: " in context:
-            try:
-                content = context.split("Content: ")[1].strip()
-            except IndexError:
-                pass
+            content = context.split("Content: ")[1].strip()
 
         # Apply replacements
         updated_content = self.apply_replacements(content, instruction)
 
         # Write the updated content back to the file
-        return self.write_file(filepath, updated_content)
+        return self.write_file(filepath, updated_content.content)
 
     def apply_replacements(self, content: str, instruction: str) -> str:
         """Applies multiple replacements based on the instruction."""
