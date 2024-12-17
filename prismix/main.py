@@ -179,48 +179,30 @@ def handle_qdrant_search_command(query):
         print("No results found.")
 
 
+def handle_command(command, args):
+    """Handle different commands."""
+    if command == "index":
+        handle_index_command(args[0])
+    elif command == "index_debug":
+        handle_index_debug_command(args[0])
+    elif command == "search":
+        handle_search_command(args[0], args[1])
+    elif command == "qdrant_insert":
+        handle_qdrant_insert_command(args[0])
+    elif command == "qdrant_search":
+        handle_qdrant_search_command(args[0])
+    else:
+        execute_instruction(command)
+
 def main() -> NoReturn:
     """Main function to execute the Prismix application."""
     print("CodeWeaver - AI-powered iterative code generation tool")
-
     if len(sys.argv) < 2:
         print_usage()
         return
-
     command = sys.argv[1]
-    if command == "index":
-        if len(sys.argv) < 3:
-            print("Usage: codeweaver index <path>")
-            return
-        path = sys.argv[2]
-        handle_index_command(path)
-    elif command == "index_debug":
-        if len(sys.argv) < 3:
-            print("Usage: codeweaver index_debug <path>")
-            return
-        path = sys.argv[2]
-        handle_index_debug_command(path)
-    elif command == "search":
-        if len(sys.argv) < 4:
-            print("Usage: codeweaver search <path> <query>")
-            return
-        path = sys.argv[2]
-        query = sys.argv[3]
-        handle_search_command(path, query)
-    elif command == "qdrant_insert":
-        if len(sys.argv) < 3:
-            print("Usage: codeweaver qdrant_insert <path>")
-            return
-        path = sys.argv[2]
-        handle_qdrant_insert_command(path)
-    elif command == "qdrant_search":
-        if len(sys.argv) < 3:
-            print("Usage: codeweaver qdrant_search <query>")
-            return
-        query = sys.argv[2]
-        handle_qdrant_search_command(query)
-    else:
-        execute_instruction(command)
+    args = sys.argv[2:]
+    handle_command(command, args)
 
 
 if __name__ == "__main__":
