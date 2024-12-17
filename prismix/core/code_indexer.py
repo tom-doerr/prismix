@@ -17,17 +17,23 @@ class IndexedCode:
 
 
 class CodeEmbedder:
+    """Handles the embedding of code content."""
+
     def embed_code(self, content: str) -> List[float]:
+        """Embed the given code content into a vector."""
         # Placeholder for embedding logic
         return [0.0] * 128  # Dummy embedding
 
 
 class CodeIndexer:
+    """Indexes and searches code files using embeddings."""
+
     DEFAULT_IGNORE_PATTERNS = ["*.pyc", "__pycache__"]
 
     def __init__(
         self, embedder: CodeEmbedder = None, ignore_patterns: List[str] = None
     ):
+        """Initialize the CodeIndexer with an optional embedder and ignore patterns."""
         if embedder is None:
             embedder = CodeEmbedder()
         self.embedder = embedder
@@ -35,12 +41,13 @@ class CodeIndexer:
         self.indexed_code: Dict[str, IndexedCode] = {}
 
     def index_directory(self, directory: str) -> None:
+        """Index all code files in the given directory."""
         for root, _, files in os.walk(directory):
             for file in files:
                 filepath = os.path.join(root, file)
                 if not self._is_ignored(filepath):
                     try:
-                        file_context = FileManager.read_file(filepath)
+                        file_context = FileManager().read_file(filepath)
                         if file_context and file_context.content:
                             embedding = self.embedder.embed_code(file_context.content)
                             indexed_code = IndexedCode(
@@ -48,12 +55,16 @@ class CodeIndexer:
                             )
                             self.indexed_code[filepath] = indexed_code
                             print(f"Indexed: {filepath}")
+                    except FileNotFoundError as e:
+                        print(f"File not found: {filepath}: {e}")
+                    except PermissionError as e:
+                        print(f"Permission error accessing {filepath}: {e}")
                     except Exception as e:
                         print(f"Error indexing {filepath}: {e}")
 
     def search_code(self, query: str) -> List[IndexedCode]:
         """Search indexed code using a query."""
-        query_embedding = self._embed_code(query)
+        query_embedding = self.embedder.embed_code(query)
         results = []
         for filepath, indexed_code in self.indexed_code.items():
             similarity = self._similarity(query_embedding, indexed_code.embedding)
@@ -69,7 +80,7 @@ class CodeIndexer:
                 filepath = os.path.join(root, file)
                 if not self._is_ignored(filepath):
                     try:
-                        file_context = FileManager.read_file(filepath)
+                        file_context = FileManager().read_file(filepath)
                         if (
                             file_context
                             and file_context.content
@@ -80,6 +91,10 @@ class CodeIndexer:
                                 filepath, file_context.content, embedding
                             )
                             results.append(indexed_code)
+                    except FileNotFoundError as e:
+                        print(f"File not found: {filepath}: {e}")
+                    except PermissionError as e:
+                        print(f"Permission error accessing {filepath}: {e}")
                     except Exception as e:
                         print(f"Error searching {filepath}: {e}")
         return results
