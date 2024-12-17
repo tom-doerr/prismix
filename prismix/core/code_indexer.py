@@ -38,6 +38,9 @@ class CodeIndexer:
 
     This class provides methods to index code files in a directory and search for
     code snippets based on a query using embeddings.
+
+    This class provides methods to index code files in a directory and search for
+    code snippets based on a query using embeddings.
     """
 
     DEFAULT_IGNORE_PATTERNS = ["*.pyc", "__pycache__"]
@@ -68,15 +71,11 @@ class CodeIndexer:
                                 filepath, file_context.content, embedding
                             )
                             self.indexed_code[filepath] = indexed_code
-                            print(
-                                f"Indexed: {filepath}"
-                            )  # Consider logging instead of printing
+                            logging.info(f"Indexed: {filepath}")
                     except (FileNotFoundError, PermissionError) as e:
-                        print(f"Error accessing {filepath}: {e}")
+                        logging.error(f"Error accessing {filepath}: {e}")
                     except Exception as e:
-                        print(
-                            f"Unexpected error indexing {filepath}: {e}"
-                        )  # Consider logging instead of printing
+                        logging.error(f"Unexpected error indexing {filepath}: {e}")
 
     def embed_code(self, content: str) -> List[float]:
         """Embed the given code content into a vector."""
@@ -114,9 +113,9 @@ class CodeIndexer:
                             )
                             results.append(indexed_code)
                     except (FileNotFoundError, PermissionError) as e:
-                        print(f"Error accessing {filepath}: {e}")
+                        logging.error(f"Error accessing {filepath}: {e}")
                     except Exception as e:
-                        print(f"Unexpected error searching {filepath}: {e}")
+                        logging.error(f"Unexpected error searching {filepath}: {e}")
         return results
 
     def _is_ignored(self, filepath: str) -> bool:

@@ -61,30 +61,26 @@ class CodeExecutor:
                 tmp_file_path = tmp_file.name
 
                 # Execute the code in a controlled environment
-                # The `exec` function is used here to execute the code
-                # This is a potential security risk, but it is necessary for this use case
-                loc = {}
-                output_buffer = []
-                loc["print"] = lambda *args, **kwargs: output_buffer.append(
-                    " ".join(map(str, args))
-                )
                 # Refactor to avoid using exec
-                subprocess.run(
+                process = subprocess.run(
                     ["python", tmp_file_path],
                     capture_output=True,
                     text=True,
-                    check=True,
+                    check=False,
                 )
-                success = True
-                output = "\n".join(output_buffer)
-            return CodeResult(
-                code=code,
-                success=success,
-                output=output,
-            )
+                if process.returncode == 0:
+                    success = True
+                    output = process.stdout
+                else:
+                    success = False
+                    output = ""
+                return CodeResult(
+                    code=code,
+                    success=success,
+                    output=output,
+                    error=process.stderr,
+                )
         except FileNotFoundError as e:
             return CodeResult(code=code, success=False, output="", error=str(e))
         except PermissionError as e:
-            return CodeResult(code=code, success=False, output="", error=str(e))
-        except subprocess.CalledProcessError as e:
             return CodeResult(code=code, success=False, output="", error=str(e))
