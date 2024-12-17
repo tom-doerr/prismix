@@ -4,11 +4,7 @@ from typing import List, Tuple
 from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
 from prismix.core.signatures import FileEdit
 
-import re
-import subprocess
 import logging
-import tempfile
-import os
 
 
 class FileEditorModule(dspy.Module):
