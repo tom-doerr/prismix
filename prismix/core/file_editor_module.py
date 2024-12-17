@@ -53,9 +53,7 @@ class FileEditorModule:
         with resources.files("litellm.llms.tokenizers").joinpath(
             "anthropic_tokenizer.json"
         ).open():
-            updated_content = content.replace(
-                search_pattern, replacement_code
-            )
+            updated_content = content.replace(search_pattern, replacement_code)
 
         return updated_content
 
