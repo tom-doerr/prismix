@@ -18,4 +18,3 @@ class CodeEmbedder:
 
     def another_method(self):
         """Another public method to satisfy pylint."""
-        pass

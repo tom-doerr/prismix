@@ -47,7 +47,7 @@ def test_search_code_on_the_fly(code_indexer_fixture: CodeIndexer, temp_dir: str
     )  # Check if all results are IndexedCode
 
     # Test search with a query that does not exist
-    results = code_indexer.search_code_on_the_fly(temp_dir, "nonexistent")
+    results = code_indexer_fixture.search_code_on_the_fly(temp_dir, "nonexistent")
     assert len(results) == 0
 
     # Test search with a query that exists in a specific file
@@ -56,6 +56,6 @@ def test_search_code_on_the_fly(code_indexer_fixture: CodeIndexer, temp_dir: str
     assert any("test2.txt" in r.filepath for r in results)
 
     # Test search with a query that is a substring of another word
-    results = code_indexer.search_code_on_the_fly(temp_dir, "wor")
+    results = code_indexer_fixture.search_code_on_the_fly(temp_dir, "wor")
     assert len(results) == 1
     assert any("test3.py" in r.filepath for r in results)
