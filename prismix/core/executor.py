@@ -52,7 +52,7 @@ class CodeExecutor:
                 compile(parsed_code, filename="<string>", mode="exec"),
                 {"__builtins__": CodeExecutor.get_safe_builtins()},
                 local_vars,
-            )
+            )  # Consider using a safer alternative to exec
 
             # Get the main function from the generated code
             main_func = None
