@@ -3,7 +3,6 @@ Module for handling file editing operations.
 """
 
 import re
-from importlib import resources
 from typing import List, Tuple
 
 from pydantic import ConfigDict
@@ -24,11 +23,21 @@ class FileEditorModule:
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the content of the file."""
-        return self.file_manager.read_file(filename)
+        try:
+            with open(filename, 'r') as file:
+                content = file.read()
+            return FileContext(filepath=filename, content=content, changes=[], error=None)
+        except FileNotFoundError:
+            return FileContext(filepath=filename, content="", changes=[], error="File does not exist")
 
     def write_file(self, filename: str, content: str) -> FileContext:
         """Writes the updated content back to the file."""
-        return self.file_manager.write_file(filename, content)
+        try:
+            with open(filename, 'w') as file:
+                file.write(content)
+            return FileContext(filepath=filename, content=content, changes=["File updated successfully"], error=None)
+        except Exception as e:
+            return FileContext(filepath=filename, content=content, changes=[], error=str(e))
 
     def parse_instructions(self, instruction: str) -> List[Tuple[str, str]]:
         """Parses the instruction string and returns a list of replacement pairs."""
@@ -42,19 +51,10 @@ class FileEditorModule:
             if "Replace" in part and len(part.split(" with ")) == 2
         ]
 
-    def apply_single_replacement(
-        self,
-        content: str,
-        search_pattern: str,
-        replacement_code: str,
-    ) -> str:
+    def apply_single_replacement(self, content: str, search_pattern: str, replacement_code: str) -> str:
         """Apply a single replacement in the content."""
-        with resources.files("litellm.llms.tokenizers").joinpath(
-            "anthropic_tokenizer.json"
-        ).open():
-            updated_content = content.replace(search_pattern, replacement_code)
-
-        return updated_content
+        # Use regex to find and replace the search pattern
+        return re.sub(search_pattern, replacement_code, content)
 
     def apply_replacements(self, content: str, instruction: str) -> FileContext:
         """Apply multiple replacements based on the instruction."""
@@ -95,11 +95,23 @@ class FileEditorModule:
 
     def forward(self, context: str, instruction: str) -> FileContext:
         """Edit the file based on the context and instruction."""
-        content = context.split("Content: ")[1] if "Content: " in context else context
-        updated_content = self.apply_replacements(content, instruction)
-        return FileContext(
-            content=updated_content.content,
-            filepath="test_file.py",
-            changes=updated_content.changes,
-            error=updated_content.error,
-        )
+        # Parse the context to extract the file path and content
+        file_path, content = self._parse_context(context)
+
+        # Apply the instructions to the content
+        updated_content = self._apply_instructions(content, instruction)
+
+        # Write the updated content back to the file
+        return self.write_file(file_path, updated_content)
+    def _parse_context(self, context: str) -> Tuple[str, str]:
+        """Parses the context to extract the file path and content."""
+        file_path = context.split(" ")[0]
+        content = context.split("Content: ")[1] if "Content: " in context else ""
+        return file_path, content
+
+    def _apply_instructions(self, content: str, instruction: str) -> str:
+        """Applies the instructions to the content."""
+        replacements = self.parse_instructions(instruction)
+        for search_pattern, replacement_code in replacements:
+            content = self.apply_single_replacement(content, search_pattern, replacement_code)
+        return content
