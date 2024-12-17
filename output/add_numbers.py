@@ -1,5 +1,6 @@
 
-def add_numbers(num1, num2):
+if __name__ == "__main__":
+    def add_numbers(num1, num2):
     """
     Adds two numbers together.
 
