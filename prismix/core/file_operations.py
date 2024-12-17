@@ -214,7 +214,7 @@ class FileEditor:
             return context
 
         # Generate numbered content
-        numbered_content = self._number_lines(context.content)
+        numbered_content = self.number_lines(context.content)
 
         # Generate edits
         edit_result = self.edit_generator(
