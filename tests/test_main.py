@@ -7,6 +7,11 @@ from unittest.mock import patch
 from io import StringIO
 
 sys.path.append(".")
+import sys
+from unittest.mock import patch
+from io import StringIO
+
+sys.path.append(".")
 from prismix.main import execute_instruction
 
 
