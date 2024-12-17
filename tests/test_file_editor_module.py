@@ -43,10 +43,10 @@ def test_file_edit_module_no_change(file_editor_module):
 def test_file_edit_module_multiple_replacements(file_editor_module):
     """Test file edit with multiple replacements."""
     """Test file edit with multiple replacements."""
-    # Test file edit with multiple replacements
-    updated_content = file_editor_module.forward(
-        context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
-        instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and Replace 'def hello()' with 'def greet()'",
+   # Test file edit with multiple replacements
+   updated_content = file_editor_module.forward(
+       context=f"File: {str(temp_file)}\nContent: def hello():\n    print('hello')\n",
+       instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and Replace 'def hello()' with 'def greet()'",
     )
 
     # Ensure the file was written
@@ -60,10 +60,10 @@ def test_file_edit_module_multiple_replacements(file_editor_module):
 def test_file_edit_module_overlapping_replacements(file_editor_module):
     """Test file edit with overlapping replacements."""
     """Test file edit with overlapping replacements."""
-    # Test file edit with overlapping replacements
-    updated_content = file_editor_module.forward(
-        context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
-        instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and Replace 'hello' with 'greet'",
+   # Test file edit with overlapping replacements
+   updated_content = file_editor_module.forward(
+       context=f"File: {str(temp_file)}\nContent: def hello():\n    print('hello')\n",
+       instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and Replace 'hello' with 'greet'",
     )
 
     # Ensure the file was written

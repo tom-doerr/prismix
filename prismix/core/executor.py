@@ -6,6 +6,7 @@ import ast
 from dataclasses import dataclass
 from typing import Dict, Any
 import tempfile
+import subprocess
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 
