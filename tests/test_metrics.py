@@ -1,6 +1,7 @@
 """
 Test module for metrics calculations.
 """
+
 from prismix.core.metrics import (
     calculate_levenshtein_similarity,
     check_indentation_consistency,

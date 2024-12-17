@@ -22,8 +22,6 @@ class MockLM(dspy.LM):
         return dspy.Prediction(is_safe=True, safety_message="The code is safe.")
 
 
-
-
 def test_is_code_safe_safe():
     """Test that safe code is identified as safe."""
     programmer = IterativeProgrammer()
