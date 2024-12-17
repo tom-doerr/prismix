@@ -49,7 +49,6 @@ class FileOperations(ABC):
     @abstractmethod
     def read_file(self, filepath: str) -> str:
         """Read the content of a file."""
-        pass
 
     @abstractmethod
     def write_file(self, filepath: str, content: str) -> None:
@@ -87,7 +86,12 @@ class FileManager:
             return FileContext(
                 filepath=filepath, content="", changes=[], error="File does not exist"
             )
+        except FileNotFoundError:
+            return FileContext(
+                filepath=filepath, content="", changes=[], error="File does not exist"
+            )
         except Exception as e:
+            return FileContext(filepath=filepath, content="", changes=[], error=str(e))
             return FileContext(filepath=filepath, content="", changes=[], error=str(e))
 
     def write_file(self, filepath: str, content: str) -> FileContext:
