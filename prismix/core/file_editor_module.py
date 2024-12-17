@@ -86,10 +86,13 @@ class FileEditorModule:
         if not changes:
             return FileContext(filepath="", content=content, changes=changes)
 
-        return FileContext(filepath="", content=content, changes=changes)
+        # Convert changes from tuples to strings
+        changes_str = [f"Replaced '{old}' with '{new}'" for old, new in changes]
+
+        return FileContext(filepath="", content=content, changes=changes_str, error=None)
 
     def forward(self, context: str, instruction: str) -> FileContext:
         """Edit the file based on the context and instruction."""
         content = context.split("Content: ")[1] if "Content: " in context else context
         updated_content = self.apply_replacements(content, instruction)
-        return FileContext(content=updated_content, filepath="test_file.py", error=None)
+        return FileContext(content=updated_content.content, filepath="test_file.py", changes=updated_content.changes, error=updated_content.error)
