@@ -1,3 +1,6 @@
+"""
+Script to run pylint and ruff checks on the project.
+"""
 import subprocess
 import glob
 import os
@@ -83,7 +86,7 @@ if __name__ == "__main__":
     all_files = glob.glob("**/*.py", recursive=True)
     pylint_success, pylint_output = run_pylint()
     ruff_success, ruff_output = run_ruff_fix()
-    combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
+    combined_output = f"Pylint output:\n{pylint_result_output}\nRuff output:\n{ruff_result_output}"
     for file_path in all_files:
         call_aider(find_related_files(file_path), combined_output)
     if pylint_success and ruff_success:

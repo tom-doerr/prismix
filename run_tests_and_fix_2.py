@@ -19,7 +19,7 @@ def run_pylint():
             capture_output=True,
             text=True,
         )
-        pylint_output = result.stdout + result.stderr
+        pylint_result_output = result.stdout + result.stderr
     except subprocess.CalledProcessError as e:
         pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
         return False, pylint_output
@@ -31,7 +31,7 @@ def run_random_pytest(n, all_files):
     test_files = [file_path for file_path in all_files if is_test_file(file_path)]
     random.shuffle(test_files)
     selected_test_files = test_files[:n]
-    pytest_output = ""
+    pytest_result_output = ""
     for test_file in selected_test_files:
         try:
             result = subprocess.run(
@@ -73,7 +73,7 @@ def run_ruff_fix(files):
             capture_output=True,
             text=True,
         )
-        ruff_output = result.stdout + result.stderr
+        ruff_result_output = result.stdout + result.stderr
     except subprocess.CalledProcessError as e:
         ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
         return False, ruff_output
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    all_files = glob.glob("**/*.py", recursive=True)
+    all_python_files = glob.glob("**/*.py", recursive=True)
 
     for iteration in tqdm(range(args.iterations), desc="Running iterations"):
         print(f"Starting iteration {iteration + 1} of {args.iterations}...")
@@ -175,13 +175,13 @@ if __name__ == "__main__":
         selected_files = all_files[: args.lint_files]
         ruff_success, ruff_output = run_ruff_fix(selected_files)
         pytest_output = run_random_pytest(args.pytest_files, all_files)
-        pylint_output = run_random_pylint(selected_files)
+        pylint_result_output = run_random_pylint(selected_files)
         combined_output = (
             f"Pylint output:\n{pylint_output}\nPytest output:\n{pytest_output}"
         )
         if "All checks passed" not in ruff_output:
             combined_output += f"\nRuff output:\n{ruff_output}"
-        files_to_fix = filter_files_by_output(combined_output, all_files)
+        files_to_fix = filter_files_by_output(combined_output, all_python_files)
         run_black(files_to_fix)
         call_aider(files_to_fix, combined_output)
         if pylint_success and ruff_success and not files_to_fix:
