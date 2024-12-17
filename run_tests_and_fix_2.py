@@ -51,6 +51,7 @@ def run_random_pytest(files):
 
 
 def run_pytest():
+    """Runs all pytest tests and captures the output."""
     pytest_output = ""
     try:
         result = subprocess.run(
@@ -86,7 +87,7 @@ def run_random_pylint(files):
 
 def run_ruff_fix(files):
     """Runs ruff to fix code style issues and captures the output."""
-    files_str = " ".join(files)
+    files_str = " ".join([f"./{file}" for file in files])
     try:
         result = subprocess.run(
             ["ruff", "check", f"./{files_str}", "--fix"],
@@ -221,10 +222,7 @@ if __name__ == "__main__":
         print("num_pytest_output_chars:", num_pytest_output_chars)
         pylint_result_output = run_random_pylint(selected_files)
         files_potentially_being_tested = []
-        # files_without_test = [file_path.replace('test_', '') for file_path in selected_test_files if file_path.replace('test_', '') in all_python_files]
         for file in all_python_files:
-            # for file_potentially in files_without_test:
-            # for file_potentially in files_without_test:
             for test_file in selected_test_files:
                 if test_file.replace(".py", "").split("test_")[1] in file:
                     files_potentially_being_tested.append(file)
