@@ -37,8 +37,8 @@ def temp_dir():
 
 def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir):
     """Test adding data to the database."""
-    retriever = colbert_retriever_fixture
-    retriever.add_data_to_db(temp_dir)
+    retriever_instance = colbert_retriever_fixture
+    retriever_instance.add_data_to_db(temp_dir)
 
     # Ensure that the data was added to the Qdrant database
     assert (
@@ -51,13 +51,13 @@ def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir):
 
 def test_colbert_retriever(colbert_retriever_fixture, temp_dir):
     """Test the ColbertRetriever class."""
-    retriever = colbert_retriever_fixture
+    retriever_instance = colbert_retriever_fixture
     query = "quantum computing"
-    retriever.forward = lambda q: [
+    retriever_instance.forward = lambda q: [
         {"long_text": f"This is a dummy result for {q}"} for _ in range(3)
     ]
-    retriever.add_data_to_db(temp_dir)
-    results = retriever.forward(query)
+    retriever_instance.add_data_to_db(temp_dir)
+    results = retriever_instance.forward(query)
     assert len(results) == 3
     for result in results:
         assert "dummy result" in result["long_text"]

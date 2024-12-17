@@ -17,7 +17,7 @@ pytest-asyncio = "^0.24.0"
 python-dotenv = "^1.0.0"
 openai = "^1.0.0"
 pydantic = "^2.0.0"
-litellm = "^2.0.0"
+litellm = "^3.0.0"
 isort = "^5.10.1"  # Known compatible version with Pylint
 pytest-xdist = "^1.35.0"
 
