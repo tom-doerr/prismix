@@ -62,7 +62,9 @@ def test_factorial_negative():
     function_code = ast.unparse(function_def)
     local_vars = {}
     local_vars = {}
-    exec(function_code, globals(), local_vars)
+    code_result = CodeExecutor.execute(function_code)
+    assert code_result.success, f"Code execution failed: {code_result.error}"
+    local_vars = {"factorial": lambda x: code_result.output}
     factorial = local_vars.get("factorial")
     assert factorial(5) == 120
     with pytest.raises(ValueError):
