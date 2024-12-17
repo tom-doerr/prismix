@@ -89,7 +89,6 @@ class ColbertRetriever(dspy.Retrieve):
         """Adds data from the given directory to the Qdrant database."""
         self.data_inserter.add_data_to_db(directory)
 
-
     def forward(self, query: str, k: int = None) -> List[str]:
         """Search for similar embeddings in Qdrant."""
         query_embedding = self.qdrant_manager.embed_code(query)
@@ -97,5 +96,3 @@ class ColbertRetriever(dspy.Retrieve):
             query_embedding, top_k=k or self.k
         )
         return [result["payload"]["content"] for result in results]
-
-
