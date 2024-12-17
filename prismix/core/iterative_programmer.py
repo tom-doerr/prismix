@@ -109,17 +109,35 @@ class IterativeProgrammer(dspy.Module):
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
         """Generate and execute code or edit files based on the command."""
         if command.startswith("edit"):
+            if len(command.split(" ")) < 3:
+                return FileContext(
+                    filepath="",
+                    content="",
+                    changes=[],
+                    error="Invalid edit command: Missing file path or instruction.",
+                )
             return self._handle_edit_command(command)
 
         return self._handle_code_generation(command)
 
     def _handle_edit_command(self, command: str) -> FileContext:
         """Handle file editing based on the command."""
-        # Implement file editing logic here
-        # For now, return a dummy FileContext to pass the test
-        return FileContext(
-            filepath="dummy_path", content="dummy_content", changes=[], error=None
-        )
+        # Extract the file path and instruction from the command
+        file_path = command.split(" ")[1]
+        instruction = command.split("'")[1]
+
+        # Read the file content
+        context = self.file_editor.read_file(file_path)
+        if context.error:
+            return context
+
+        # Apply the edit instruction
+        new_content = self.file_editor.apply_replacements(context.content, instruction)
+
+        # Write the updated content back to the file
+        write_result = self.file_editor.write_file(file_path, new_content.content)
+
+        return write_result
 
     def _handle_code_generation(self, command: str) -> CodeResult:
         """Handle code generation based on the command."""
