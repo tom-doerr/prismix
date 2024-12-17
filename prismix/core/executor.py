@@ -2,16 +2,17 @@
 This module provides a safe execution environment for code generation and execution.
 """
 
-import ast
 from dataclasses import dataclass
 from typing import Dict, Any
+from typing import List, Optional
+
 import tempfile
 import subprocess
-from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 
 
 @dataclass
+"""Represents the result of code execution."""
 class CodeResult:
     code: str
     success: bool
@@ -28,7 +29,8 @@ class FileContext(BaseModel):
 
 
 class CodeExecutor:
-    """Handles safe code execution in isolated environment.
+    """
+    Handles safe code execution in isolated environment.
 
     This class provides methods to execute code in a controlled and safe environment,
     ensuring that only a limited set of built-in functions are available to the executed code.
@@ -52,7 +54,7 @@ class CodeExecutor:
     @staticmethod
     def execute(code: str) -> CodeResult:
         """Execute code in isolated environment and return results"""
-        safe_builtins = CodeExecutor.get_safe_builtins()
+        # safe_builtins = CodeExecutor.get_safe_builtins() # Removed unused variable
         try:
             with tempfile.NamedTemporaryFile(
                 mode="w", suffix=".py", delete=False

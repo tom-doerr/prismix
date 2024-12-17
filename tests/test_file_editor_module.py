@@ -286,6 +286,6 @@ def test_forward_with_file_not_found(file_editor_module):
         context="non_existent_file.py Content: def hello():\n    print('hello')\n",
         instruction=instruction,
     )
-   assert file_context.error and "File does not exist" in file_context.error
-   assert file_context.changes == [], f"Changes were: {file_context.changes}"
-   assert file_context.changes == []
+    assert file_context.error and "File does not exist" in file_context.error
+    assert file_context.changes == [], f"Changes were: {file_context.changes}"
+    assert file_context.changes == []
