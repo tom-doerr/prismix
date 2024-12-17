@@ -25,7 +25,7 @@ def execute_instruction(instruction: str) -> None:
 
     if hasattr(result, "code"):
         # Handle CodeResult
-        
+
         function_match = re.search(r"def\s+(\w+)", result.code)
         function_name = function_match.group(1) if function_match else "generated_code"
 

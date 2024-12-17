@@ -108,7 +108,7 @@ def test_file_edit_module_file_not_found(file_editor_module, temp_file):
         context="non_existent_file.py Content: def hello():\n    print('hello')\n",
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')'.",
     )
-    assert "File does not exist" in str(result.error) # Check the error message
+    assert "File does not exist" in str(result.error)  # Check the error message
     assert (
         result.changes == []
     ), f"Changes were: {result.changes}, error was: {result.error}"
