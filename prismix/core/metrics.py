@@ -2,10 +2,6 @@
 This module provides functions for calculating and evaluating metrics related to code edits.
 """
 
-"""
-This module provides functions for calculating and evaluating metrics related to code edits.
-"""
-
 from typing import List
 from rapidfuzz.distance import Levenshtein
 from dataclasses import dataclass
