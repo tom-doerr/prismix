@@ -9,7 +9,3 @@ with resources.files("litellm.llms.tokenizers").joinpath(
     "anthropic_tokenizer.json"
 ).open() as f:
     tokenizer_data = json.load(f)
-with resources.files("litellm.llms.tokenizers").joinpath(
-    "anthropic_tokenizer.json"
-).open() as f:
-    pass
