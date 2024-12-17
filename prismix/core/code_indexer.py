@@ -8,7 +8,8 @@ from typing import List, Dict
 from dataclasses import dataclass
 from prismix.core.file_operations import FileManager
 
-file_manager = FileManager()
+from prismix.core.file_operations import DefaultFileOperations
+file_manager = FileManager(file_operations=DefaultFileOperations())
 
 # Rest of the code...
 
