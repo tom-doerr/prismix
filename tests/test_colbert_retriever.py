@@ -41,9 +41,12 @@ def test_add_data_to_db_basic(colbert_retriever, temp_dir):
     count_result = colbert_retriever_instance.qdrant_manager.client.count(
         collection_name="colbert_embeddings"
     )
-    assert colbert_retriever.qdrant_manager.client.count(
-        collection_name="colbert_embeddings"
-    ).count > 0
+    assert (
+        colbert_retriever.qdrant_manager.client.count(
+            collection_name="colbert_embeddings"
+        ).count
+        > 0
+    )
 
 
 def test_colbert_retriever(colbert_retriever_instance):
