@@ -57,12 +57,10 @@ class FileEditorModule:
                 changes=[],
                 error=f"Permission error: {e}",
             )
-        except IOError as e:
+        except (PermissionError, IOError) as e:
             return FileContext(
-                filepath=filename, content="", changes=[], error=f"IO error: {e}"
+                filepath=filename, content="", changes=[], error=f"Error: {e}"
             )
-        except IOError as e:
-            return FileContext(filepath=filename, content="", changes=[], error=str(e))
 
     def parse_instructions(self, instruction: str) -> List[Tuple[str, str]]:
         """Parses the instruction string and returns a list of replacement pairs."""
