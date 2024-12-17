@@ -1,3 +1,7 @@
+"""
+Script to run random pytest tests and pylint checks on specified number of files.
+"""
+
 import argparse
 import subprocess
 import os
@@ -12,10 +16,10 @@ def run_pylint():
         result = subprocess.run(
             ["pylint", "."],
             check=True,
-            capture_output=True,  # Capture both stdout and stderr
+            capture_output=True,
             text=True,
         )
-        pylint_output = result.stdout + result.stderr  # Combine stdout and stderr
+        pylint_output = result.stdout + result.stderr
     except subprocess.CalledProcessError as e:
         pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
         return False, pylint_output
@@ -33,34 +37,33 @@ def run_random_pytest(n, all_files):
             result = subprocess.run(
                 ["pytest", test_file],
                 check=True,
-                capture_output=True,  # Capture both stdout and stderr
+                capture_output=True,
                 text=True,
             )
-            pytest_output += result.stdout + result.stderr  # Combine stdout and stderr
+            pytest_output += result.stdout + result.stderr
         except subprocess.CalledProcessError as e:
-            pytest_output += f"Error running pytest on {test_file}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
+            pytest_output += (
+                f"Error running pytest on {test_file}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
+            )
     return pytest_output
 
 
-# def run_random_pylint(n, all_files):
 def run_random_pylint(files):
     """Runs pylint on n random files and captures the output."""
-    # random.shuffle(all_files)
-    # selected_files = all_files[:n]
-    # for file_path in selected_files:
     pylint_output = ""
-
     for file_path in files:
         try:
             result = subprocess.run(
                 ["pylint", file_path],
                 check=True,
-                capture_output=True,  # Capture both stdout and stderr
+                capture_output=True,
                 text=True,
             )
-            pylint_output += result.stdout + result.stderr  # Combine stdout and stderr
+            pylint_output += result.stdout + result.stderr
         except subprocess.CalledProcessError as e:
-            pylint_output += f"Error running pylint on {file_path}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
+            pylint_output += (
+                f"Error running pylint on {file_path}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
+            )
     return pylint_output
 
 
@@ -71,10 +74,10 @@ def run_ruff_fix(files):
         result = subprocess.run(
             ["ruff", "check", files_str, "--fix"],
             check=True,
-            capture_output=True,  # Capture both stdout and stderr
+            capture_output=True,
             text=True,
         )
-        ruff_output = result.stdout + result.stderr  # Combine stdout and stderr
+        ruff_output = result.stdout + result.stderr
     except subprocess.CalledProcessError as e:
         ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
         return False, ruff_output
@@ -103,12 +106,7 @@ def filter_files_by_output(output, all_files):
     """Filters files based on the output of pytest and pylint."""
     files_to_fix = set()
     for line in output.splitlines():
-        # if "Error running" in line:
-        # file_path = line.split(" ")[-1].strip("'")
-        # better way to get file path
-        # file_path = line.split(" ")[-1].split(":")[0]
         file_path = line.split(":")[0].strip()
-
         if file_path in all_files:
             files_to_fix.add(file_path)
     return list(files_to_fix)
@@ -155,13 +153,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--pytest-files",
         type=int,
-        default=3,
+        default=1,
         help="Number of random pytest files to run.",
     )
     parser.add_argument(
         "--lint-files",
         type=int,
-        default=3,
+        default=1,
         help="Number of random pylint files to run.",
     )
     parser.add_argument(
@@ -180,41 +178,18 @@ if __name__ == "__main__":
         random.shuffle(all_files)
         selected_files = all_files[: args.lint_files]
         ruff_success, ruff_output = run_ruff_fix(selected_files)
-        # Run n random pytest tests and n random pylint checks
         pytest_output = run_random_pytest(args.pytest_files, all_files)
-
-        # pylint_output = run_random_pylint(args.lint_files, all_files)
         pylint_output = run_random_pylint(selected_files)
-        # Combine the outputs
-        # combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
-        # combined_output = f"Pytest output:\n{pytest_output}\nPylint output:\n{pylint_output}"
         combined_output = (
             f"Pylint output:\n{pylint_output}\nPytest output:\n{pytest_output}"
         )
         if "All checks passed" not in ruff_output:
             combined_output += f"\nRuff output:\n{ruff_output}"
-
-        # Filter files based on the output
         files_to_fix = filter_files_by_output(combined_output, all_files)
-
-        # Run black on the files
         run_black(files_to_fix)
-
-        # Only pass the directly involved files to aider
         call_aider(files_to_fix, combined_output)
-
         if pylint_success and ruff_success and not files_to_fix:
             print("No more issues found. Stopping early.")
             break
 
     print("All iterations completed.")
-
-
-def run_black(file_paths):
-    """Runs black on the specified files."""
-    for file_path in file_paths:
-        try:
-            subprocess.run(["black", file_path], check=True)
-            print(f"Formatted {file_path} with black.")
-        except subprocess.CalledProcessError as e:
-            print(f"Error running black on {file_path}: {e}")
