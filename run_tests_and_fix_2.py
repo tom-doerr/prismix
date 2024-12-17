@@ -47,6 +47,20 @@ def run_random_pytest(files):
             pytest_output += f"Error running pytest on {test_file}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
     return pytest_output
 
+def run_pytest():
+    pytest_output = ""
+    try:
+        result = subprocess.run(
+            ["pytest", "-v"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        pytest_output += result.stdout + result.stderr
+    except subprocess.CalledProcessError as e:
+        pytest_output += f"Error running pytest: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
+    return pytest_output
+
 
 def run_random_pylint(files):
     """Runs pylint on n random files and captures the output."""
@@ -127,7 +141,10 @@ def call_aider(file_paths, combined_output):
                 "--file questions.md",
             ]
             + [item for file_path in file_paths for item in ["--file", file_path]]
-            + ["--message", f"There are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. Output: {combined_output}. What should we do next?"]
+            + [
+                "--message",
+                f"There are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. Refactor notes.md and questions.md when necessary. Output: {combined_output}. What should we do next?",
+            ]
         )
         print("Aider command:", " ".join(command))
         subprocess.run(command, check=True)
@@ -160,7 +177,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--lint-files",
         type=int,
-        default=1,
+        default=3,
         help="Number of random pylint files to run.",
     )
     parser.add_argument(
@@ -179,29 +196,39 @@ if __name__ == "__main__":
         random.shuffle(all_python_files)
         selected_files = all_python_files[: args.lint_files]
         ruff_success, ruff_output = run_ruff_fix(selected_files)
-        
-        test_files = [file_path for file_path in all_python_files if is_test_file(file_path)]
+
+        test_files = [
+            file_path for file_path in all_python_files if is_test_file(file_path)
+        ]
         random.shuffle(test_files)
         selected_test_files = test_files[: args.pytest_files]
         # pytest_output = run_random_pytest(args.pytest_files, all_python_files)
-        pytest_output = run_random_pytest(selected_test_files)
+        # pytest_output = run_random_pytest(selected_test_files)
+        pytest_output = run_pytest()
+        num_pytest_output_chars = len(pytest_output)
+        print("num_pytest_output_chars:", num_pytest_output_chars)
         pylint_result_output = run_random_pylint(selected_files)
-        files_being_tested = []
-        files_potentially_being_tested = [file_path.replace('test_', '') for file_path in selected_test_files if file_path.replace('test_', '') in all_python_files]
+        files_potentially_being_tested = []
+        # files_without_test = [file_path.replace('test_', '') for file_path in selected_test_files if file_path.replace('test_', '') in all_python_files]
         for file in all_python_files:
-            for file_potentially in files_potentially_being_tested:
-                if file_potentially in file:
-                    files_being_tested.append(file)
+            # for file_potentially in files_without_test:
+            # for file_potentially in files_without_test:
+            for test_file in selected_test_files:
+                if test_file.replace(".py", "").split("test_")[1] in file:
+                    files_potentially_being_tested.append(file)
 
-
-        print("files_being_tested:", files_being_tested)
+        print("files_potentially_being_tested:", files_potentially_being_tested)
         combined_output = (
             f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_output}"
         )
         if "All checks passed" not in ruff_output:
             combined_output += f"\nRuff output:\n{ruff_output}"
         files_to_fix = filter_files_by_output(combined_output, all_python_files)
-        files_to_fix.extend(files_being_tested)
+        files_to_fix.extend(files_potentially_being_tested)
+        files_to_fix.extend(selected_files)
+        files_to_fix.extend(selected_test_files)
+
+        files_to_fix = list(set(files_to_fix))
         run_black(files_to_fix)
         call_aider(files_to_fix, combined_output)
         if pylint_success and ruff_success and not files_to_fix:
