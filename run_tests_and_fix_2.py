@@ -133,14 +133,27 @@ def filter_files_by_output(output, all_files):
             files_to_fix.add(file_path)
     return list(files_to_fix)
 
-debugging_and_testing_file = 'introduction-to-debugging-and-testing-software.md'
+
+debugging_and_testing_file_url = "https://gist.githubusercontent.com/mwanginjuguna/545f983b12c76af238861d9af2e551a5/raw/9d8a8d47ca64cc340db69960011b368ab00179a9/introduction-to-debugging-and-testing-software.md"
+debugging_and_testing_file = (
+    "prompt_text/introduction-to-debugging-and-testing-software.md"
+)
+import requests
+
+if not os.path.exists(debugging_and_testing_file):
+    os.makedirs(os.path.dirname(debugging_and_testing_file), exist_ok=True)
+    response = requests.get(debugging_and_testing_file_url)
+    with open(debugging_and_testing_file, "wb") as file:
+        file.write(response.content)
+
 try:
-    with open(debugging_and_testing_file, 'r') as file:
+    with open(debugging_and_testing_file, "r") as file:
         debugging_and_testing_content = file.read()
 except FileNotFoundError:
     # warn
     print(f"File {debugging_and_testing_file} not found.")
-    debugging_and_testing_content = ''
+    debugging_and_testing_content = ""
+
 
 def call_aider(file_paths, combined_output, model):
     """Call aider to fix issues based on combined output."""
@@ -162,7 +175,7 @@ def call_aider(file_paths, combined_output, model):
             + ["--file", "questions.md"]
             + [
                 "--message",
-                f"{debugging_and_testing_content}\n\n\nThere are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. Refactor notes.md and questions.md when necessary to avoid redundancy and to reduce length. Output: {combined_output}. What should we do next?",
+                f"{debugging_and_testing_content}\n\n\nDon't work on too many things at the same time. There are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. Refactor notes.md and questions.md when necessary to avoid redundancy and to reduce length. Output: {combined_output}. What should we do next?",
             ]
         )
         print("Aider command:", " ".join(command))
@@ -254,6 +267,7 @@ if __name__ == "__main__":
         # sort
         files_to_fix.sort()
         run_black(files_to_fix)
+        files_to_fix = []
         call_aider(files_to_fix, combined_output, args.model)
         if pylint_success and ruff_success and not files_to_fix:
             print("No more issues found. Stopping early.")
