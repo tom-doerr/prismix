@@ -48,7 +48,10 @@ def test_file_edit_module_multiple_replacements(file_editor_module_fixture):
     )
     # Ensure the file was written correctly
     assert updated_content.content.strip() == "def greet():\n    print('hi')"
-    assert updated_content.changes == ["Replaced 'print(\\'hello\\')' with 'print(\\'hi\\')'", "Replaced 'def hello()' with 'def greet()'"]
+    assert updated_content.changes == [
+        "Replaced 'print(\\'hello\\')' with 'print(\\'hi\\')'",
+        "Replaced 'def hello()' with 'def greet()'",
+    ]
 
 
 def test_file_edit_module_overlapping_replacements(file_editor_module_fixture):
@@ -61,7 +64,10 @@ def test_file_edit_module_overlapping_replacements(file_editor_module_fixture):
     )
     # Ensure the file was written
     assert updated_content.content == "def greet():\n    print('hi')\n"
-    assert updated_content.changes == ["Replaced 'print(\\'hello\\')' with 'print(\\'hi\\')'", "Replaced 'def hello()' with 'def greet()'"]
+    assert updated_content.changes == [
+        "Replaced 'print(\\'hello\\')' with 'print(\\'hi\\')'",
+        "Replaced 'def hello()' with 'def greet()'",
+    ]
 
 
 def test_file_edit_module_empty_file(file_editor_module_fixture):
