@@ -3,6 +3,7 @@ Test suite for the safety checks in the IterativeProgrammer module.
 """
 
 import unittest
+import pytest
 import dspy
 from prismix.core.iterative_programmer import IterativeProgrammer
 
@@ -15,12 +16,12 @@ from prismix.core.iterative_programmer import IterativeProgrammer
 
 @pytest.fixture
 def setup_agent():
+    """Set up the agent fixture."""
     return IterativeProgrammer()
 
 
 def test_setup_agent_fixture():
     """Test the setup_agent fixture."""
-    pass
 
 
 class TestSafetyCheck(unittest.TestCase):
