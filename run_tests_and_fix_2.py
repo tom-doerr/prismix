@@ -244,8 +244,8 @@ if __name__ == "__main__":
         random.shuffle(test_files)
         selected_test_files = test_files[: args.pytest_files]
         # pytest_output = run_random_pytest(args.pytest_files, all_python_files)
-        # pytest_output = run_random_pytest(selected_test_files)
-        pytest_output = run_pytest()
+        pytest_output = run_random_pytest(selected_test_files)
+        # pytest_output = run_pytest()
         num_pytest_output_chars = len(pytest_output)
         print("num_pytest_output_chars:", num_pytest_output_chars)
         pylint_result_output = run_random_pylint(selected_files) if selected_files else ""
