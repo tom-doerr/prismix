@@ -149,19 +149,18 @@ DEBUGGING_AND_TESTING_FILE_URL = (
 )
 DEBUGGING_AND_TESTING_FILE = "prompt_text/introduction-to-debugging-and-testing-software.md"
 
-if not os.path.exists(debugging_and_testing_file):
-    os.makedirs(os.path.dirname(debugging_and_testing_file), exist_ok=True)
-    response = requests.get(debugging_and_testing_file_url, timeout=10)
-    with open(debugging_and_testing_file, "wb") as file:
+if not os.path.exists(DEBUGGING_AND_TESTING_FILE):
+    os.makedirs(os.path.dirname(DEBUGGING_AND_TESTING_FILE), exist_ok=True)
+    response = requests.get(DEBUGGING_AND_TESTING_FILE_URL, timeout=10)
+    with open(DEBUGGING_AND_TESTING_FILE, "wb") as file:
         file.write(response.content)
 
 try:
-    with open(debugging_and_testing_file, "r", encoding="utf-8") as file:
-        debugging_and_testing_content = file.read()
+    with open(DEBUGGING_AND_TESTING_FILE, "r", encoding="utf-8") as file:
+        DEBUGGING_AND_TESTING_CONTENT = file.read()
 except FileNotFoundError:
-    # warn
-    print(f"File {debugging_and_testing_file} not found.")
-    debugging_and_testing_content = ""
+    print(f"File {DEBUGGING_AND_TESTING_FILE} not found.")
+    DEBUGGING_AND_TESTING_CONTENT = ""
 
 
 def call_aider(file_paths, combined_output, model):
