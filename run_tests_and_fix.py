@@ -16,7 +16,7 @@ def run_pylint():
             capture_output=True,  # Capture both stdout and stderr
             text=True,
         )
-        pylint_output = result.stdout + result.stderr  # Combine stdout and stderr
+        pylint_result_output = result.stdout + result.stderr  # Combine stdout and stderr
     except subprocess.CalledProcessError as e:
         pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
         return False, pylint_output
@@ -32,7 +32,7 @@ def run_ruff_fix():
             capture_output=True,  # Capture both stdout and stderr
             text=True,
         )
-        ruff_output = result.stdout + result.stderr  # Combine stdout and stderr
+        ruff_result_output = result.stdout + result.stderr  # Combine stdout and stderr
     except subprocess.CalledProcessError as e:
         ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
         return False, ruff_output
@@ -40,8 +40,6 @@ def run_ruff_fix():
 
 
 def is_test_file(file_path):
-    """Checks if a file is a test file."""
-    """Checks if a file is a test file."""
     return file_path.endswith("_test.py") or "tests" in file_path.split("/")
 
 
@@ -49,8 +47,6 @@ MAX_RECURSION_DEPTH = 1
 
 
 def find_related_files(file_path):
-    """Finds related files for a given file."""
-    """Finds related files for a given file."""
 
     if is_test_file(file_path):
         base_name = os.path.basename(file_path).replace("_test.py", ".py")
@@ -88,7 +84,10 @@ if __name__ == "__main__":
     pylint_success, pylint_output = run_pylint()
     ruff_success, ruff_output = run_ruff_fix()
     combined_output = (
-        f"Pylint output:\n{pylint_result_output}\nRuff output:\n{ruff_result_output}"
+        f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
+    )
+    combined_output = (
+        f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
     )
     for file_path in all_files:
         call_aider(find_related_files(file_path), combined_output)
