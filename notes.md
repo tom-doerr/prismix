@@ -16,7 +16,7 @@
   - Factorial test failures due to improperly wrapped code.
 
 ### Ruff Output
-- **Error**: File not found in the specified paths. Ensure the paths are correct.
+- **Error**: File not found in the specified paths. Ensure the paths are correct and the files exist.
 
 ### Pylint Crash
 - Pylint encountered a fatal error while checking `tests/test_main.py`. Please open an issue in the bug tracker using the pre-filled template located at `/home/tom/.cache/pylint/pylint-crash-2024-12-17-01-31-52.txt`.
