@@ -9,7 +9,7 @@ import logging
 from typing import List, Tuple
 from prismix.core.signatures import FileEdit
 
-    def read_file(self, filename: str) -> FileContext:
+def read_file(self, filename: str) -> FileContext:
         """Reads the file and returns its content."""
         file_manager = FileManager(file_operations=DefaultFileOperations())
         try:
