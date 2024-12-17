@@ -2,7 +2,6 @@
 This module provides a safe execution environment for code generation and execution.
 """
 
-import importlib
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
@@ -34,6 +33,12 @@ class CodeExecutor:
     This class provides methods to execute code in a controlled and safe environment,
     ensuring that only a limited set of built-in functions are available to the executed code.
     """
+    """
+    Handles safe code execution in isolated environment.
+
+    This class provides methods to execute code in a controlled and safe environment,
+    ensuring that only a limited set of built-in functions are available to the executed code.
+    """
 
     @staticmethod
     def execute(code: str) -> CodeResult:
@@ -47,13 +52,6 @@ class CodeExecutor:
             return CodeResult(code=code, success=True, output="", error="")
         except (SyntaxError, NameError) as e:
             return CodeResult(code=code, success=False, output="", error=str(e))
-
-    """
-    Handles safe code execution in isolated environment.
-
-    This class provides methods to execute code in a controlled and safe environment,
-    ensuring that only a limited set of built-in functions are available to the executed code.
-    """
 
     @staticmethod
     def get_safe_builtins() -> Dict[str, Any]:
@@ -69,16 +67,4 @@ class CodeExecutor:
             "ValueError": ValueError,
             "TypeError": TypeError,
         }
-
-    @staticmethod
-    def execute(code: str) -> CodeResult:
-        """Execute code in isolated environment and return results"""
-        try:
-            spec = importlib.util.spec_from_loader("temp_module", loader=None)
-            temp_module = importlib.util.module_from_spec(spec)
-            temp_module.__dict__.update(CodeExecutor.get_safe_builtins())
-            exec(code, temp_module.__dict__)
-            return CodeResult(code=code, success=True, output="", error="")
-        except (SyntaxError, NameError) as e:
-            return CodeResult(code=code, success=False, output="", error=str(e))
 
