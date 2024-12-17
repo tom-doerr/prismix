@@ -16,9 +16,7 @@ def test_apply_replacements():
         context=f"test_file.py Content: {content}",
         instruction=instruction,
     )
-    assert (
-        updated_content.content == 'def foo():\n    print("hello")'
-    )  # Check the content
+    assert updated_content.content == 'def foo():\n    print("hello")'
 
 
 def test_read_file_existing():
