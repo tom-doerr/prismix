@@ -188,12 +188,10 @@ def test_forward_with_no_change(file_editor_module, temp_file):
 
 def test_forward_with_multiline_replacement(file_editor_module, temp_file):
     """Test forward method with multiline replacement."""
-    # Test file edit with multiline replacement
     updated_content = file_editor_module.forward(
         context=f"{temp_file} Content: def hello():\n    print('hello')\n",
         instruction="Replace 'def hello():\\n    print(\\'hello\\')' with "
-        "'def greet():\\n    print(\\'hi\\')\\n    "
-        "print(\\'there\\')'",
+        "'def greet():\\n    print(\\'hi\\')\\n    print(\\'there\\')'",
     )
     assert (
         updated_content.content == "def greet():\n    print('hi')\n    print('there')\n"
@@ -223,13 +221,12 @@ def test_forward_with_different_replacements(file_editor_module, temp_file):
 
 def test_forward_with_edge_cases(file_editor_module, temp_file):
     """Test forward method with edge cases."""
-    # Test file edit with edge cases
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
         f.write("# This is a comment\n")
         temp_file_path_comment = f.name
 
     updated_content_comment = file_editor_module.forward(
-        context=f"{temp_file_path_comment} Content: # This is a " "comment\n",
+        context=f"{temp_file_path_comment} Content: # This is a comment\n",
         instruction="Replace '# This is a comment' with '# New comment' ",
     )
     assert updated_content_comment.content == "# New comment\n"
