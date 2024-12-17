@@ -74,7 +74,10 @@ class CodeIndexer:
                             logging.info(f"Indexed: {filepath}")
                     except (FileNotFoundError, PermissionError) as e:
                         logging.error(f"Error accessing {filepath}: {e}")
-                    except (FileNotFoundError, PermissionError) as e:  # Combine exceptions
+                    except (
+                        FileNotFoundError,
+                        PermissionError,
+                    ) as e:  # Combine exceptions
                         logging.error(f"Error accessing {filepath}: {e}")
 
     def embed_code(self, content: str) -> List[float]:
