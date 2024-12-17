@@ -23,8 +23,7 @@ def get_all_files_to_index(directory: str) -> List[str]:
             filepath = os.path.join(root, file)
             if not indexer._is_ignored(filepath):
                 files_to_index.append(filepath)
-    return files_to_index
-
+   return files_to_index
 
 def add_data_to_db(directory: str):
     """Add data to the database."""

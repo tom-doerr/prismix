@@ -89,7 +89,7 @@ def test_file_edit_module_empty_file(file_editor_module):
         instruction="Replace 'print(\\'hello\\')' with " "'print(\\'hi\\')'.",
     )
 
-    # Ensure the file remains empty
+   # Ensure the file remains empty    
     assert updated_content.content.strip() == ""
     assert updated_content.changes == []
 
@@ -108,9 +108,7 @@ def test_file_edit_module_file_not_found(file_editor_module):
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')'.",
     )
     assert "File does not exist" in str(result.error)
-    assert (
-        result.changes == []
-    ), f"Changes were: {result.changes}, error was: {result.error}"
+    assert result.changes == [], f"Changes were: {result.changes}, error was: {result.error}"
 
 
 def test_apply_single_replacement_function_def(file_editor_module):
@@ -288,6 +286,6 @@ def test_forward_with_file_not_found(file_editor_module):
         context="non_existent_file.py Content: def hello():\n    print('hello')\n",
         instruction=instruction,
     )
-    assert file_context.error and "File does not exist" in file_context.error
-    assert file_context.changes == [], f"Changes were: {file_context.changes}"
-    assert file_context.changes == []
+   assert file_context.error and "File does not exist" in file_context.error
+   assert file_context.changes == [], f"Changes were: {file_context.changes}"
+   assert file_context.changes == []
