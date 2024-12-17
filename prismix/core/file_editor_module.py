@@ -31,11 +31,11 @@ def read_file(self, filename: str) -> FileContext:
             content = content.replace(search_pattern, replacement_code)
         return content
 
-    def apply_single_replacement(
-        self, content: str, search_pattern: str, replacement_code: str
-    ) -> str:
-        """Applies a single replacement to the content."""
-        return content.replace(search_pattern, replacement_code)
+def apply_single_replacement(
+    self, content: str, search_pattern: str, replacement_code: str
+) -> str:
+    """Applies a single replacement to the content."""
+    return content.replace(search_pattern, replacement_code)
 
     def parse_instructions(self, instruction: str) -> List[Tuple[str, str]]:
         """Parses the instruction string and returns a list of replacement pairs."""
