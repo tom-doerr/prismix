@@ -35,6 +35,9 @@ def run_random_pytest(files):
     # random.shuffle(test_files)
     # selected_test_files = test_files[:n]
     pytest_output = ""
+    if not files:
+        return pytest_output
+
     # for test_file in selected_test_files:
     for test_file in files:
         try:
