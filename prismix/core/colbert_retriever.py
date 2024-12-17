@@ -48,7 +48,6 @@ def add_data_to_db(directory: str):
 
 
 class DataInserter:
-
     """Inserts data into the Qdrant database."""
 
     def __init__(self, qdrant_manager: QdrantManager):
