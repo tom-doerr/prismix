@@ -3,7 +3,6 @@ Test suite for the IterativeProgrammer module.
 """
 
 import dspy
-import pytest
 from prismix.core.iterative_programmer import IterativeProgrammer
 
 
