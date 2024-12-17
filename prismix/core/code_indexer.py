@@ -23,6 +23,7 @@ class IndexedCode:
 
 
 class CodeEmbedder:
+    """Class responsible for embedding code content into vectors."""
 
     def embed_code(self) -> List[float]:
         """Embed the given code content into a vector."""
@@ -31,10 +32,10 @@ class CodeEmbedder:
 
     def another_method(self):
         """Another method in the CodeEmbedder class."""
-        pass
 
 
 class CodeIndexer:
+    """Class responsible for indexing and searching code files using embeddings."""
     """Indexes and searches code files using embeddings."""
 
     DEFAULT_IGNORE_PATTERNS = ["*.pyc", "__pycache__"]
@@ -70,8 +71,12 @@ class CodeIndexer:
                         print(f"File not found: {filepath}: {e}")
                     except PermissionError as e:
                         print(f"Permission error accessing {filepath}: {e}")
+                    except FileNotFoundError as e:
+                        print(f"File not found: {filepath}: {e}")
+                    except PermissionError as e:
+                        print(f"Permission error accessing {filepath}: {e}")
                     except Exception as e:
-                        print(f"Error indexing {filepath}: {e}")
+                        print(f"Unexpected error indexing {filepath}: {e}")
 
     def search_code(self, query: str) -> List[IndexedCode]:
         """Search indexed code using a query."""
@@ -108,8 +113,12 @@ class CodeIndexer:
                         print(f"File not found: {filepath}: {e}")
                     except PermissionError as e:
                         print(f"Permission error accessing {filepath}: {e}")
+                    except FileNotFoundError as e:
+                        print(f"File not found: {filepath}: {e}")
+                    except PermissionError as e:
+                        print(f"Permission error accessing {filepath}: {e}")
                     except Exception as e:
-                        print(f"Error searching {filepath}: {e}")
+                        print(f"Unexpected error searching {filepath}: {e}")
         return results
 
     def _is_ignored(self, filepath: str) -> bool:
