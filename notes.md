@@ -76,6 +76,9 @@
   - Re-ran tests to verify the fix.
 
 ### Resolved Issues
+- **Fixed W0122 (exec-used) Warning**: Refactored `prismix/core/executor.py` to avoid using `exec`.
+- **Fixed ImportError in `tests/test_file_editor_module.py`**: Ensured correct import of `FileEditorModule`.
+- **Fixed SyntaxError in `tests/test_factorial.py`**: Corrected the f-string usage.
 - **Fixed Pylint Warning in `output/generated_code.py`**:
   - Renamed `dummy_code` to `DUMMY_CODE` to conform to the `UPPER_CASE` naming style.
 - **Fixed Pytest Failures in `tests/test_file_operations.py`**:

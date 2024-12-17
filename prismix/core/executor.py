@@ -39,10 +39,11 @@ class CodeExecutor:
     def execute(code: str) -> CodeResult:
         """Execute code in isolated environment and return results"""
         try:
-            spec = importlib.util.spec_from_loader("temp_module", loader=None)
-            temp_module = importlib.util.module_from_spec(spec)
-            temp_module.__dict__.update(CodeExecutor.get_safe_builtins())
-            exec(code, temp_module.__dict__)
+            # Safely parse and evaluate the code
+            tree = ast.parse(code)
+            compiled_code = compile(tree, filename="<string>", mode="exec")
+            local_vars = {}
+            exec(compiled_code, CodeExecutor.get_safe_builtins(), local_vars)
             return CodeResult(code=code, success=True, output="", error="")
         except (SyntaxError, NameError) as e:
             return CodeResult(code=code, success=False, output="", error=str(e))
