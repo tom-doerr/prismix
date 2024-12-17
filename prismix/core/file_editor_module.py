@@ -20,11 +20,11 @@ def read_file(self, filename: str) -> FileContext:
             )
 
         def apply_replacements(self, content: str, instruction: str) -> str:
-        """Applies multiple replacements based on the instruction."""
-        replacements = self.parse_instructions(instruction)
-        for search_pattern, replacement_code in replacements:
-            content = content.replace(search_pattern, replacement_code)
-        return content
+            """Applies multiple replacements based on the instruction."""
+            replacements = self.parse_instructions(instruction)
+            for search_pattern, replacement_code in replacements:
+                content = content.replace(search_pattern, replacement_code)
+            return content
         """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
