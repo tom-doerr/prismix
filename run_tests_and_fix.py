@@ -68,7 +68,7 @@ def find_related_files(current_file_path):
     return [current_file_path]
 
 
-def call_aider(file_paths, combined_output):
+def call_aider(file_paths, combined_output_local):
     """Call aider to fix issues based on combined output."""
     try:
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
@@ -82,7 +82,7 @@ def call_aider(file_paths, combined_output):
                 "--no-suggest-shell-commands",
             ]
             + [item for file_path in file_paths for item in ["--file", file_path]]
-            + ["--message", f"Output: {combined_output}. Fix it"]
+            + ["--message", f"Output: {combined_output_local}. Fix it"]
         )
         print("Aider command:", " ".join(command))
         subprocess.run(command, check=True)
