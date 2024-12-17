@@ -34,7 +34,10 @@ class FileEditorModule:
         ]
 
     def apply_single_replacement(
-        self, content: str, search_pattern: str, replacement_code: str,
+        self,
+        content: str,
+        search_pattern: str,
+        replacement_code: str,
     ) -> str:
         """Apply a single replacement in the content."""
         updated_content = content.replace(search_pattern, replacement_code)
@@ -53,7 +56,9 @@ class FileEditorModule:
                     content = self.apply_single_replacement(
                         content, search_pattern, replacement_code
                     )
-                    changes.append((search_pattern, replacement_code))  # Store the changes
+                    changes.append(
+                        (search_pattern, replacement_code)
+                    )  # Store the changes
 
                     if original_content == content:
                         print(
@@ -90,7 +95,11 @@ class FileEditorModule:
                 filepath=filepath, content="", error="File does not exist"
             )  # Return FileContext with error
         file_context = self.read_file(filepath)
-        updated_file_context = self.apply_replacements(file_context.content, instruction)
+        updated_file_context = self.apply_replacements(
+            file_context.content, instruction
+        )
         return FileContext(
-            filepath=filepath, content=updated_file_context.content, changes=updated_file_context.changes
+            filepath=filepath,
+            content=updated_file_context.content,
+            changes=updated_file_context.changes,
         )

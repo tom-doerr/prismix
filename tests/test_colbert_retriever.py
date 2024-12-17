@@ -40,9 +40,12 @@ def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir_fixture):
     colbert_retriever_fixture.add_data_to_db(temp_dir_fixture)
 
     # Ensure that the data was added to the Qdrant database
-    assert colbert_retriever_fixture.qdrant_manager.client.count(
-        collection_name="colbert_embeddings"
-    ).count > 0
+    assert (
+        colbert_retriever_fixture.qdrant_manager.client.count(
+            collection_name="colbert_embeddings"
+        ).count
+        > 0
+    )
 
 
 def test_colbert_retriever(colbert_retriever_fixture, temp_dir):
