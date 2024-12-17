@@ -1,8 +1,6 @@
 ## Questions
 
-1. **Pylint Crash**:
-   - What version of `isort` is currently installed, and is it compatible with the version of Pylint being used?
-   - Should we update or downgrade `isort` to resolve the Pylint crash?
+
 
 2. **Pytest ImportError**:
    - Why is `FileEditorModule` not being imported correctly in `tests/test_file_editor_module.py`?
