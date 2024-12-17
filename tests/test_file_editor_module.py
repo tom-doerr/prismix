@@ -29,7 +29,6 @@ def temp_file():
 
 def test_file_edit_module_no_change(file_editor_module, temp_file):
     """Test file edit with no change."""
-    # Test file edit with no change
     updated_content = file_editor_module.apply_replacements(
         content="def hello():\n    print('hello')\n",
         instruction="Do not change 'print('hello')'.",
