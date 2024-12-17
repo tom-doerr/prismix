@@ -41,6 +41,10 @@ class QdrantManager:
     def _embed_code(self, content: str) -> List[float]:
         return self.embed_code(content)
 
+    def embed_code(self, content: str) -> List[float]:
+        # Dummy embedding for testing
+        return [0.0] * 128
+
     def search_embeddings(
         self, query_embedding: List[float], top_k: int = 3
     ) -> List[Dict[str, any]]:
