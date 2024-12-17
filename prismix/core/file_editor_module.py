@@ -19,7 +19,14 @@ class FileEditorModule:
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
             content = content.replace(search_pattern, replacement_code)
-        return FileContext(filepath="", content=content, changes=[f"{search_pattern} -> {replacement_code}" for search_pattern, replacement_code in replacements])
+        return FileContext(
+            filepath="",
+            content=content,
+            changes=[
+                f"{search_pattern} -> {replacement_code}"
+                for search_pattern, replacement_code in replacements
+            ],
+        )
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the content of the file."""
