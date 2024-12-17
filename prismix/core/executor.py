@@ -57,7 +57,9 @@ class CodeExecutor:
                 loc["print"] = lambda *args, **kwargs: output_buffer.append(
                     " ".join(map(str, args))
                 )
-                exec(compile(code, tmp_file_path, "exec"), safe_builtins, loc) # pylint: disable=exec-used
+                exec(
+                    compile(code, tmp_file_path, "exec"), safe_builtins, loc
+                )  # pylint: disable=exec-used
                 success = True
                 output = "\n".join(output_buffer)
             return CodeResult(
