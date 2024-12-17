@@ -143,14 +143,15 @@ def call_aider(file_paths, combined_output, model):
                 "aider",
                 "--deepseek",
                 "--architect",
+                "--cache-prompts",
                 "--yes-always",
                 "--no-detect-urls",
                 "--no-suggest-shell-commands",
             ]
             + ["--model", model]
+            + [item for file_path in file_paths for item in ["--file", file_path]]
             + ["--file", "notes.md"]
             + ["--file", "questions.md"]
-            + [item for file_path in file_paths for item in ["--file", file_path]]
             + [
                 "--message",
                 f"There are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. Refactor notes.md and questions.md when necessary to avoid redundancy and to reduce length. Output: {combined_output}. What should we do next?",
@@ -242,6 +243,8 @@ if __name__ == "__main__":
         files_to_fix.extend(selected_test_files)
 
         files_to_fix = list(set(files_to_fix))
+        # sort
+        files_to_fix.sort()
         run_black(files_to_fix)
         call_aider(files_to_fix, combined_output, args.model)
         if pylint_success and ruff_success and not files_to_fix:
