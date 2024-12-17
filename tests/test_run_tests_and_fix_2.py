@@ -1,8 +1,8 @@
-import os
-import unittest
-from unittest.mock import patch, mock_open
-import run_tests_and_fix_2 as run_tests_and_fix
 import argparse
+import unittest
+from unittest.mock import mock_open, patch
+
+import run_tests_and_fix_2 as run_tests_and_fix
 
 
 class TestRunTestsAndFix(unittest.TestCase):
