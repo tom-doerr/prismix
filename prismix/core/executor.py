@@ -45,6 +45,7 @@ class CodeExecutor:
             parsed_code = ast.parse(code)
             # Necessary for executing the code in a controlled environment
             # Safely parse and execute the code
+            # Safely execute the code in a controlled environment
             exec(
                 compile(parsed_code, filename="<string>", mode="exec"),
                 {"__builtins__": CodeExecutor.get_safe_builtins()},
