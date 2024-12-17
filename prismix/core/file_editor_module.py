@@ -12,7 +12,6 @@ from prismix.core.file_operations import (
     FileContext,
     FileManager,
 )
-from pydantic import ConfigDict
 
 
 class FileEditorModule:
