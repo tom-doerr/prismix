@@ -123,7 +123,7 @@ class FileEditor:
         self.edit_generator = dspy.ChainOfThought(FileEdit)
         self.file_manager = FileManager(DefaultFileOperations())
 
-    def _number_lines(self, content: str) -> str:
+    def number_lines(self, content: str) -> str:
         """Add line numbers to content"""
         lines = content.splitlines()
         return "\n".join(f"{i+1:4d} | {line}" for i, line in enumerate(lines))
