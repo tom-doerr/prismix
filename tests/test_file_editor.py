@@ -21,9 +21,8 @@ def test_apply_replacements():
 
 def test_read_file_existing():
     """Test reading an existing file."""
-    """Test reading an existing file."""
     editor = FileEditorModule()
-    # Create a dummy file for testing
+    # Ensure the file exists before reading
     with open("test_file.txt", "w", encoding="utf-8") as f:
         f.write("test content")
     file_context = editor.read_file("test_file.txt")
