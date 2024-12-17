@@ -16,7 +16,9 @@ def run_pylint():
             capture_output=True,  # Capture both stdout and stderr
             text=True,
         )
-        pylint_result_output = result.stdout + result.stderr  # Combine stdout and stderr
+        pylint_result_output = (
+            result.stdout + result.stderr
+        )  # Combine stdout and stderr
     except subprocess.CalledProcessError as e:
         pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
         return False, pylint_output
@@ -83,12 +85,8 @@ if __name__ == "__main__":
     all_files = glob.glob("**/*.py", recursive=True)
     pylint_success, pylint_output = run_pylint()
     ruff_success, ruff_output = run_ruff_fix()
-    combined_output = (
-        f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
-    )
-    combined_output = (
-        f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
-    )
+    combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
+    combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
     for file_path in all_files:
         call_aider(find_related_files(file_path), combined_output)
     if pylint_success and ruff_success:
