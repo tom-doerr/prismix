@@ -71,7 +71,9 @@ class EditDatasetGenerator(dspy.Module):
         self.signature = GenerateDatasetSignature()
         self.script_generator = dspy.ChainOfThought(GenerateScript)
         self.edit_generator = dspy.ChainOfThought(GenerateEditInstruction)
-        self.hindsight_generator = dspy.ChainOfThought(GenerateHindsightEdit)
+        self.hindsight_generator = dspy.ChainOfThought(
+            GenerateHindsightEdit
+        )
 
         # Themes for script generation
         self.themes = [
