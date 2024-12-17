@@ -1,13 +1,21 @@
+"""
+Script to generate an edit dataset for training purposes.
+"""
+
 import json
 import random
+import re
+import tempfile
 from pathlib import Path
 from dataclasses import dataclass
+
 import dspy
 from prismix.core.file_operations import FileEditor
 from prismix.core.metrics import calculate_levenshtein_similarity
 
 
 class GenerateScript(dspy.Signature):
+    """Generate a Python script based on a theme"""
     """Generate a Python script based on a theme"""
 
     theme = dspy.InputField(
@@ -18,6 +26,7 @@ class GenerateScript(dspy.Signature):
 
 class GenerateEditInstruction(dspy.Signature):
     """Generate an edit instruction for a script"""
+    """Generate an edit instruction for a script"""
 
     script = dspy.InputField(desc="Original Python script")
     instruction = dspy.OutputField(
@@ -26,6 +35,7 @@ class GenerateEditInstruction(dspy.Signature):
 
 
 class GenerateHindsightEdit(dspy.Signature):
+    """Generate precise edit command that describes transformation between two scripts"""
     """Generate precise edit command that describes transformation between two scripts"""
 
     original = dspy.InputField(desc="Original script content")
@@ -38,6 +48,7 @@ class GenerateHindsightEdit(dspy.Signature):
 @dataclass
 class EditDataPoint:
     """Represents a single edit transformation example"""
+    """Represents a single edit transformation example"""
 
     original_script: str
     edited_script: str
@@ -46,6 +57,7 @@ class EditDataPoint:
 
 
 class EditDatasetGenerator(dspy.Module):
+    """Module to generate edit dataset examples"""
     def __init__(self):
         super().__init__()
 
@@ -276,7 +288,7 @@ class EditDatasetGenerator(dspy.Module):
         output_path = Path(output_file)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_path, "w") as f:
+        with open(output_path, "w", encoding="utf-8") as f:
             json.dump(dataset, f, indent=2)
 
         print(f"\nDataset generated with {len(dataset)} examples")
@@ -284,6 +296,7 @@ class EditDatasetGenerator(dspy.Module):
 
 
 def main():
+    """Main function to generate the edit dataset"""
     # Configure DSPy
     lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
     dspy.configure(lm=lm)
@@ -297,7 +310,8 @@ def main():
     generator = dspy.Retry(generator, max_retries=5)
 
     # Add backtracking for failed assertions
-    def backtrack_handler(state, suggestion):
+    def backtrack_handler(suggestion):
+        """Handle backtracking with a suggestion"""
         print(f"Backtracking with suggestion: {suggestion}")
         return True
 
