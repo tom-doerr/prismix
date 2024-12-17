@@ -21,7 +21,7 @@ def get_all_files_to_index(directory: str) -> List[str]:
     for root, _, files in os.walk(directory):
         for file in files:
             filepath = os.path.join(root, file)
-            if not indexer.is_ignored(filepath):  # Use a public method instead
+            if not indexer._is_ignored(filepath):  # Use a public method instead
                 files_to_index.append(filepath)
     return files_to_index
 
@@ -48,6 +48,7 @@ def add_data_to_db(directory: str):
 
 
 class DataInserter:
+    """Inserts data into the Qdrant database."""
     """Inserts data into the Qdrant database."""
 
     def __init__(self, qdrant_manager: QdrantManager):
@@ -79,7 +80,6 @@ class DataInserter:
 
     def another_public_method(self):
         """Example of another public method."""
-        pass
 
 
 class ColbertRetriever(dspy.Retrieve):
