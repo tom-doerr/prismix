@@ -130,7 +130,7 @@ def filter_files_by_output(output, all_files):
     return list(files_to_fix)
 
 
-def call_aider(file_paths, combined_output):
+def call_aider(file_paths, combined_output, model):
     """Call aider to fix issues based on combined output."""
     try:
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
@@ -143,6 +143,7 @@ def call_aider(file_paths, combined_output):
                 "--no-detect-urls",
                 "--no-suggest-shell-commands",
             ]
+            + ["--model", model]
             + ["--file", "notes.md"]
             + ["--file", "questions.md"]
             + [item for file_path in file_paths for item in ["--file", file_path]]
@@ -191,6 +192,12 @@ if __name__ == "__main__":
         default=1000,
         help="Number of iterations to run the tests and fixes.",
     )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="deepseek",
+        help="Model to use for aider.",
+    )
     args = parser.parse_args()
 
     all_python_files = glob.glob("**/*.py", recursive=True)
@@ -235,7 +242,7 @@ if __name__ == "__main__":
 
         files_to_fix = list(set(files_to_fix))
         run_black(files_to_fix)
-        call_aider(files_to_fix, combined_output)
+        call_aider(files_to_fix, combined_output, args.model)
         if pylint_success and ruff_success and not files_to_fix:
             print("No more issues found. Stopping early.")
             break
