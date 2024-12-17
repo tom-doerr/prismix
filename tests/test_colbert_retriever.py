@@ -42,17 +42,30 @@ def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir):
     retriever.add_data_to_db(directory)
 
     # Ensure that the data was added to the Qdrant database
-    assert retriever.qdrant_manager.client.count(collection_name="colbert_embeddings").count > 0
+    assert (
+        retriever.qdrant_manager.client.count(
+            collection_name="colbert_embeddings"
+        ).count
+        > 0
+    )
+
 
 def test_colbert_retriever(colbert_retriever_fixture, temp_dir):
     """Test the ColbertRetriever class."""
     retriever = colbert_retriever_fixture
     directory = temp_dir
     query = "quantum computing"
-    retriever.forward = lambda q: [{"long_text": f"This is a dummy result for {q}"} for _ in range(3)]
+    retriever.forward = lambda q: [
+        {"long_text": f"This is a dummy result for {q}"} for _ in range(3)
+    ]
     retriever.add_data_to_db(directory)
     results = retriever.forward(query)
     assert len(results) == 3
     for result in results:
         assert "dummy result" in result["long_text"]
-    assert retriever.qdrant_manager.client.count(collection_name="colbert_embeddings").count > 0
+    assert (
+        retriever.qdrant_manager.client.count(
+            collection_name="colbert_embeddings"
+        ).count
+        > 0
+    )
