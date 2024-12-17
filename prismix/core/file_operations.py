@@ -87,7 +87,7 @@ class FileManager:
                 filepath=filepath, content="", changes=[], error="File does not exist"
             )
         except (FileNotFoundError, PermissionError) as e:
-            return FileContext(filepath=filepath, content="", changes=[], error=str(e))
+            return FileContext(filepath=filepath, content="", changes=[], error=f"Error reading file: {str(e)}")
 
     def write_file(self, filepath: str, content: str) -> FileContext:
         """Write content to a file and return a FileContext."""

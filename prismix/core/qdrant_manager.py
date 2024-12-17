@@ -29,14 +29,9 @@ class QdrantManager:
             logging.info("Collection '%s' created.", self.collection_name)
         else:
             logging.info("Collection '%s' already exists.", self.collection_name)
-
-    def insert_embeddings(self, embeddings: List[Dict[str, any]]):
-        points = [
-            models.PointStruct(
-                id=emb["id"], vector=emb["vector"], payload=emb["payload"]
-            )
-            for emb in embeddings
-        ]
+ 
+    def insert_embeddings(self, points: List[models.PointStruct]):
+        """Insert embeddings into the Qdrant collection."""
         self.client.upsert(
             collection_name=self.collection_name,
             points=points,

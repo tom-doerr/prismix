@@ -32,10 +32,10 @@ def test_factorial_basic():
     assert code_result.success, f"Code execution failed: {code_result.error}"
 
     # Execute the factorial function directly
-    # Safer alternative to exec
     loc = {}
     exec(function_code, globals(), loc)
     factorial = loc.get("factorial")
+    
     factorial = globals().get("factorial")
 
     # Test basic cases
