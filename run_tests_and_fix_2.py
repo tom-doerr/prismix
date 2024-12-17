@@ -68,6 +68,7 @@ def run_pytest():
         pytest_output += result.stdout
     except subprocess.CalledProcessError as e:
         pytest_output += f"Error running pytest: {e}\nstdout: {e.stdout}"
+    print("pytest_output:", pytest_output)
     return pytest_output
 
 
@@ -202,7 +203,7 @@ except FileNotFoundError:
     DEBUGGING_AND_TESTING_CONTENT = ""
 
 
-def call_aider(file_paths, model):
+def call_aider(file_paths, model, combined_output):
     """Call aider to fix issues based on combined output."""
     try:
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
@@ -215,6 +216,7 @@ def call_aider(file_paths, model):
                 "--yes-always",
                 "--no-detect-urls",
                 "--no-suggest-shell-commands",
+                "--verbose",
             ]
             + ["--model", model]
             + [item for file_path in file_paths for item in ["--file", file_path]]
@@ -285,12 +287,6 @@ if __name__ == "__main__":
         default=1000,
         help="Number of iterations to run the tests and fixes.",
     )
-    parser.add_argument(
-        "--model",
-        type=str,
-        default="deepseek",
-        help="Model to use for aider.",
-    )
     args = parser.parse_args()
 
     all_python_files = glob.glob("**/*.py", recursive=True)
@@ -310,8 +306,10 @@ if __name__ == "__main__":
         random.shuffle(test_files)
         selected_test_files = test_files[: args.pytest_files]
         # pytest_output = run_random_pytest(args.pytest_files, all_python_files)
-        pytest_output = run_random_pytest(selected_test_files)
-        # pytest_output = run_pytest()
+        if args.pytest_mode == "all":
+            pytest_output = run_pytest()
+        else:
+            pytest_output = run_random_pytest(selected_test_files)
         num_pytest_output_chars = len(pytest_output)
         print("num_pytest_output_chars:", num_pytest_output_chars)
         pylint_result_output = (
@@ -327,16 +325,16 @@ if __name__ == "__main__":
         radon_mi_output = run_radon_mi(files_potentially_being_tested)
 
         print("files_potentially_being_tested:", files_potentially_being_tested)
-        COMBINED_OUTPUT = (
+        combined_output = (
             f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_output}"
         ).strip()
         if "All checks passed" not in ruff_output:
-            COMBINED_OUTPUT += f"\nRuff output:\n{ruff_output}"
+            combined_output += f"\nRuff output:\n{ruff_output}"
         if radon_cc_output:
-            COMBINED_OUTPUT += f"\nRadon CC output:\n{radon_cc_output}"
+            combined_output += f"\nRadon CC output:\n{radon_cc_output}"
         if radon_mi_output:
-            COMBINED_OUTPUT += f"\nRadon MI output:\n{radon_mi_output}"
-        files_to_fix = filter_files_by_output(COMBINED_OUTPUT, all_python_files)
+            combined_output += f"\nRadon MI output:\n{radon_mi_output}"
+        files_to_fix = filter_files_by_output(combined_output, all_python_files)
         files_to_fix.extend(files_potentially_being_tested)
         files_to_fix.extend(selected_files)
         files_to_fix.extend(selected_test_files)
@@ -346,8 +344,8 @@ if __name__ == "__main__":
         files_to_fix.sort()
         run_black(files_to_fix)
         files_to_fix = []
-        if COMBINED_OUTPUT:
-            call_aider(files_to_fix, args.model)
+        if combined_output:
+            call_aider(files_to_fix, args.model, combined_output)
         if (
             args.pytest_mode == "all"
             and pylint_success
