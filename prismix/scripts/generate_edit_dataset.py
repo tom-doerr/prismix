@@ -56,7 +56,6 @@ class EditDataPoint:
 
 class EditDatasetGenerator(dspy.Module):
 
-
     def __init__(self):
         super().__init__()
 
