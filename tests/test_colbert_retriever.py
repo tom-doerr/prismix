@@ -44,8 +44,7 @@ def test_colbert_retriever(colbert_retriever_instance):
     query = "quantum computing"
     # Set a mock RM for testing
     dspy.settings.rm = lambda queries, k=3: [
-        [{"long_text": f"This is a dummy result for {q}"} for _ in range(k)]
-        for q in queries
+        {"long_text": f"This is a dummy result for {q}"} for q in queries
     ]
     results = colbert_retriever_instance.forward(query)
     assert len(results) == 3
