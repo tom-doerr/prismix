@@ -159,7 +159,7 @@ def test_forward_with_no_file_content_in_context(file_editor_module):
 def test_write_file(file_editor_module):
     """Test writing to a file."""
     new_content = "def greet():\n    print('hi')\n"
-    file_context = file_editor_module.write_file(temp_file, new_content)
+    file_context = file_editor_module.write_file("test_write_file.txt", new_content)
     assert file_context.content == new_content
     assert file_context.filepath == temp_file
     assert not file_context.error
