@@ -37,12 +37,11 @@ def agent():
 
 def test_file_read(test_file_fixture_read):
     """Test reading file content."""
-    """Test reading file content."""
     file_manager = FileManager(DefaultFileOperations())
-    result = file_manager.read_file(test_file_fixture_read)
-    assert isinstance(result, FileContext)
-    assert result.error is None
-    assert "def main():" in result.content
+    read_result = file_manager.read_file(test_file_fixture_read)
+    assert isinstance(read_result, FileContext)
+    assert read_result.error is None
+    assert "def main():" in read_result.content
 
 
 def test_file_write(tmp_path_write):
@@ -64,10 +63,7 @@ def test_line_numbering(test_file_fixture):
     editor = FileEditor()
     with open(test_file_fixture, encoding="utf-8") as f:
         content = f.read()
-
     # If number_lines is not needed, remove this test
-    # numbered = editor.number_lines(content)
-    # assert numbered is not None
 
 
 def test_apply_line_edits_list():
@@ -116,9 +112,7 @@ def test_replace_line():
     editor = FileEditor()
     content = "line 1\nline 2\nline 3"
     edits = [("replace", 2, "modified line 2")]
-
-    new_content, changes = editor._apply_line_edits(content, edits)
-
+    new_content, changes = editor.apply_line_edits(content, edits)
     assert "modified line 2" in new_content
     assert len(changes) == 1
     assert "Replaced line 2" in changes[0]
