@@ -23,9 +23,6 @@ class IndexedCode:
 
 
 class CodeEmbedder:
-    """Handles the embedding of code content."""
-
-    """Handles the embedding of code content."""
 
     def embed_code(self) -> List[float]:
         """Embed the given code content into a vector."""
@@ -33,6 +30,7 @@ class CodeEmbedder:
         return [0.0] * 128  # Dummy embedding
 
     def another_method(self):
+        """Another method in the CodeEmbedder class."""
         pass
 
 
@@ -58,18 +56,12 @@ class CodeIndexer:
                 filepath = os.path.join(root, file)
                 if not self._is_ignored(filepath):
                     try:
-                        file_context = FileManager().read_file(filepath)
+                        file_context = FileManager(file_operations=DefaultFileOperations()).read_file(filepath)
                         if file_context and file_context.content:
                             embedding = self.embedder.embed_code(file_context.content)
-                            indexed_code = IndexedCode(
-                                filepath, file_context.content, embedding
-                            )
+                            indexed_code = IndexedCode(filepath, file_context.content, embedding)
                             self.indexed_code[filepath] = indexed_code
                             print(f"Indexed: {filepath}")
-                    except FileNotFoundError as e:
-                        print(f"File not found: {filepath}: {e}")
-                    except PermissionError as e:
-                        print(f"Permission error accessing {filepath}: {e}")
                     except FileNotFoundError as e:
                         print(f"File not found: {filepath}: {e}")
                     except PermissionError as e:
@@ -81,7 +73,7 @@ class CodeIndexer:
         """Search indexed code using a query."""
         query_embedding = self.embedder.embed_code(query)
         results = []
-        for filepath, indexed_code in self.indexed_code.items():
+        for _, indexed_code in self.indexed_code.items():
             similarity = self._similarity(query_embedding, indexed_code.embedding)
             if similarity > 0.5:  # Arbitrary threshold for now
                 results.append(indexed_code)
@@ -95,21 +87,11 @@ class CodeIndexer:
                 filepath = os.path.join(root, file)
                 if not self._is_ignored(filepath):
                     try:
-                        file_context = FileManager().read_file(filepath)
-                        if (
-                            file_context
-                            and file_context.content
-                            and query in file_context.content
-                        ):
+                        file_context = FileManager(file_operations=DefaultFileOperations()).read_file(filepath)
+                        if file_context and file_context.content and query in file_context.content:
                             embedding = self.embedder.embed_code(file_context.content)
-                            indexed_code = IndexedCode(
-                                filepath, file_context.content, embedding
-                            )
+                            indexed_code = IndexedCode(filepath, file_context.content, embedding)
                             results.append(indexed_code)
-                    except FileNotFoundError as e:
-                        print(f"File not found: {filepath}: {e}")
-                    except PermissionError as e:
-                        print(f"Permission error accessing {filepath}: {e}")
                     except FileNotFoundError as e:
                         print(f"File not found: {filepath}: {e}")
                     except PermissionError as e:
