@@ -13,7 +13,7 @@ from prismix.core.qdrant_manager import QdrantManager
 def colbert_retriever_instance():
     """Fixture to create an instance of ColbertRetriever."""
     qdrant_manager = QdrantManager(collection_name="colbert_embeddings")
-    qdrant_manager.embed_code = lambda x: [0.0] * 128 # Mock embedding
+    qdrant_manager.embed_code = lambda x: [0.0] * 128  # Mock embedding
     return ColbertRetriever(url="http://example.com/colbert", k=3)
 
 
@@ -57,6 +57,6 @@ def test_colbert_retriever(colbert_retriever_instance):
     assert (
         colbert_retriever_instance.qdrant_manager.client.count(
             collection_name="colbert_embeddings"
-        ).count # Access the count attribute
+        ).count  # Access the count attribute
         > 0
     )
