@@ -45,6 +45,7 @@ class IterativeProgrammer(dspy.Module):
 
     def execute_code(self, code: str) -> CodeResult:
         """Execute the generated code in a safe environment and return results."""
+
         def _extract_file_path(code: str) -> str:
             """Extract the file path from the code comment."""
             lines = code.splitlines()
@@ -57,7 +58,9 @@ class IterativeProgrammer(dspy.Module):
             """Apply changes to the original file content."""
             with open(file_path, "r", encoding="utf-8") as f:
                 original_content = f.read()
-            modified_content, _ = self.file_editor.apply_line_edits(original_content, code)
+            modified_content, _ = self.file_editor.apply_line_edits(
+                original_content, code
+            )
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(modified_content)
             return modified_content
@@ -68,7 +71,10 @@ class IterativeProgrammer(dspy.Module):
             sys.stdout, sys.stderr = StringIO(), StringIO()
             try:
                 result = subprocess.run(
-                    [sys.executable, file_path], check=True, text=True, capture_output=True
+                    [sys.executable, file_path],
+                    check=True,
+                    text=True,
+                    capture_output=True,
                 )
                 output, error = result.stdout, result.stderr
             except (CalledProcessError, FileNotFoundError, PermissionError) as e:
