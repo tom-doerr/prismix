@@ -2,8 +2,9 @@
 Module for handling file editing operations.
 """
 
-from typing import List, Tuple, Optional
-from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
+from typing import List, Tuple
+
+from prismix.core.file_operations import DefaultFileOperations, FileContext, FileManager
 
 
 class FileEditorModule:

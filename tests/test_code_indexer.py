@@ -4,12 +4,14 @@ Test module for the CodeIndexer class.
 
 import os
 import tempfile
+
 import pytest
-from prismix.core.code_indexer import CodeIndexer, IndexedCode, CodeEmbedder
+
+from prismix.core.code_indexer import CodeEmbedder, CodeIndexer, IndexedCode
 
 
 @pytest.fixture
-def code_indexer():
+def code_indexer_fixture():
     """Fixture to create an instance of CodeIndexer."""
     code_embedder = CodeEmbedder()
     code_embedder.embed_code = lambda x: [0.0] * 128  # Mock embedding
@@ -30,17 +32,17 @@ def temp_dir():
         yield tmpdir
 
 
-def test_search_code_on_the_fly(code_indexer: CodeIndexer, temp_dir: str):
+def test_search_code_on_the_fly(code_indexer_fixture: CodeIndexer, temp_dir: str):
     """Test the search_code_on_the_fly method."""
     # Test search with a query that exists in some files
-    results = code_indexer.search_code_on_the_fly(
+    results = code_indexer_fixture.search_code_on_the_fly(
         temp_dir,
         "print",
     )
     assert len(results) == 2
     assert any("test1.py" in r.filepath for r in results)
     assert any("test3.py" in r.filepath for r in results)
-    assert all(isinstance(r, IndexedCode) for r in results)
+    assert all(isinstance(r, IndexedCode) for r in results)  # Check if all results are IndexedCode
 
     # Test search with a query that does not exist
     results = code_indexer.search_code_on_the_fly(temp_dir, "nonexistent")

@@ -49,4 +49,7 @@ line_length = 100
 known_first_party = ["prismix"]
 known_third_party = ["isort"]
 virtual_env = ".venv"  # Ensure isort uses the correct virtual environment+
- 
+
+[tool.ruff]
+select = ["E", "W", "F", "I"]
+fix = true

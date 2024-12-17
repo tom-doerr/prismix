@@ -4,13 +4,15 @@ Test module for the ColbertRetriever class.
 
 import os
 import tempfile
+
 import pytest
+
 from prismix.core.colbert_retriever import ColbertRetriever
 from prismix.core.qdrant_manager import QdrantManager
 
 
 @pytest.fixture
-def colbert_retriever():
+def colbert_retriever_fixture():
     """Fixture to create an instance of ColbertRetriever."""
     qdrant_manager = QdrantManager(collection_name="colbert_embeddings")
     qdrant_manager.client.embed_code = lambda x: [0.0] * 128  # Mock embedding
@@ -33,30 +35,30 @@ def temp_dir():
         yield tmpdir
 
 
-def test_add_data_to_db_basic(colbert_retriever, temp_dir):
+def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir):
     """Test adding data to the database."""
-    colbert_retriever.add_data_to_db(temp_dir)
+    colbert_retriever_fixture.add_data_to_db(temp_dir)
 
     # Ensure that the data was added to the Qdrant database
-    count = colbert_retriever.qdrant_manager.client.count(
+    count = colbert_retriever_fixture.qdrant_manager.client.count(
         collection_name="colbert_embeddings"
     ).count
     assert count > 0
 
 
-def test_colbert_retriever(colbert_retriever):
+def test_colbert_retriever(colbert_retriever_fixture, temp_dir):
     """Test the ColbertRetriever class."""
     query = "quantum computing"
-    colbert_retriever.forward = lambda q: [
+    colbert_retriever_fixture.forward = lambda q: [
         {"long_text": f"This is a dummy result for {q}"} for _ in range(3)
     ]
-    colbert_retriever.add_data_to_db(str(temp_dir))
-    results = colbert_retriever.forward(query)
+    colbert_retriever_fixture.add_data_to_db(str(temp_dir))
+    results = colbert_retriever_fixture.forward(query)
     assert len(results) == 3
     for result in results:
         assert "dummy result" in result["long_text"]
     count = (
-        colbert_retriever.qdrant_manager.client.count(
+        colbert_retriever_fixture.qdrant_manager.client.count(
             collection_name="colbert_embeddings"
         ).count  # Access the count attribute
         > 0

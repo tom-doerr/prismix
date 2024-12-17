@@ -3,18 +3,20 @@ Test module for file operations.
 """
 
 import os  # Move this to the top
-import pytest, dspy
-from prismix.core.iterative_programmer import setup_agent
+
+import pytest
+
 from prismix.core.file_operations import (
-    FileContext,
-    FileManager,
-    FileEditor,
     DefaultFileOperations,
+    FileContext,
+    FileEditor,
+    FileManager,
 )
+from prismix.core.iterative_programmer import setup_agent
 
 
 @pytest.fixture
-def test_file(tmp_path):
+def test_file_fixture(tmp_path):
     """Create a temporary test file"""
     file_path = tmp_path / "test.py"
     content = """def main():
@@ -33,14 +35,14 @@ def agent():
     return setup_agent()
 
 
-def test_file_read(test_file):
+def test_file_read(test_file_fixture):
     """Test reading file content"""
     file_manager = FileManager(DefaultFileOperations())  # Create an instance here
-    result = file_manager.read_file(test_file)  # Use the instance here
+    result = file_manager.read_file(test_file_fixture)  # Use the instance here
     assert isinstance(result, FileContext)
     assert result.error is None
     assert "def main():" in result.content
-    assert result.filepath == test_file
+    assert result.filepath == test_file_fixture
 
 
 def test_file_write(tmp_path):
@@ -57,10 +59,10 @@ def test_file_write(tmp_path):
         assert f.read() == content
 
 
-def test_line_numbering(test_file):
+def test_line_numbering(test_file_fixture):
     """Test line numbering functionality"""
     editor = FileEditor()
-    with open(test_file) as f:
+    with open(test_file_fixture) as f:
         content = f.read()
 
     numbered = editor._number_lines(content)
@@ -72,7 +74,7 @@ def test_line_numbering(test_file):
     assert lines[0].startswith("   1 |")  # Check first line number
 
 
-def test_apply_line_edits_list(test_file):
+def test_apply_line_edits_list():
     """Test applying line-specific edits with list format"""
     editor = FileEditor()
     original = "line 1\nline 2\nline 3"
@@ -102,10 +104,10 @@ def test_apply_line_edits_string():
     assert "modified line 2" in changes[0]
 
 
-def test_file_edit(agent, test_file):
+def test_file_edit(agent, test_file_fixture):
     """Test editing file content"""
     instruction = "add a docstring to the main function"
-    result = agent.forward(f"edit {test_file} '{instruction}'")
+    result = agent.forward(f"edit {test_file_fixture} '{instruction}'")
 
     assert isinstance(result, FileContext)
     assert result.error is None
@@ -113,7 +115,7 @@ def test_file_edit(agent, test_file):
     assert len(result.changes) > 0
 
 
-def test_replace_line(test_file):
+def test_replace_line():
     """Test replacing a line"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3"
@@ -126,7 +128,7 @@ def test_replace_line(test_file):
     assert "Replaced line 2" in changes[0]
 
 
-def test_insert_line(test_file):
+def test_insert_line():
     """Test inserting a line"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3"
@@ -140,7 +142,7 @@ def test_insert_line(test_file):
     assert "Inserted at line 2" in changes[0]
 
 
-def test_delete_line(test_file):
+def test_delete_line():
     """Test deleting a line"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3"
@@ -154,7 +156,7 @@ def test_delete_line(test_file):
     assert "Deleted line 2" in changes[0]
 
 
-def test_multiple_edit_modes(test_file):
+def test_multiple_edit_modes():
     """Test multiple edits with different modes"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3\nline 4"
@@ -183,7 +185,7 @@ def test_multiple_edit_modes(test_file):
     assert lines[3] == "line 3"
 
 
-def test_edit_line_numbers(test_file):
+def test_edit_line_numbers():
     """Test line number adjustments after edits"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3\nline 4"
@@ -204,7 +206,7 @@ def test_edit_line_numbers(test_file):
     assert lines[3] == "line 4"
 
 
-def test_edit_boundary_conditions(test_file):
+def test_edit_boundary_conditions():
     """Test edge cases in line editing"""
     editor = FileEditor()
     content = "line 1\nline 2"
@@ -226,7 +228,7 @@ def test_edit_boundary_conditions(test_file):
     assert new_content.endswith("new line")
 
 
-def test_edit_format_handling(test_file):
+def test_edit_format_handling():
     """Test handling of different edit format inputs"""
     editor = FileEditor()
     content = "line 1\nline 2"
