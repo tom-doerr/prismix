@@ -24,8 +24,8 @@ def temp_file():
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
         f.write("def hello():\n    print('hello')\n")
         temp_file_path_empty = f.name
-    yield temp_file_path
-    os.remove(temp_file_path)
+    yield temp_file_path_empty
+    os.remove(temp_file_path_empty)
 
 
 def test_file_edit_module_no_change(file_editor_module, temp_file):
@@ -113,7 +113,7 @@ def test_file_edit_module_file_not_found(file_editor_module):
         context="non_existent_file.py Content: def hello():\n    print('hello')\n",
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')'.",
     )
-    assert "File does not exist" in str(result.error)  # Check the error message
+    assert result.error == "File does not exist"  # Check the error message
 
 
 def test_apply_single_replacement_function_def(file_editor_module):
@@ -317,4 +317,4 @@ def test_forward_with_file_not_found(file_editor_module):
         context="non_existent_file.py Content: def hello():\n    print('hello')\n",
         instruction=instruction,
     )
-    assert file_context.error and "File does not exist" in file_context.error
+    assert file_context.error == "File does not exist"
