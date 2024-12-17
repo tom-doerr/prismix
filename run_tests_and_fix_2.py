@@ -147,7 +147,9 @@ DEBUGGING_AND_TESTING_FILE_URL = (
     "https://gist.githubusercontent.com/mwanginjuguna/545f983b12c76af238861d9af2e551a5/"
     "raw/9d8a8d47ca64cc340db69960011b368ab00179a9/introduction-to-debugging-and-testing-software.md"
 )
-DEBUGGING_AND_TESTING_FILE = "prompt_text/introduction-to-debugging-and-testing-software.md"
+DEBUGGING_AND_TESTING_FILE = (
+    "prompt_text/introduction-to-debugging-and-testing-software.md"
+)
 
 if not os.path.exists(DEBUGGING_AND_TESTING_FILE):
     os.makedirs(os.path.dirname(DEBUGGING_AND_TESTING_FILE), exist_ok=True)
