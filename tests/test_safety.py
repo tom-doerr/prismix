@@ -3,8 +3,10 @@ Test suite for the safety checks in the IterativeProgrammer module.
 """
 
 import unittest
-import pytest
+
 import dspy
+import pytest
+
 from prismix.core.iterative_programmer import IterativeProgrammer
 
 
