@@ -29,10 +29,10 @@ class FileEditorModule:
             changes.append(f"{search_pattern} -> {replacement_code}")
             content = content.replace(search_pattern, replacement_code)
         return FileContext(
-+            filepath="",
-+            content=content,
-+            changes=changes,
-+        )
+            filepath="",
+            content=content,
+            changes=changes,
+        )
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the content of the file."""
