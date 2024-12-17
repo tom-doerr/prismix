@@ -51,5 +51,6 @@ known_third_party = ["isort"]
 virtual_env = ".venv"  # Ensure isort uses the correct virtual environment+
 
 [tool.ruff]
+[tool.ruff.lint]
 select = ["E", "W", "F", "I"]
 fix = true

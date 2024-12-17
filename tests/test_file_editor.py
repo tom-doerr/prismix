@@ -16,10 +16,10 @@ def test_apply_replacements():
         context=f"test_file.py Content: {content}",
         instruction=instruction,
     )
-    assert updated_content.content == 'def foo():\n    print("hello")'
+    assert updated_content.content == 'def foo():\n    print("hello")' # Check the content
     assert (
         editor.file_manager.read_file("test_file.py").content
-        == 'def foo():\n    print("hello")'
+        == 'def foo():\n    print("hello")' # Check the file content
     )
 
 
