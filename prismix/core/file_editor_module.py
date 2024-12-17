@@ -1,10 +1,13 @@
+"""
+Module for handling file editing operations.
+"""
+
 import dspy
 import re
+import logging
 from typing import List, Tuple
 from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
 from prismix.core.signatures import FileEdit
-
-import logging
 
 
 class FileEditorModule(dspy.Module):
@@ -27,7 +30,7 @@ class FileEditorModule(dspy.Module):
         """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
-            content = re.sub(re.escape(search_pattern), replacement_code, content)
+            content = content.replace(search_pattern, replacement_code)
         return content
 
     def apply_single_replacement(
