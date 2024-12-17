@@ -35,7 +35,7 @@ def temp_dir():
         yield tmpdir
 
 
-def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir_fixture):
+def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir):
     """Test adding data to the database."""
     colbert_retriever_fixture.add_data_to_db(temp_dir_fixture)
 
@@ -48,7 +48,7 @@ def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir_fixture):
     )
 
 
-def test_colbert_retriever(colbert_retriever_fixture, temp_dir):
+def test_colbert_retriever(colbert_retriever_fixture_test, temp_dir_test):
     """Test the ColbertRetriever class."""
     query = "quantum computing"
     colbert_retriever_fixture.forward = lambda q: [
