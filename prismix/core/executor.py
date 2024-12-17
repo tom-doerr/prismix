@@ -16,7 +16,11 @@ class CodeResult:
 
 
 class CodeExecutor:
-    """Handles safe code execution in isolated environment"""
+    """Handles safe code execution in isolated environment.
+
+    This class provides methods to execute code in a controlled and safe environment,
+    ensuring that only a limited set of built-in functions are available to the executed code.
+    """
 
     @staticmethod
     def get_safe_builtins() -> Dict[str, Any]:
@@ -48,12 +52,11 @@ class CodeExecutor:
                     success=True,
                     output=f"Code executed successfully. Test main(5) = {result}",
                 )
-            else:
                 return CodeResult(
                     code=code,
                     success=False,
                     output="",
                     error="No callable 'main' function found in generated code",
                 )
-        except Exception as e:
+        except (SyntaxError, ValueError) as e:
             return CodeResult(code=code, success=False, output="", error=str(e))
