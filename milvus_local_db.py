@@ -74,10 +74,6 @@ def search_milvus_collection():
             logging.info("No results found.")
         for res in result:
             logging.info("Document: %s, Distance: %s", res["text"], res["distance"])
-    except FileNotFoundError as e:
-        logging.error("File not found: %s", e)
-    except PermissionError as e:
-        logging.error("Permission denied: %s", e)
     except (FileNotFoundError, PermissionError) as e:
         logging.error("Error searching Milvus collection: %s", e)
 
