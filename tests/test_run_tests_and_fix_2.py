@@ -46,7 +46,7 @@ class TestRunTestsAndFix(unittest.TestCase):
             text=True,
         )
         mock_run.return_value.returncode = 1
-        mock_run.side_effect = subprocess.CalledProcessError(
+        mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["pytest", "test1.py"], stderr="Error output", stdout="Error output"
         )
         output = run_tests_and_fix.run_random_pytest(files)
@@ -232,11 +232,11 @@ class TestRunTestsAndFix(unittest.TestCase):
         files = ["file1.py", "file2.py"]
         run_tests_and_fix.run_black(files)
         mock_run.assert_called()
-        mock_run.assert_called_with(["black", "file2.py"], check=True)
-
-        mock_run.side_effect = subprocess.CalledProcessError(
-            1, ["black", "file1.py"], stderr="Error output", stdout="Error output"
-        )
+       mock_run.assert_called_with(["black", "file2.py"], check=True)
+ 
+       mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
+           1, ["black", "file1.py"], stderr="Error output", stdout="Error output"
+       )
         run_tests_and_fix.run_black(files)
 
     @patch("run_tests_and_fix_2.run_pylint")
