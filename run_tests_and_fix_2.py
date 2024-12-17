@@ -15,6 +15,7 @@ from tqdm import tqdm
 
 def run_pylint():
     """Runs pylint on the entire project and captures the output."""
+    pylint_output_local = ""
     try:
         result = subprocess.run(
             ["pylint", "."],
@@ -25,7 +26,7 @@ def run_pylint():
         )
     except subprocess.CalledProcessError as e:
         pylint_output_local = f"Error running pylint: {e}\n{e.stdout}"
-        return False, pylint_output
+        return False, pylint_output_local
     return True, result.stdout
 
 
