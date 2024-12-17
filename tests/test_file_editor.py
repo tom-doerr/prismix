@@ -60,5 +60,3 @@ def test_write_file():
 """
 Test module for the FileEditorModule class.
 """
-
-import os
