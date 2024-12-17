@@ -8,7 +8,7 @@ from prismix.core.iterative_programmer import IterativeProgrammer
 
 
 """Mock implementation of the __call__ method."""
-        if "unsafe" in prompt.lower():
+    if "unsafe" in prompt.lower():
             return dspy.Prediction(
                 is_safe=False,
                 safety_message="The code contains potentially unsafe operations.",
