@@ -35,7 +35,7 @@ class CodeSafetyCheck(dspy.Signature):
     """Analyze code for potential security risks, printing variables should be considered safe unless there are indications it is not"""
 
     code: str = dspy.InputField(desc="Code to analyze")
-    is_safe: bool = dspy.OutputField(
+    is_safe: bool = dspy.OutputField(  
         desc="Boolean indicating if code is safe, allowing print statements"
     )
     safety_message: str = dspy.OutputField(desc="Explanation of safety concerns if any")
