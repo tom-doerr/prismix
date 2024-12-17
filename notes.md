@@ -69,6 +69,12 @@
   1. **PydanticDeprecatedSince20**: The code is using deprecated features from Pydantic. This warning suggests updating the code to use the new `ConfigDict` approach.
   2. **DeprecationWarning from litellm**: The `open_text` API is deprecated. The warning recommends migrating to the new `files()` API.
 
+### Pytest Compatibility Issue
+- There was an issue with the `pytest-asyncio` plugin, specifically related to the import of `FixtureDef` from `pytest`.
+- Steps taken to resolve:
+  - Checked and updated versions of `pytest` and `pytest-asyncio`.
+  - Re-ran tests to verify the fix.
+
 ### Resolved Issues
 - **Fixed Pylint Warning in `output/generated_code.py`**:
   - Renamed `dummy_code` to `DUMMY_CODE` to conform to the `UPPER_CASE` naming style.
