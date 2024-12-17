@@ -15,6 +15,7 @@ file_manager = FileManager(file_operations=DefaultFileOperations())
 
 @dataclass
 class IndexedCode:
+    """Class to represent indexed code with filepath, content, and embedding."""
     filepath: str
     content: str
     embedding: List[float]  # Placeholder for embedding
@@ -23,7 +24,7 @@ class IndexedCode:
 class CodeEmbedder:
     """Class responsible for embedding code content into vectors."""
 
-    def embed_code(self, content: str) -> List[float]:  # Add content parameter
+    def embed_code(self) -> List[float]:
         """Embed the given code content into a vector."""
         # Placeholder for embedding logic
         return [0.0] * 128  # Dummy embedding
@@ -73,12 +74,7 @@ class CodeIndexer:
                             self.indexed_code[filepath] = indexed_code
                             logging.info(f"Indexed: {filepath}")
                     except (FileNotFoundError, PermissionError) as e:
-                        logging.error(f"Error accessing {filepath}: {e}")
-                    except (
-                        FileNotFoundError,
-                        PermissionError,
-                    ) as e:  # Combine exceptions
-                        logging.error(f"Error accessing {filepath}: {e}")
+                        logging.error("Error accessing %s: %s", filepath, e)
 
     def embed_code(self, content: str) -> List[float]:
         """Embed the given code content into a vector."""
@@ -124,15 +120,6 @@ class CodeIndexer:
         return results
 
     def _is_ignored(self, filepath: str) -> bool:
-        """Check if the file should be ignored based on the ignore patterns."""
-        for pattern in self.ignore_patterns:
-            if fnmatch.fnmatch(filepath, pattern):
-                return True
-        return False
-
-    def is_ignored(self, filepath: str) -> bool:
-        """Check if the file should be ignored based on the ignore patterns."""
-        return self._is_ignored(filepath)
         """Check if the file should be ignored based on the ignore patterns."""
         for pattern in self.ignore_patterns:
             if fnmatch.fnmatch(filepath, pattern):

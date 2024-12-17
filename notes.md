@@ -39,6 +39,7 @@
 ### Additional Notes
 - The `PydanticDeprecatedSince20` warning indicates that the code is using deprecated features from Pydantic. Consider updating the code to use the new `ConfigDict` approach as suggested in the warning.
 - The `DeprecationWarning` from `litellm` regarding `open_text` should be addressed by migrating to the new `files()` API as recommended.
+- Ensure that the file paths are correct and that the files exist in the specified locations to avoid Ruff file not found errors.
 ### Pylint Warning
 - The `tests/test_iterative_programmer.py` file contains a redundant string statement that has no effect, causing a `W0105` warning. This has been resolved by removing the unnecessary string statement.
 - Imports in `tests/test_iterative_programmer.py` were not at the top of the module, causing `C0413` warnings. These have been moved to the top.
