@@ -6,8 +6,16 @@ import ast
 from dataclasses import dataclass
 from typing import Dict, Any
 import tempfile
+from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
 
+
+@dataclass
+class CodeResult:
+    code: str
+    success: bool
+    output: str
+    error: str = ""
 
 class FileContext(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
