@@ -6,6 +6,7 @@ import logging
 from qdrant_client import QdrantClient, models
 from typing import List, Dict
 
+
 class QdrantManager:
     """Manages Qdrant operations for storing and querying ColBERT embeddings."""
 
