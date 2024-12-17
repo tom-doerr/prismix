@@ -16,5 +16,5 @@ class SomeModel(BaseModel):
 
 import importlib.resources as resources
 
-with resources.open_text("some_module", "some_file.txt") as f:
+with resources.files("some_module").joinpath("some_file.txt").open() as f:
     content = f.read()
