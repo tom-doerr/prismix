@@ -7,6 +7,7 @@ import random
 import tempfile
 from pathlib import Path
 from dataclasses import dataclass
+import re
 
 import dspy
 from prismix.core.file_operations import FileEditor
@@ -14,8 +15,6 @@ from prismix.core.metrics import calculate_levenshtein_similarity
 
 
 class GenerateScript(dspy.Signature):
-    """Generate a Python script based on a theme"""
-
     """Generate a Python script based on a theme"""
 
     theme = dspy.InputField(
@@ -27,8 +26,6 @@ class GenerateScript(dspy.Signature):
 class GenerateEditInstruction(dspy.Signature):
     """Generate an edit instruction for a script"""
 
-    """Generate an edit instruction for a script"""
-
     script = dspy.InputField(desc="Original Python script")
     instruction = dspy.OutputField(
         desc="Natural language instruction for editing the script (e.g., 'add error handling', 'improve documentation')"
@@ -36,8 +33,6 @@ class GenerateEditInstruction(dspy.Signature):
 
 
 class GenerateHindsightEdit(dspy.Signature):
-    """Generate precise edit command that describes transformation between two scripts"""
-
     """Generate precise edit command that describes transformation between two scripts"""
 
     original = dspy.InputField(desc="Original script content")
@@ -49,8 +44,6 @@ class GenerateHindsightEdit(dspy.Signature):
 
 @dataclass
 class EditDataPoint:
-    """Represents a single edit transformation example"""
-
     """Represents a single edit transformation example"""
 
     original_script: str
@@ -104,8 +97,6 @@ class EditDatasetGenerator(dspy.Module):
         original_script = result.script.strip()
         if "```" in original_script:
             # Extract code from markdown block
-            import re
-
             code_match = re.search(r"```python\n(.*?)\n```", original_script, re.DOTALL)
             if code_match:
                 original_script = code_match.group(1).strip()
@@ -116,14 +107,7 @@ class EditDatasetGenerator(dspy.Module):
                     original_script = code_match.group(1).strip()
 
         print("Cleaned script length:", len(original_script))
-        print(
-            "Script preview:",
-            (
-                original_script[:100] + "..."
-                if len(original_script) > 100
-                else original_script
-            ),
-        )
+        print("Script preview:", original_script[:100] + "..." if len(original_script) > 100 else original_script)
 
         # 2. Generate edit instruction
         print("\nGenerating edit instruction...")
@@ -149,9 +133,7 @@ class EditDatasetGenerator(dspy.Module):
 
         # Generate modified version with both approaches
         print("\nGenerating alternative version...")
-        modified_result = self.script_generator(
-            theme=theme, instruction=edit_instruction
-        )
+        modified_result = self.script_generator(theme=theme, instruction=edit_instruction)
         generated_script = modified_result.script.strip()
         if generated_script.startswith("```python"):
             generated_script = generated_script[8:].strip()
@@ -165,44 +147,20 @@ class EditDatasetGenerator(dspy.Module):
 
         # Log similarity scores
         if editor_script:
-            editor_similarity = calculate_levenshtein_similarity(
-                original_script, editor_script
-            )
+            editor_similarity = calculate_levenshtein_similarity(original_script, editor_script)
             print(f"\nEditor version similarity: {editor_similarity:.3f}")
-            print(
-                "Editor changes preview:",
-                (
-                    editor_script[:100] + "..."
-                    if len(editor_script) > 100
-                    else editor_script
-                ),
-            )
+            print("Editor changes preview:", editor_script[:100] + "..." if len(editor_script) > 100 else editor_script)
         else:
             editor_similarity = 1.0
             print("\nNo valid editor version")
 
-        generated_similarity = calculate_levenshtein_similarity(
-            original_script, generated_script
-        )
+        generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
         print(f"Generated version similarity: {generated_similarity:.3f}")
-        print(
-            "Generated changes preview:",
-            (
-                generated_script[:100] + "..."
-                if len(generated_script) > 100
-                else generated_script
-            ),
-        )
+        print("Generated changes preview:", generated_script[:100] + "..." if len(generated_script) > 100 else generated_script)
 
         # Calculate similarity scores
-        editor_similarity = (
-            calculate_levenshtein_similarity(original_script, editor_script)
-            if editor_script
-            else 1.0
-        )
-        generated_similarity = calculate_levenshtein_similarity(
-            original_script, generated_script
-        )
+        editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
+        generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
 
         print("\nSimilarity scores:")
         print(f"Editor version: {editor_similarity:.3f}")
@@ -216,11 +174,7 @@ class EditDatasetGenerator(dspy.Module):
             not (too_similar or too_different),
             f"Similarity scores (editor: {editor_similarity:.2f}, generated: {generated_similarity:.2f}) "
             "indicate changes are not optimal. "
-            + (
-                "Changes are too minor. "
-                if too_similar
-                else "Changes are too drastic. "
-            )
+            + ("Changes are too minor. " if too_similar else "Changes are too drastic. ")
             + "Try adjusting the modifications to maintain code structure while adding meaningful changes.",
         )
 
@@ -250,9 +204,7 @@ class EditDatasetGenerator(dspy.Module):
             edited_script = generated_script
 
         # 4. Generate hindsight edit command
-        hindsight = self.hindsight_generator(
-            original=original_script, edited=edited_script
-        )
+        hindsight = self.hindsight_generator(original=original_script, edited=edited_script)
 
         return EditDataPoint(
             original_script=original_script,
