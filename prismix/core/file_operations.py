@@ -137,7 +137,9 @@ class FileEditor:
             if mode == "REPLACE" and 1 <= line_num <= len(lines):
                 old_text = lines[line_num - 1]
                 lines[line_num - 1] = new_text
-                changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
+                changes.append(
+                    f"Replaced line {line_num}: '{old_text}' -> '{new_text}'"
+                )
             elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
                 lines.insert(line_num - 1, new_text)
                 changes.append(f"Inserted at line {line_num}: '{new_text}'")
