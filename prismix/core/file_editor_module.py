@@ -38,6 +38,18 @@ class FileEditorModule:
             content = content.replace(search_pattern, replacement_code)
         return content
 
+    def parse_instructions(self, instruction: str) -> List[Tuple[str, str]]:
+        """Parses the instruction string and returns a list of replacement pairs."""
+        replacements = instruction.split(" and ")
+        return [
+            (
+                part.split(" with ")[0].strip("'"),
+                part.split(" with ")[1].strip("'"),
+            )
+            for part in replacements
+            if "Replace" in part and len(part.split(" with ")) == 2
+        ]
+
     def apply_single_replacement(
         self, content: str, search_pattern: str, replacement_code: str
     ) -> str:
