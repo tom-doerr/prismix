@@ -44,7 +44,9 @@ class CodeExecutor:
             # Safer alternative to `exec`: use `ast.literal_eval` for simple evaluations
             loc = {}
             output_buffer = []
-            loc["print"] = lambda *args, **kwargs: output_buffer.append(" ".join(map(str, args)))
+            loc["print"] = lambda *args, **kwargs: output_buffer.append(
+                " ".join(map(str, args))
+            )
             exec(code, CodeExecutor.get_safe_builtins(), loc)
             return CodeResult(
                 code=code,
