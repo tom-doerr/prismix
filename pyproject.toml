@@ -20,15 +20,6 @@ isort = "^5.10.1"  # Known compatible version with Pylint
 pytest-xdist = "^1.35.0"
 
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.3"
-pytest-cov = "^6.0.0"
-mypy = "^1.13.0"
-# Explicitly remove pytest-parallel to avoid conflicts
-# pytest-parallel = "*"
-
-[tool.poetry.group.dev.dependencies]
-pydantic = "^2.0.0"
-litellm = "^0.1.0"
 
 [build-system]
 requires = ["poetry-core"]
