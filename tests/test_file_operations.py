@@ -37,6 +37,7 @@ def agent():
 
 def test_file_read(test_file_fixture_read):
     """Test reading file content."""
+    """Test reading file content."""
     file_manager = FileManager(DefaultFileOperations())
     read_result = file_manager.read_file(test_file_fixture_read)
     assert isinstance(read_result, FileContext)
@@ -45,6 +46,7 @@ def test_file_read(test_file_fixture_read):
 
 
 def test_file_write(tmp_path_write):
+    """Test writing file content."""
     """Test writing file content"""
     file_path = str(tmp_path_write / "output.py")
     content = "print('test')"
@@ -59,6 +61,7 @@ def test_file_write(tmp_path_write):
 
 
 def test_line_numbering(test_file_fixture):
+    """Test line numbering functionality."""
     """Test line numbering functionality"""
     editor = FileEditor()
     with open(test_file_fixture, encoding="utf-8") as f:
@@ -67,6 +70,7 @@ def test_line_numbering(test_file_fixture):
 
 
 def test_apply_line_edits_list():
+    """Test applying line-specific edits with list format."""
     """Test applying line-specific edits with list format"""
     editor = FileEditor()
     original = "line 1\nline 2\nline 3"
@@ -82,6 +86,7 @@ def test_apply_line_edits_list():
 
 
 def test_apply_line_edits_string():
+    """Test applying line-specific edits with string format."""
     """Test applying line-specific edits with string format"""
     editor = FileEditor()
     original = "line 1\nline 2\nline 3"
@@ -98,6 +103,7 @@ def test_apply_line_edits_string():
 
 def test_file_edit(agent, test_file_fixture):
     """Test editing file content."""
+    """Test editing file content."""
     instruction = "add a docstring to the main function"
     result = agent.forward(f"edit {test_file_fixture} '{instruction}'")
 
@@ -108,6 +114,7 @@ def test_file_edit(agent, test_file_fixture):
 
 
 def test_replace_line():
+    """Test replacing a line."""
     """Test replacing a line"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3"
@@ -119,6 +126,7 @@ def test_replace_line():
 
 
 def test_insert_line():
+    """Test inserting a line."""
     """Test inserting a line"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3"
@@ -133,6 +141,7 @@ def test_insert_line():
 
 
 def test_delete_line():
+    """Test deleting a line."""
     """Test deleting a line"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3"
@@ -147,6 +156,7 @@ def test_delete_line():
 
 
 def test_multiple_edit_modes():
+    """Test multiple edits with different modes."""
     """Test multiple edits with different modes"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3\nline 4"
@@ -176,6 +186,7 @@ def test_multiple_edit_modes():
 
 
 def test_edit_line_numbers():
+    """Test line number adjustments after edits."""
     """Test line number adjustments after edits"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3\nline 4"
@@ -197,6 +208,7 @@ def test_edit_line_numbers():
 
 
 def test_edit_boundary_conditions():
+    """Test edge cases in line editing."""
     """Test edge cases in line editing"""
     editor = FileEditor()
     content = "line 1\nline 2"
@@ -219,6 +231,7 @@ def test_edit_boundary_conditions():
 
 
 def test_edit_format_handling():
+    """Test handling of different edit format inputs."""
     """Test handling of different edit format inputs"""
     editor = FileEditor()
     content = "line 1\nline 2"
@@ -246,6 +259,7 @@ def test_edit_format_handling():
 
 
 def test_concurrent_edits():
+    """Test multiple edits happening at the same line."""
     """Test multiple edits happening at the same line"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3"
@@ -260,6 +274,7 @@ def test_concurrent_edits():
 
 
 def test_edit_chain_effects():
+    """Test how edits affect subsequent operations."""
     """Test how edits affect subsequent operations"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3\nline 4"
@@ -281,6 +296,7 @@ def test_edit_chain_effects():
 
 
 def test_whitespace_handling():
+    """Test handling of whitespace in edits."""
     """Test handling of whitespace in edits"""
     editor = FileEditor()
     content = "    indented line\n\tline with tab\nno indent"
@@ -298,6 +314,7 @@ def test_whitespace_handling():
 
 
 def test_empty_and_whitespace_lines():
+    """Test handling of empty and whitespace-only lines."""
     """Test handling of empty and whitespace-only lines"""
     editor = FileEditor()
     content = "line 1\n\n    \nline 4"
@@ -312,6 +329,7 @@ def test_empty_and_whitespace_lines():
 
 
 def test_apply_line_edits_debug():
+    """Debug test for line edits."""
     """Debug test for line edits"""
     editor = FileEditor()
     content = "line 1\nline 2\nline 3\nline 4"
@@ -359,6 +377,7 @@ def test_apply_line_edits_debug():
 
 
 def test_invalid_file():
+    """Test handling non-existent file."""
     """Test handling non-existent file"""
     file_manager = FileManager(DefaultFileOperations())
     result = file_manager.read_file("nonexistent.py")
@@ -368,6 +387,7 @@ def test_invalid_file():
 
 
 def test_invalid_edit_command(agent):
+    """Test handling invalid edit command."""
     """Test handling invalid edit command"""
     result = agent.forward("edit")
     assert isinstance(result, FileContext)
@@ -376,6 +396,7 @@ def test_invalid_edit_command(agent):
 
 
 def test_write_to_new_directory(tmp_path):
+    """Test writing file to new directory."""
     """Test writing file to new directory"""
     file_path = str(tmp_path / "new_dir" / "test.py")
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
