@@ -180,4 +180,4 @@ def main() -> NoReturn:
 
 if __name__ == "__main__":
     main()
-# This file is intentionally left empty.
+# Ensure any references to 'Changes in prismix/main.py' are removed or corrected.

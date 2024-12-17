@@ -113,11 +113,9 @@ class CodeIndexer:
                             )
                             results.append(indexed_code)
                     except (FileNotFoundError, PermissionError) as e:
-                        logging.error(f"Error accessing {filepath}: {e}")
-                    except FileNotFoundError as e:
-                        logging.error(f"Error accessing {filepath}: {e}")
-                    except PermissionError as e:
-                        logging.error(f"Error accessing {filepath}: {e}")
+                        logging.error("Error accessing %s: %s", filepath, e)
+                    except (FileNotFoundError, PermissionError) as e:
+                        logging.error("Error accessing %s: %s", filepath, e)
         return results
 
     def _is_ignored(self, filepath: str) -> bool:
