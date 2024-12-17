@@ -1,4 +1,9 @@
 from pymilvus import MilvusClient
+"""
+Module for setting up and interacting with a local Milvus database.
+"""
+
+from pymilvus import MilvusClient
 import numpy as np
 import logging
 
@@ -23,7 +28,7 @@ def setup_milvus_local_db():
         )
         logging.info("Milvus local database setup complete.")
     except Exception as e:
-        logging.error(f"Error setting up Milvus local database: {e}")
+        logging.error("Error setting up Milvus local database: %s", e)
 
 
 def insert_data_into_milvus():
@@ -41,9 +46,9 @@ def insert_data_into_milvus():
         data = [{"text": doc, "vector": vector} for doc, vector in zip(docs, vectors)]
         client.insert(collection_name="demo_collection", data=data)
         logging.info("Data successfully inserted into the collection.")
-        logging.info(f"Inserted {len(data)} documents.")
+        logging.info("Inserted %d documents.", len(data))
     except Exception as e:
-        logging.error(f"Error inserting data into Milvus: {e}")
+        logging.error("Error inserting data into Milvus: %s", e)
 
 
 def search_milvus_collection():
@@ -63,9 +68,9 @@ def search_milvus_collection():
         if len(result) == 0:
             logging.info("No results found.")
         for res in result:
-            logging.info(f"Document: {res['text']}, Distance: {res['distance']}")
+            logging.info("Document: %s, Distance: %s", res['text'], res['distance'])
     except Exception as e:
-        logging.error(f"Error searching Milvus collection: {e}")
+        logging.error("Error searching Milvus collection: %s", e)
 
 
 def main():
