@@ -2,6 +2,7 @@
 This module provides functions to count words in a file and write the word count to another file.
 """
 
+
 def count_words_in_file(input_file):
     """Counts the number of words in a given text file."""
     try:
