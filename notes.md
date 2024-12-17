@@ -28,3 +28,11 @@
 ### Action Items
 1. **Fix Syntax Error**: Updated the f-string in `tests/test_factorial.py` to remove the invalid backslash.
 2. **Ensure Proper Import**: Verified the import statement in `tests/test_file_editor_module.py` and ensured there are no circular dependencies.
+### Pylint Error
+- The `samples/basic_function.py` file is missing a final newline, causing a `C0304` (missing-final-newline) error. Add a newline at the end of the file to resolve this issue.
+
+### Pydantic Deprecation
+- The code is using deprecated features from Pydantic. Update the code to use the new `ConfigDict` approach to avoid future issues.
+
+### litellm Deprecation
+- The `litellm` library is using deprecated `open_text` API. Migrate to the new `files()` API to avoid future deprecation warnings.
