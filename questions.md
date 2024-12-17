@@ -1,5 +1,8 @@
 ## Questions
 
+1. **Exec Statement in `examples/example.py`**:
+   - Should we replace the `exec` statement in `examples/example.py` with a safer alternative, such as using `eval` or directly invoking the function?
+
 1. **Pydantic Deprecation**:
    - Should we update the code to use the new `ConfigDict` approach in Pydantic to avoid future issues?
 
