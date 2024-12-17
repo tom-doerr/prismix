@@ -254,7 +254,14 @@ if __name__ == "__main__":
         "--pytest-files",
         type=int,
         default=1,
-        help="Number of random pytest files to run.",
+        help="Number of random pytest files to run when --pytest-mode is 'selected'.",
+    )
+    parser.add_argument(
+        "--pytest-mode",
+        type=str,
+        choices=["all", "selected"],
+        default="all",
+        help="Mode for running pytest tests. 'all' runs all tests, 'selected' runs a random selection.",
     )
     parser.add_argument(
         "--lint-files",
@@ -331,7 +338,7 @@ if __name__ == "__main__":
         files_to_fix = []
         if COMBINED_OUTPUT:
             call_aider(files_to_fix, args.model)
-        if pylint_success and ruff_success and not files_to_fix and "All tests passed" in pytest_output:
+        if args.pytest_mode == "all" and pylint_success and ruff_success and not files_to_fix and "All tests passed" in pytest_output:
             print("No more issues found. Stopping early.")
             break
 
