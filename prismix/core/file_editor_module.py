@@ -57,7 +57,7 @@ class FileEditorModule:
                 changes=[],
                 error=f"Permission error: {e}",
             )
-        except (PermissionError, IOError) as e:
+        except IOError as e:
             return FileContext(
                 filepath=filename, content="", changes=[], error=f"Error: {e}"
             )
