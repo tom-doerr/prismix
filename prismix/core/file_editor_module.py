@@ -93,7 +93,7 @@ class FileEditorModule:
 
         if not os.path.exists(filepath):
             return FileContext(
-                filepath=filepath, content="", error="File does not exist"
+                filepath=filepath, content="", error="File does not exist", changes=[]
             )  # Return FileContext with error
         file_context = self.read_file(filepath)
         updated_file_context = self.apply_replacements(
