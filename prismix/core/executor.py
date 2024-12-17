@@ -59,9 +59,8 @@ class CodeExecutor:
             ) as tmp_file:
                 tmp_file.write(code)
                 tmp_file_path = tmp_file.name
-
+ 
                 # Execute the code in a controlled environment
-                # Refactor to avoid using exec
                 process = subprocess.run(
                     ["python", tmp_file_path],
                     capture_output=True,

@@ -3,7 +3,7 @@ Test module for file operations.
 """
 
 import os  # Move this to the top
-import pytest
+import pytest, dspy
 from prismix.core.iterative_programmer import setup_agent
 from prismix.core.file_operations import (
     FileContext,
