@@ -7,12 +7,6 @@ from typing import List, Tuple, Optional
 from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
 
 
-class FileContext(BaseModel):
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-    filepath: str
-    content: str
-    changes: List[str]
-    error: Optional[str] = None
 
 
 class FileEditorModule:
@@ -21,18 +15,6 @@ class FileEditorModule:
     def __init__(self):
         self.file_manager = FileManager(file_operations=DefaultFileOperations())
 
-    def apply_replacements(self, content: str, instruction: str) -> FileContext:
-        """Applies multiple replacements based on the instruction."""
-        replacements = self.parse_instructions(instruction)
-        changes = []
-        for search_pattern, replacement_code in replacements:
-            changes.append(f"{search_pattern} -> {replacement_code}")
-            content = content.replace(search_pattern, replacement_code)
-        return FileContext(
-            filepath="",
-            content=content,
-            changes=changes,
-        )
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the content of the file."""

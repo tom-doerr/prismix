@@ -1,4 +1,5 @@
 from importlib import resources
 
 # Use the file
-pass
+with resources.files("litellm.llms.tokenizers").joinpath("anthropic_tokenizer.json").open() as f:
+    pass
