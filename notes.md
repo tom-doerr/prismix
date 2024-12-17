@@ -78,6 +78,7 @@
 
 2. **Fixed Pylint Warnings in `generate_edit_dataset.py`**:
    - Broke long lines into multiple shorter lines.
+   - Removed pointless string statement.
    - Added class docstring to `GenerateDatasetSignature`.
 
 ### Action Items
