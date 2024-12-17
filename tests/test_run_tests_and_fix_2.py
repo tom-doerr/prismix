@@ -221,8 +221,8 @@ class TestRunTestsAndFix(unittest.TestCase):
         self.assertIn("notes.md", command)
         self.assertIn("questions.md", command)
         self.assertIn("test content", command[-1])
-
-        mock_run.side_effect = subprocess.CalledProcessError(
+ 
+        mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["aider"], stderr="Error output", stdout="Error output"
         )
         run_tests_and_fix.call_aider(files, "deepseek")
