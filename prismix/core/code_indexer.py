@@ -8,6 +8,8 @@ from typing import List, Dict
 from dataclasses import dataclass
 from prismix.core.file_operations import FileManager
 
+file_manager = FileManager()
+
 
 @dataclass
 class IndexedCode:
@@ -17,6 +19,7 @@ class IndexedCode:
 
 
 class CodeEmbedder:
+    """Handles the embedding of code content."""
     """Handles the embedding of code content."""
 
     def embed_code(self, content: str) -> List[float]:
@@ -59,6 +62,10 @@ class CodeIndexer:
                         print(f"File not found: {filepath}: {e}")
                     except PermissionError as e:
                         print(f"Permission error accessing {filepath}: {e}")
+                    except FileNotFoundError as e:
+                        print(f"File not found: {filepath}: {e}")
+                    except PermissionError as e:
+                        print(f"Permission error accessing {filepath}: {e}")
                     except Exception as e:
                         print(f"Error indexing {filepath}: {e}")
 
@@ -91,6 +98,10 @@ class CodeIndexer:
                                 filepath, file_context.content, embedding
                             )
                             results.append(indexed_code)
+                    except FileNotFoundError as e:
+                        print(f"File not found: {filepath}: {e}")
+                    except PermissionError as e:
+                        print(f"Permission error accessing {filepath}: {e}")
                     except FileNotFoundError as e:
                         print(f"File not found: {filepath}: {e}")
                     except PermissionError as e:
