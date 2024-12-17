@@ -1,3 +1,6 @@
+"""
+CodeIndexer module: Indexes and searches code files using embeddings.
+"""
 import os
 import fnmatch
 from typing import List, Dict
