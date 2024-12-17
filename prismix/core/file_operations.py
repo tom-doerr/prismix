@@ -134,6 +134,7 @@ class FileEditor:
         changes = []
 
         def apply_edit(mode, line_num, new_text):
+            """Helper function to apply a single edit."""
             if mode == "REPLACE" and 1 <= line_num <= len(lines):
                 old_text = lines[line_num - 1]
                 lines[line_num - 1] = new_text
@@ -148,8 +149,7 @@ class FileEditor:
                 changes.append(f"Deleted line {line_num}: '{old_text}'")
 
         if isinstance(line_edits, str):
-            edit_lines = line_edits.splitlines()
-            for edit in edit_lines:
+            for edit in line_edits.splitlines():
                 try:
                     parts = edit.split("|", 1)
                     if not parts:
@@ -181,7 +181,7 @@ class FileEditor:
                     )
                     continue
         else:
-            for i, edit in enumerate(line_edits):
+            for edit in line_edits:
                 if len(edit) == 2:
                     line_num, new_text = edit
                     mode = "REPLACE"
