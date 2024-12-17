@@ -21,7 +21,7 @@ def get_all_files_to_index(directory: str) -> List[str]:
     for root, _, files in os.walk(directory):
         for file in files:
             filepath = os.path.join(root, file)
-            if not indexer._is_ignored(filepath):  # Use a public method instead
+            if not indexer._is_ignored(filepath):
                 files_to_index.append(filepath)
     return files_to_index
 
@@ -80,8 +80,6 @@ class DataInserter:
             except (FileNotFoundError, PermissionError) as e:  # Specific exceptions
                 logging.error("Error adding %s to Qdrant: %s", filepath, e)
 
-    def another_public_method(self):
-        """Example of another public method."""
 
 
 class ColbertRetriever(dspy.Retrieve):
