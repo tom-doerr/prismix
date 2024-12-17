@@ -2,6 +2,7 @@
 Module for handling file editing operations.
 """
 
+import os
 from typing import List, Tuple
 from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
 
@@ -38,14 +39,18 @@ class FileEditorModule:
         """Applies a single replacement to the content."""
         return content.replace(search_pattern, replacement_code)
 
-    def apply_replacements(self, content: str, instruction: str) -> FileContext:
+    def apply_replacements(self, content: str, instruction: str) -> Tuple[str, List[Tuple[str, str]]]:
         """Applies replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
+        changes = []
         for search_pattern, replacement_code in replacements:
+            original_content = content
             content = self.apply_single_replacement(
                 content, search_pattern, replacement_code
             )
-        return FileContext(filepath="", content=content, changes=[])
+            if original_content != content:
+                changes.append((search_pattern, replacement_code))
+        return content, changes
 
     def forward(self, context: str, instruction: str) -> FileContext:
         """Edit the file based on the context and instruction."""
@@ -62,12 +67,18 @@ class FileEditorModule:
             except IndexError:
                 pass
 
+        if not content and filepath:
+            file_context = self.read_file(filepath)
+            if file_context.error:
+                return file_context
+            content = file_context.content
+
         # Apply replacements
-        updated_content = self.apply_replacements(content, instruction)
+        updated_content, changes = self.apply_replacements(content, instruction)
 
         # Return a FileContext object with changes
         return FileContext(
             filepath=filepath,
-            content=updated_content.content,  # Use the content from the updated_content
-            changes=[],
+            content=updated_content,
+            changes=changes,
         )

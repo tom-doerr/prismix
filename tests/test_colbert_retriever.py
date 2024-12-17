@@ -13,7 +13,7 @@ from prismix.core.qdrant_manager import QdrantManager
 def colbert_retriever():
     """Fixture to create an instance of ColbertRetriever."""
     qdrant_manager = QdrantManager(collection_name="colbert_embeddings")
-    qdrant_manager.embed_code = lambda x: [0.0] * 128  # Mock embedding
+    qdrant_manager.client.embed_code = lambda x: [0.0] * 128  # Mock embedding
     return ColbertRetriever(url="http://example.com/colbert", k=3)
 
 
@@ -38,11 +38,11 @@ def test_add_data_to_db_basic(colbert_retriever, temp_dir):
     colbert_retriever.add_data_to_db(temp_dir)
 
     # Ensure that the data was added to the Qdrant database
+    count = colbert_retriever.qdrant_manager.client.count(
+        collection_name="colbert_embeddings"
+    ).count
     assert (
-        colbert_retriever.qdrant_manager.client.count(
-            collection_name="colbert_embeddings"
-        ).count
-        > 0
+        count > 0
     )
 
 
@@ -52,12 +52,12 @@ def test_colbert_retriever(colbert_retriever):
     colbert_retriever.forward = lambda q: [
         {"long_text": f"This is a dummy result for {q}"} for _ in range(3)
     ]
-    colbert_retriever.add_data_to_db(str(temp_dir))
+    colbert_retriever.add_data_to_db(temp_dir)
     results = colbert_retriever.forward(query)
     assert len(results) == 3
     for result in results:
         assert "dummy result" in result["long_text"]
-    assert (
+    count = (
         colbert_retriever.qdrant_manager.client.count(
             collection_name="colbert_embeddings"
         ).count  # Access the count attribute
