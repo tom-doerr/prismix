@@ -70,5 +70,3 @@ def apply_single_replacement(
 
         # Write the updated content back to the file
         return self.write_file(filepath, updated_content)
-from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
-import logging
