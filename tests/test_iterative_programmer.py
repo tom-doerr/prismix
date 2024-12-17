@@ -1,3 +1,7 @@
+"""
+Test suite for the IterativeProgrammer module.
+"""
+
 import pytest
 import dspy
 from prismix.core.iterative_programmer import IterativeProgrammer
@@ -5,10 +9,12 @@ from prismix.core.iterative_programmer import IterativeProgrammer
 
 # Mock LM for testing
 class MockLM(dspy.LM):
+    """Mock language model for testing purposes."""
     def __init__(self, model="mock"):
         super().__init__(model=model)
 
     def __call__(self, prompt, **kwargs):
+        """Mock implementation of the __call__ method."""
         if "unsafe" in prompt.lower():
             return dspy.Prediction(
                 is_safe=False,
@@ -25,6 +31,7 @@ def setup_dspy():
 
 
 def test_is_code_safe_safe():
+    """Test that safe code is identified as safe."""
     programmer = IterativeProgrammer()
     code = "def hello():\n    print('hello')\n"
     is_safe, _ = programmer.is_code_safe(code)
@@ -32,6 +39,7 @@ def test_is_code_safe_safe():
 
 
 def test_is_code_safe_unsafe():
+    """Test that unsafe code is identified as unsafe."""
     programmer = IterativeProgrammer()
     code = "import os\n os.system('rm -rf /')"
     is_safe, _ = programmer.is_code_safe(code)
@@ -39,6 +47,7 @@ def test_is_code_safe_unsafe():
 
 
 def test_execute_code_success():
+    """Test successful execution of code."""
     programmer = IterativeProgrammer()
     code = """# samples/basic_function.py
 def calculate_sum(a, b, c):
@@ -59,6 +68,7 @@ if __name__ == "__main__":
 
 
 def test_execute_code_fail():
+    """Test failed execution of code."""
     programmer = IterativeProgrammer()
     code = """# samples/basic_function.py
 def calculate_sum(a, b, c):
