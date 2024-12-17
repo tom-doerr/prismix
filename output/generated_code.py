@@ -1,1 +1,5 @@
-dummy_code
+"""
+This module contains generated code examples.
+"""
+
+dummy_code = "dummy_code"
