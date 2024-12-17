@@ -86,12 +86,12 @@ def run_random_pylint(files):
                 stderr=subprocess.STDOUT,
                 text=True,
             )
-            pylint_output += result.stdout
+            pylint_output_local += result.stdout
         except subprocess.CalledProcessError as e:
-            pylint_output += (
+            pylint_output_local += (
                 f"Error running pylint on {file_path}: {e}\nstdout: {e.stdout}"
             )
-    return pylint_output
+    return pylint_output_local
 
 
 def run_ruff_fix(files):
