@@ -4,6 +4,7 @@ Module for handling file editing operations.
 
 import os
 import re
+from importlib import resources
 from typing import List, Tuple
 
 from prismix.core.file_operations import (
@@ -18,6 +19,7 @@ class FileEditorModule:
 
     def __init__(self):
         self.file_manager = FileManager(file_operations=DefaultFileOperations())
+        self.model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the content of the file."""
@@ -46,7 +48,8 @@ class FileEditorModule:
         replacement_code: str,
     ) -> str:
         """Apply a single replacement in the content."""
-        updated_content = content.replace(search_pattern, replacement_code)
+        with resources.files("litellm.llms.tokenizers").joinpath("anthropic_tokenizer.json").open() as f:
+            updated_content = content.replace(search_pattern, replacement_code)
 
         return updated_content
 
