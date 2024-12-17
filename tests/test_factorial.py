@@ -18,8 +18,9 @@ def test_factorial_basic():
     # Wrap the generated code in a callable function
     # Replace newline escape sequences outside of the f-string
     cleaned_code = result.code.replace("```python", "").replace("```", "").strip()
+    indented_code = cleaned_code.replace("{{", "{").replace("}}", "}").replace("\n", "\n    ")
     wrapped_code = f"""def main():
-    {cleaned_code.replace("{{", "{").replace("}}", "}").replace("\n", "\n    ")}
+    {indented_code}
     main()"""
     code_result = CodeExecutor.execute(wrapped_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
