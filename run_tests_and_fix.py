@@ -2,9 +2,9 @@
 Script to run pylint and ruff checks on the project.
 """
 
-import subprocess
 import glob
 import os
+import subprocess
 
 
 def run_pylint():
@@ -95,8 +95,6 @@ if __name__ == "__main__":
     ruff_success, ruff_output = run_ruff_fix()
     combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
     for file_path in all_files:
-        call_aider(
-            find_related_files(file_path), combined_output
-        )
+        call_aider(find_related_files(file_path), combined_output)
     if pylint_success and ruff_success:
         print("Pylint and Ruff checks and fixes applied successfully.")

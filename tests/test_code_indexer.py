@@ -42,7 +42,9 @@ def test_search_code_on_the_fly(code_indexer_fixture: CodeIndexer, temp_dir: str
     assert len(results) == 2
     assert any("test1.py" in r.filepath for r in results)
     assert any("test3.py" in r.filepath for r in results)
-    assert all(isinstance(r, IndexedCode) for r in results)  # Check if all results are IndexedCode
+    assert all(
+        isinstance(r, IndexedCode) for r in results
+    )  # Check if all results are IndexedCode
 
     # Test search with a query that does not exist
     results = code_indexer.search_code_on_the_fly(temp_dir, "nonexistent")
