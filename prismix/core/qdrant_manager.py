@@ -30,7 +30,7 @@ class QdrantManager:
         else:
             logging.info("Collection '%s' already exists.", self.collection_name)
 
-    def insert_embeddings(self, embeddings: List[Dict[str, any]]):
+    def insert_embeddings(self, embeddings: List[models.PointStruct]):
         """Insert embeddings into the Qdrant collection."""
         self.client.upsert(
             collection_name=self.collection_name,
@@ -38,12 +38,9 @@ class QdrantManager:
         )
         logging.info("Embeddings inserted into collection '%s'.", self.collection_name)
 
-    def _embed_code(self, content: str) -> List[float]:
-        return self.embed_code(content)
-
     def embed_code(self, content: str) -> List[float]:
-        # Dummy embedding for testing
-        return [0.0] * 128
+        """Implement embedding logic here"""
+        return [0.0] * 128  # Placeholder for embedding
 
     def search_embeddings(
         self, query_embedding: List[float], top_k: int = 3
