@@ -44,7 +44,11 @@ class CodeExecutor:
             local_vars = {}
             # Safely parse and execute the code
             parsed_code = ast.parse(code)
-            exec(compile(parsed_code, filename="<string>", mode="exec"), {"__builtins__": CodeExecutor.get_safe_builtins()}, local_vars)
+            exec(
+                compile(parsed_code, filename="<string>", mode="exec"),
+                {"__builtins__": CodeExecutor.get_safe_builtins()},
+                local_vars,
+            )
 
             # Get the main function from the generated code
             main_func = None
