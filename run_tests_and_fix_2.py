@@ -19,13 +19,14 @@ def run_pylint():
         result = subprocess.run(
             ["pylint", "."],
             check=True,
-            capture_output=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True,
         )
     except subprocess.CalledProcessError as e:
-        pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
+        pylint_output = f"Error running pylint: {e}\n{e.stdout}"
         return False, pylint_output
-    return True, pylint_output
+    return True, result.stdout
 
 
 # def run_random_pytest(n, all_files):
@@ -43,13 +44,14 @@ def run_random_pytest(files):
         try:
             result = subprocess.run(
                 ["pytest", test_file],
-                check=True,
-                capture_output=True,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
                 text=True,
             )
-            pytest_output += result.stdout + result.stderr
+            pytest_output += result.stdout
         except subprocess.CalledProcessError as e:
-            pytest_output += f"Error running pytest on {test_file}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
+            pytest_output += f"Error running pytest on {test_file}: {e}\nstdout: {e.stdout}"
     return pytest_output
 
 
@@ -78,13 +80,14 @@ def run_random_pylint(files):
         try:
             result = subprocess.run(
                 ["pylint", file_path],
-                check=True,
-                capture_output=True,
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
                 text=True,
             )
-            pylint_output += result.stdout + result.stderr
+            pylint_output += result.stdout
         except subprocess.CalledProcessError as e:
-            pylint_output += f"Error running pylint on {file_path}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
+            pylint_output += f"Error running pylint on {file_path}: {e}\nstdout: {e.stdout}"
     return pylint_output
 
 
@@ -94,14 +97,15 @@ def run_ruff_fix(files):
     try:
         result = subprocess.run(
             ["ruff", "check", f"./{files_str}", "--fix"],
-            check=True,
-            capture_output=True,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True,
         )
         # ruff_result_output = result.stdout + result.stderr
-        ruff_output = f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        ruff_output = f"stdout: {result.stdout}"
     except subprocess.CalledProcessError as e:
-        ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
+        ruff_output = f"Error running ruff fix: {e}\n{e.stdout}"
         return False, ruff_output
     return True, ruff_output
 
@@ -233,7 +237,7 @@ if __name__ == "__main__":
         pylint_success, pylint_output = run_pylint()
         random.shuffle(all_python_files)
         selected_files = all_python_files[: args.lint_files]
-        ruff_success, ruff_output = run_ruff_fix(selected_files)
+        ruff_success, ruff_output = run_ruff_fix(selected_files) if selected_files else (True, "")
 
         test_files = [
             file_path for file_path in all_python_files if is_test_file(file_path)
@@ -245,7 +249,7 @@ if __name__ == "__main__":
         pytest_output = run_pytest()
         num_pytest_output_chars = len(pytest_output)
         print("num_pytest_output_chars:", num_pytest_output_chars)
-        pylint_result_output = run_random_pylint(selected_files)
+        pylint_result_output = run_random_pylint(selected_files) if selected_files else ""
         files_potentially_being_tested = []
         for file in all_python_files:
             for test_file in selected_test_files:
@@ -255,7 +259,7 @@ if __name__ == "__main__":
         print("files_potentially_being_tested:", files_potentially_being_tested)
         combined_output = (
             f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_output}"
-        )
+        ).strip()
         if "All checks passed" not in ruff_output:
             combined_output += f"\nRuff output:\n{ruff_output}"
         files_to_fix = filter_files_by_output(combined_output, all_python_files)
@@ -268,7 +272,7 @@ if __name__ == "__main__":
         files_to_fix.sort()
         run_black(files_to_fix)
         files_to_fix = []
-        call_aider(files_to_fix, combined_output, args.model)
+        call_aider(files_to_fix, combined_output, args.model) if combined_output else None
         if pylint_success and ruff_success and not files_to_fix:
             print("No more issues found. Stopping early.")
             break
