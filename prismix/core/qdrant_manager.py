@@ -32,7 +32,9 @@ class QdrantManager:
 
     def insert_embeddings(self, embeddings: List[Dict[str, any]]):
         points = [
-            models.PointStruct(id=emb["id"], vector=emb["vector"], payload=emb["payload"])
+            models.PointStruct(
+                id=emb["id"], vector=emb["vector"], payload=emb["payload"]
+            )
             for emb in embeddings
         ]
         self.client.upsert(
