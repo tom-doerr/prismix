@@ -62,11 +62,9 @@ def test_file_write(tmp_path_write):
 
 def test_line_numbering(test_file_fixture):
     """Test line numbering functionality."""
-    """Test line numbering functionality"""
     editor = FileEditor()
     with open(test_file_fixture, encoding="utf-8") as f:
         content = f.read()
-    # If number_lines is not needed, remove this test
 
 
 def test_apply_line_edits_list():
