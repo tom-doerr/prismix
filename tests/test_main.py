@@ -28,8 +28,7 @@ def test_execute_instruction_code_result():
         assert "Changes made:" in mock_stdout.getvalue()
         assert (
             "Replace 'print(f\"Calculated sum: {a + b + c}\")' with "
-            "'print(f\"The sum is: {a + b + c}\")'"
-            in mock_stdout.getvalue()
+            "'print(f\"The sum is: {a + b + c}\")'" in mock_stdout.getvalue()
         )
 
     with patch("sys.stdout", new_callable=StringIO) as mock_stdout:
@@ -42,8 +41,7 @@ def test_execute_instruction_code_result():
         assert "Changes made:" in mock_stdout.getvalue()
         assert (
             "Replace 'print(f\"Calculated sum: {a + b + c}\")' with "
-            "'print(f\"The sum is: {a + b + c}\")'"
-            in mock_stdout.getvalue()
+            "'print(f\"The sum is: {a + b + c}\")'" in mock_stdout.getvalue()
         )
 
 
