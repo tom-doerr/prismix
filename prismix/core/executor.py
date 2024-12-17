@@ -42,7 +42,9 @@ class CodeExecutor:
         """Execute code in isolated environment and return results"""
         try:
             # Safer alternative to `exec`: use `ast.literal_eval` for simple evaluations
-            result = ast.literal_eval(code)
+            loc = {}
+            exec(code, CodeExecutor.get_safe_builtins(), loc)
+            result = loc.get("result", "No result returned")
             return CodeResult(
                 code=code,
                 success=True,

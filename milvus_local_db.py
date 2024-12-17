@@ -31,8 +31,10 @@ def setup_milvus_local_db():
             index_file_size=1024,  # Optional parameter
         )
         logging.info("Milvus local database setup complete.")
-    except Exception as e:
-        logging.error("Error setting up Milvus local database: %s", e)
+    except FileNotFoundError as e:
+        logging.error("File not found: %s", e)
+    except PermissionError as e:
+        logging.error("Permission denied: %s", e)
 
 
 def insert_data_into_milvus():
