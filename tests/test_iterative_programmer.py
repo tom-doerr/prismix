@@ -22,11 +22,6 @@ class MockLM(dspy.LM):
         return dspy.Prediction(is_safe=True, safety_message="The code is safe.")
 
 
-@pytest.fixture(scope="function", autouse=True)
-def setup_dspy():
-    """Set up dspy with a mock LM for each test."""
-    lm = MockLM(model="mock-model")  # Provide the model argument
-    dspy.configure(lm=lm)
 
 
 def test_is_code_safe_safe():
