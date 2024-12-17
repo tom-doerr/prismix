@@ -33,7 +33,6 @@ def temp_dir():
 
 
 def test_search_code_on_the_fly(code_indexer_fixture: CodeIndexer, temp_dir: str):
-    """Test the search_code_on_the_fly method."""
     indexer = code_indexer_fixture
     directory = temp_dir
     results = indexer.search_code_on_the_fly(directory, "print")
