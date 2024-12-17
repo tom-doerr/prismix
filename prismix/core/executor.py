@@ -1,9 +1,7 @@
-import ast
-
 """
 This module provides a safe execution environment for code generation and execution.
 """
-
+import ast
 from dataclasses import dataclass
 from typing import Dict, Any
 
@@ -44,6 +42,7 @@ class CodeExecutor:
             local_vars = {}
             # Safely parse and execute the code
             parsed_code = ast.parse(code)
+            # Necessary for executing the code in a controlled environment
             exec(
                 compile(parsed_code, filename="<string>", mode="exec"),
                 {"__builtins__": CodeExecutor.get_safe_builtins()},

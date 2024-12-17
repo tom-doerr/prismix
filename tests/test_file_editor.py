@@ -12,6 +12,11 @@ def test_apply_replacements():
     instruction = "Replace 'pass' with 'print(\"hello\")'"
     updated_content = editor.apply_replacements(content, instruction)
     assert updated_content == 'def foo():\n    print("hello")'
+    editor = FileEditorModule()
+    content = "def foo():\n    pass"
+    instruction = "Replace 'pass' with 'print(\"hello\")'"
+    updated_content = editor.apply_replacements(content, instruction)
+    assert updated_content == 'def foo():\n    print("hello")'
 
 
 def test_read_file_existing():
