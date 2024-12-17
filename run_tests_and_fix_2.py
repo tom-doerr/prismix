@@ -61,15 +61,14 @@ def run_pytest():
     try:
         result = subprocess.run(
             ["pytest", "-v"],
-            check=True,
-            capture_output=True,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
             text=True,
         )
-        pytest_output += result.stdout + result.stderr
+        pytest_output += result.stdout
     except subprocess.CalledProcessError as e:
-        pytest_output += (
-            f"Error running pytest: {e}\n" f"stdout: {e.stdout}\n" f"stderr: {e.stderr}"
-        )
+        pytest_output += f"Error running pytest: {e}\nstdout: {e.stdout}"
     return pytest_output
 
 
