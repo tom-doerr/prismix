@@ -12,8 +12,6 @@ from prismix.core.file_operations import DefaultFileOperations
 
 file_manager = FileManager(file_operations=DefaultFileOperations())
 
-# Rest of the code...
-
 
 @dataclass
 class IndexedCode:
@@ -35,6 +33,8 @@ class CodeEmbedder:
 
 
 class CodeIndexer:
+    """Class responsible for indexing and searching code files using embeddings."""
+
     """Class responsible for indexing and searching code files using embeddings."""
 
     """Indexes and searches code files using embeddings."""
@@ -68,10 +68,6 @@ class CodeIndexer:
                             )
                             self.indexed_code[filepath] = indexed_code
                             print(f"Indexed: {filepath}")
-                    except FileNotFoundError as e:
-                        print(f"File not found: {filepath}: {e}")
-                    except PermissionError as e:
-                        print(f"Permission error accessing {filepath}: {e}")
                     except FileNotFoundError as e:
                         print(f"File not found: {filepath}: {e}")
                     except PermissionError as e:

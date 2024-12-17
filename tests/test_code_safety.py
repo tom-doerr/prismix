@@ -49,3 +49,8 @@ def test_safe_code_with_output(agent):
     code = "def safe_function(x): return x * 2"
     result = setup_agent_fixture.execute_code(code)
     assert result.success is True
+
+
+@pytest.fixture
+def agent():
+    return setup_agent()

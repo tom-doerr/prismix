@@ -53,7 +53,7 @@ def test_factorial_negative():
     indented_code = cleaned_code.replace("\n", "\n    ")
     wrapped_code = f"""def main():
         {indented_code}
-    main()"""
+    """
     code_result = CodeExecutor.execute(wrapped_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
     factorial = locals().get("factorial")
