@@ -101,12 +101,47 @@ def run_ruff_fix(files):
             stderr=subprocess.STDOUT,
             text=True,
         )
-        # ruff_result_output = result.stdout + result.stderr
         ruff_output_local = f"stdout: {result.stdout}"
     except subprocess.CalledProcessError as e:
         ruff_output = f"Error running ruff fix: {e}\n{e.stdout}"
         return False, ruff_output
     return True, ruff_output
+
+
+def run_radon_cc(files):
+    """Runs radon cc on the specified files and captures the output."""
+    radon_cc_output = ""
+    for file_path in files:
+        try:
+            result = subprocess.run(
+                ["radon", "cc", file_path],
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            radon_cc_output += result.stdout
+        except subprocess.CalledProcessError as e:
+            radon_cc_output += f"Error running radon cc on {file_path}: {e}\nstdout: {e.stdout}"
+    return radon_cc_output
+
+
+def run_radon_mi(files):
+    """Runs radon mi on the specified files and captures the output."""
+    radon_mi_output = ""
+    for file_path in files:
+        try:
+            result = subprocess.run(
+                ["radon", "mi", file_path],
+                check=False,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+            radon_mi_output += result.stdout
+        except subprocess.CalledProcessError as e:
+            radon_mi_output += f"Error running radon mi on {file_path}: {e}\nstdout: {e.stdout}"
+    return radon_mi_output
 
 
 def is_test_file(file_path):
@@ -269,12 +304,19 @@ if __name__ == "__main__":
                 if test_file.replace(".py", "").split("test_")[1] in file:
                     files_potentially_being_tested.append(file)
 
+        radon_cc_output = run_radon_cc(files_potentially_being_tested)
+        radon_mi_output = run_radon_mi(files_potentially_being_tested)
+
         print("files_potentially_being_tested:", files_potentially_being_tested)
         COMBINED_OUTPUT = (
             f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_output}"
         ).strip()
         if "All checks passed" not in ruff_output:
             COMBINED_OUTPUT += f"\nRuff output:\n{ruff_output}"
+        if radon_cc_output:
+            COMBINED_OUTPUT += f"\nRadon CC output:\n{radon_cc_output}"
+        if radon_mi_output:
+            COMBINED_OUTPUT += f"\nRadon MI output:\n{radon_mi_output}"
         files_to_fix = filter_files_by_output(COMBINED_OUTPUT, all_python_files)
         files_to_fix.extend(files_potentially_being_tested)
         files_to_fix.extend(selected_files)
