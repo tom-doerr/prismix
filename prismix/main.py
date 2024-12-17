@@ -5,6 +5,7 @@ import os
 from typing import NoReturn
 from prismix.core.iterative_programmer import setup_agent
 from prismix.core.code_indexer import CodeIndexer
+import re
 from prismix.core.colbert_retriever import ColbertRetriever  # Add this import
 
 
@@ -46,6 +47,7 @@ def execute_instruction(instruction: str) -> None:
         print("\nContents:")
         print("----------")
         print(result.code)
+        print("----------")
     else:
         # Handle FileContext
         print("\nFile Edit Result:")
