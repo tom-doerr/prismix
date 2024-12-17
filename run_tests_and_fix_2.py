@@ -32,15 +32,11 @@ def run_pylint():
 # def run_random_pytest(n, all_files):
 def run_random_pytest(files):
     """Runs n random pytest tests and captures the output."""
-    # test_files = [file_path for file_path in all_files if is_test_file(file_path)]
-    # random.shuffle(test_files)
-    # selected_test_files = test_files[:n]
-    pytest_output_local = ""
+    pytest_output = ""
     if not files:
         return pytest_output
 
-    # for test_file in selected_test_files:
-    for test_file_local in files:
+    for test_file in files:
         try:
             result = subprocess.run(
                 ["pytest", test_file],
