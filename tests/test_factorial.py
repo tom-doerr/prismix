@@ -36,19 +36,7 @@ def test_factorial_basic():
     # Execute the factorial function directly
     local_vars = {}
     # Safer alternative: Use CodeExecutor to execute the function code
-    code_result = CodeExecutor.execute(function_code)
-    assert code_result.success, f"Code execution failed: {code_result.error}"
-    local_vars = {}
-    code_result = CodeExecutor.execute(function_code)
-    assert code_result.success, f"Code execution failed: {code_result.error}"
-    # Safer alternative: Use CodeExecutor to execute the function code
-    code_result = CodeExecutor.execute(function_code)
-    assert code_result.success, f"Code execution failed: {code_result.error}"
-
-    # Safely execute the factorial function
-    code_result = CodeExecutor.execute(function_code)
-    assert code_result.success, f"Code execution failed: {code_result.error}"
-    # Safely execute the factorial function using CodeExecutor
+    # Execute the factorial function using CodeExecutor
     code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
 
@@ -63,8 +51,6 @@ def test_factorial_basic():
     assert factorial(5) == 120
     with pytest.raises(ValueError):
         factorial(-1)
-    assert factorial(1) == 1
-    assert factorial(5) == 120
 
 
 def test_factorial_negative():
@@ -80,13 +66,16 @@ def test_factorial_negative():
         (node for node in tree.body if isinstance(node, ast.FunctionDef)), None
     )
     function_code = ast.unparse(function_def)
-    local_vars = {}
-    local_vars = {}
+    # Execute the factorial function using CodeExecutor
     code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
-    local_vars = {"factorial": lambda x: code_result.output}
+
+    # Retrieve the factorial function from the executed code
+    local_vars = {}
+    exec(code_result.output, {}, local_vars)
     factorial = local_vars.get("factorial")
-    assert factorial(5) == 120
+
+    # Test negative input
     with pytest.raises(ValueError):
         factorial(-1)
 
