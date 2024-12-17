@@ -77,7 +77,7 @@ def test_file_edit_module_empty_file(file_editor_module, temp_file):
     # Test file edit with an empty file
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
         f.write("")
-        temp_file_path_empty = f.name
+        temp_file_path = f.name
 
     updated_content = file_editor_module.forward(
         context=f"{temp_file} Content: ",
