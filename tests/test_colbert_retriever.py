@@ -7,6 +7,7 @@ import tempfile
 import pytest
 import dspy
 from prismix.core.colbert_retriever import ColbertRetriever
+from prismix.core.qdrant_manager import QdrantManager
 
 
 @pytest.fixture

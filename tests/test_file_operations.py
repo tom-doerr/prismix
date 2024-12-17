@@ -19,7 +19,7 @@ def test_file(tmp_path):
 if __name__ == "__main__":
     main()
 """
-    with open(file_path, "w") as f:
+    with open(file_path, "w", encoding="utf-8") as f:
         f.write(content)
     return str(file_path)
 
@@ -49,7 +49,7 @@ def test_file_write(tmp_path):
     assert isinstance(result, FileContext)
     assert result.error is None
     assert os.path.exists(file_path)
-    with open(file_path) as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         assert f.read() == content
 
 
