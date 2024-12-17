@@ -30,7 +30,6 @@ def temp_file():
 
 def test_file_edit_module_no_change(file_editor_module, temp_file):
     """Test file edit with no change."""
-    """Test file edit with no change."""
 
     updated_content = file_editor_module.forward(
         context=f"{temp_file} Content: def hello():\n    print('hello')\n",
@@ -89,10 +88,8 @@ def test_file_edit_module_empty_file(file_editor_module, temp_file):
     assert final_content == ""
 
 
-def test_file_edit_module_file_not_found(file_editor_module, temp_file):
+def test_file_edit_module_file_not_found(file_editor_module):
     """Test file edit with file not found."""
-    """Test file edit with file not found"""
-    # Test file edit with file not found
     result = file_editor_module.forward(
         context="non_existent_file.py Content: def hello():\n    print('hello')\n",
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')'.",
@@ -189,12 +186,11 @@ def test_forward_with_valid_edit(file_editor_module, temp_file):
     assert file_context.content == "def hello():\n    print('hi')\n"
 
 
-def test_forward_with_no_change(file_editor_module, temp_file):
-    """Test forward method with no change."""
+def test_forward_with_no_change(file_editor_module):
     """Test forward method with no change."""
     instruction = "Do not change 'print(\\'hello\\')'"
     file_context = file_editor_module.forward(
-        context=f"{temp_file} Content: def hello():\n    print('hello')\n",
+        context="test_file.py Content: def hello():\n    print('hello')\n",
         instruction=instruction,
     )
     assert file_context.content == "def hello():\n    print('hello')\n"
