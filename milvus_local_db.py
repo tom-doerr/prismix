@@ -1,4 +1,5 @@
 from pymilvus import MilvusClient
+
 """
 Module for setting up and interacting with a local Milvus database.
 """
@@ -68,7 +69,7 @@ def search_milvus_collection():
         if len(result) == 0:
             logging.info("No results found.")
         for res in result:
-            logging.info("Document: %s, Distance: %s", res['text'], res['distance'])
+            logging.info("Document: %s, Distance: %s", res["text"], res["distance"])
     except Exception as e:
         logging.error("Error searching Milvus collection: %s", e)
 
