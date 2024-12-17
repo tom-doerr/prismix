@@ -2,9 +2,9 @@
 Module for handling file editing operations.
 """
 
+from pydantic import ConfigDict
 from typing import List, Tuple
 from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
-from pydantic import ConfigDict
 
 
 class FileEditorModule:
