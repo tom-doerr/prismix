@@ -32,3 +32,4 @@ if __name__ == "__main__":
         print(add_numbers("5", 3))     # Expected to raise TypeError
     except TypeError as e:
         print(e)                      # Output: Both inputs must be numbers (int or float).
+    main()
