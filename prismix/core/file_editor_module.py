@@ -25,6 +25,11 @@ def read_file(self, filename: str) -> FileContext:
         for search_pattern, replacement_code in replacements:
             content = content.replace(search_pattern, replacement_code)
         return content
+        """Applies multiple replacements based on the instruction."""
+        replacements = self.parse_instructions(instruction)
+        for search_pattern, replacement_code in replacements:
+            content = content.replace(search_pattern, replacement_code)
+        return content
 
     def apply_single_replacement(
         self, content: str, search_pattern: str, replacement_code: str

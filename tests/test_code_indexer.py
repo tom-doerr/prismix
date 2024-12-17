@@ -4,9 +4,7 @@ Test module for the CodeIndexer class.
 
 import os
 import tempfile
-
 import pytest
-
 from prismix.core.code_indexer import CodeIndexer, IndexedCode
 from prismix.core.file_operations import FileManager, DefaultFileOperations
 
@@ -54,10 +52,3 @@ def test_search_code_on_the_fly(indexer, temp_directory):
     results = indexer.search_code_on_the_fly(temp_directory, "wor")
     assert len(results) == 1
     assert any("test3.py" in r.filepath for r in results)
-
-
-import os
-import tempfile
-import pytest
-from prismix.core.code_indexer import CodeIndexer, IndexedCode
-from prismix.core.file_operations import FileManager, DefaultFileOperations
