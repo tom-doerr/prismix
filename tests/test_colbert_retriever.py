@@ -50,4 +50,4 @@ def test_colbert_retriever(colbert_retriever_instance):
     results = colbert_retriever_instance.forward(query)
     assert len(results) == 3
     for result in results:
-        assert "dummy result" in result
+        assert "dummy result" in result["long_text"]
