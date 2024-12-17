@@ -16,6 +16,7 @@ file_manager = FileManager(file_operations=DefaultFileOperations())
 @dataclass
 class IndexedCode:
     """Class to represent indexed code with filepath, content, and embedding."""
+
     filepath: str
     content: str
     embedding: List[float]  # Placeholder for embedding
