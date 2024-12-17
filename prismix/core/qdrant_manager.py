@@ -38,7 +38,7 @@ class QdrantManager:
         )
         logging.info("Embeddings inserted into collection '%s'.", self.collection_name)
 
-    def _embed_code(self, content: str) -> List[float]:
+    def embed_code(self, content: str) -> List[float]:
         """Embed code content using a suitable embedding model."""
         # Placeholder for embedding logic
         # In a real implementation, this would use a model like SentenceTransformers
