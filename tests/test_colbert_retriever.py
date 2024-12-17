@@ -58,7 +58,7 @@ def test_colbert_retriever(colbert_retriever_fixture, temp_dir):
     retriever.forward = lambda q: [
         {"long_text": f"This is a dummy result for {q}"} for _ in range(3)
     ]
-    retriever.add_data_to_db(directory)
+    retriever.add_data_to_db(temp_dir)
     results = retriever.forward(query)
     assert len(results) == 3
     for result in results:
