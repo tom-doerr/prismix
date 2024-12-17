@@ -39,6 +39,9 @@ class QdrantManager:
         logging.info("Embeddings inserted into collection '%s'.", self.collection_name)
 
 
+    def _embed_code(self, content: str) -> List[float]:
+        return self.embed_code(content)
+
     def search_embeddings(
         self, query_embedding: List[float], top_k: int = 3
     ) -> List[Dict[str, any]]:
