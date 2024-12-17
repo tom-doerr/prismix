@@ -1,16 +1,21 @@
+"""
+Module for iterative programming and code generation.
+"""
+
 from typing import Tuple, Union
 import dspy
-import tempfile  # Add this import
-import sys
 import subprocess
+import sys
+import tempfile
 from io import StringIO
-from .signatures import CodeSafetyCheck
-from .executor import CodeResult, CodeExecutor
-from .generator import CodeGenerator, GenerationContext
-from .file_operations import FileEditor, FileContext
+from prismix.core.signatures import CodeSafetyCheck
+from prismix.core.executor import CodeResult
+from prismix.core.generator import CodeGenerator
+from prismix.core.file_operations import FileEditor, FileContext
 
 
 def is_code_safe(code: str, safety_checker: dspy.TypedPredictor) -> Tuple[bool, str]:
+    """Check if the generated code is safe to execute."""
     if "import os" in code or "os.system" in code:
         return (
             False,
@@ -21,7 +26,10 @@ def is_code_safe(code: str, safety_checker: dspy.TypedPredictor) -> Tuple[bool, 
 
 
 class IterativeProgrammer(dspy.Module):
+    """Class for iterative programming and code generation."""
+
     def __init__(self, max_iterations: int = 3) -> None:
+        """Initialize the IterativeProgrammer with a maximum number of iterations."""
         super().__init__()
         self.generator = CodeGenerator(max_iterations)
         self.safety_checker = dspy.TypedPredictor(CodeSafetyCheck)
@@ -29,10 +37,11 @@ class IterativeProgrammer(dspy.Module):
         self.max_iterations = max_iterations
 
     def is_code_safe(self, code: str) -> Tuple[bool, str]:
+        """Check if the generated code is safe to execute."""
         return is_code_safe(code, self.safety_checker)
 
     def execute_code(self, code: str) -> CodeResult:
-        """Execute the generated code in a safe environment and return results"""
+        """Execute the generated code in a safe environment and return results."""
         is_safe, safety_msg = self.is_code_safe(code)
         print("is_safe:", is_safe)
         if not is_safe:
@@ -53,14 +62,14 @@ class IterativeProgrammer(dspy.Module):
             if not file_path:
                 # If no file path is provided, use a temporary file
                 with tempfile.NamedTemporaryFile(
-                    mode="w", delete=False, suffix=".py"
+                    mode="w", delete=False, suffix=".py", encoding="utf-8"
                 ) as temp_file:
                     temp_file_path = temp_file.name
                     temp_file.write(code)
                 file_path = temp_file_path
 
             # Read the original file content
-            with open(file_path, "r") as f:
+            with open(file_path, "r", encoding="utf-8") as f:
                 original_content = f.read()
 
             # Apply the changes to the original content
@@ -68,7 +77,7 @@ class IterativeProgrammer(dspy.Module):
             modified_content, _ = file_editor._apply_line_edits(original_content, code)
 
             # Write the modified content back to the original file
-            with open(file_path, "w") as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.write(modified_content)
 
             # Capture stdout and stderr
@@ -94,6 +103,20 @@ class IterativeProgrammer(dspy.Module):
                 output="",
                 error=f"Function execution failed in {file_path}: {str(e.stderr)}",
             )
+        except FileNotFoundError as e:
+            return CodeResult(
+                code=code,
+                success=False,
+                output="",
+                error=f"File not found: {str(e)}",
+            )
+        except PermissionError as e:
+            return CodeResult(
+                code=code,
+                success=False,
+                output="",
+                error=f"Permission error: {str(e)}",
+            )
         except Exception as e:
             return CodeResult(
                 code=code,
@@ -103,7 +126,7 @@ class IterativeProgrammer(dspy.Module):
             )
 
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
-        """Generate and execute code or edit files based on the command"""
+        """Generate and execute code or edit files based on the command."""
         # Check if this is a file editing command
         if command.startswith("edit"):
             command = command.strip()
@@ -194,7 +217,7 @@ class IterativeProgrammer(dspy.Module):
 
 
 def setup_agent() -> IterativeProgrammer:
-    """Configure and return an instance of IterativeProgrammer"""
+    """Configure and return an instance of IterativeProgrammer."""
     # Configure LM
     lm = dspy.LM(model="gpt-4o-mini", max_tokens=2000)
     dspy.configure(lm=lm)
