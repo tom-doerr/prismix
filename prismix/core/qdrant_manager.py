@@ -38,7 +38,6 @@ class QdrantManager:
         )
         logging.info("Embeddings inserted into collection '%s'.", self.collection_name)
 
-
     def _embed_code(self, content: str) -> List[float]:
         return self.embed_code(content)
 
