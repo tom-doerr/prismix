@@ -35,7 +35,7 @@ def test_factorial_basic():
     loc = {}
     exec(function_code, globals(), loc)
     factorial = loc.get("factorial")
-    
+
     factorial = globals().get("factorial")
 
     # Test basic cases
