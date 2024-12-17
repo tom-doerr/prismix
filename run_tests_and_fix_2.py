@@ -24,7 +24,7 @@ def run_pylint():
             text=True,
         )
     except subprocess.CalledProcessError as e:
-        pylint_output = f"Error running pylint: {e}\n{e.stdout}"
+        pylint_output_local = f"Error running pylint: {e}\n{e.stdout}"
         return False, pylint_output
     return True, result.stdout
 
@@ -35,12 +35,12 @@ def run_random_pytest(files):
     # test_files = [file_path for file_path in all_files if is_test_file(file_path)]
     # random.shuffle(test_files)
     # selected_test_files = test_files[:n]
-    pytest_output = ""
+    pytest_output_local = ""
     if not files:
         return pytest_output
 
     # for test_file in selected_test_files:
-    for test_file in files:
+    for test_file_local in files:
         try:
             result = subprocess.run(
                 ["pytest", test_file],
@@ -76,7 +76,7 @@ def run_pytest():
 
 def run_random_pylint(files):
     """Runs pylint on n random files and captures the output."""
-    pylint_output = ""
+    pylint_output_local = ""
     for file_path in files:
         try:
             result = subprocess.run(
@@ -106,7 +106,7 @@ def run_ruff_fix(files):
             text=True,
         )
         # ruff_result_output = result.stdout + result.stderr
-        ruff_output = f"stdout: {result.stdout}"
+        ruff_output_local = f"stdout: {result.stdout}"
     except subprocess.CalledProcessError as e:
         ruff_output = f"Error running ruff fix: {e}\n{e.stdout}"
         return False, ruff_output
@@ -141,7 +141,7 @@ def filter_files_by_output(output, all_files):
     return list(files_to_fix)
 
 
-import requests
+import requests  # Move this to the top of the module
 
 DEBUGGING_AND_TESTING_FILE_URL = (
     "https://gist.githubusercontent.com/mwanginjuguna/545f983b12c76af238861d9af2e551a5/"
@@ -165,7 +165,7 @@ except FileNotFoundError:
     DEBUGGING_AND_TESTING_CONTENT = ""
 
 
-def call_aider(file_paths, combined_output, model):
+def call_aider(file_paths, model):  # Remove 'combined_output'
     """Call aider to fix issues based on combined output."""
     try:
         print(f"Calling aider to fix issues in {', '.join(file_paths)}...")
@@ -282,16 +282,13 @@ if __name__ == "__main__":
         files_to_fix.extend(selected_files)
         files_to_fix.extend(selected_test_files)
 
-        files_to_fix = list(set(files_to_fix))
+        files_to_fix_local = list(set(files_to_fix))
         # sort
         files_to_fix.sort()
         run_black(files_to_fix)
         files_to_fix = []
-        (
+        if COMBINED_OUTPUT:
             call_aider(files_to_fix, COMBINED_OUTPUT, args.model)
-            if COMBINED_OUTPUT
-            else None
-        )
         if pylint_success and ruff_success and not files_to_fix:
             print("No more issues found. Stopping early.")
             break
