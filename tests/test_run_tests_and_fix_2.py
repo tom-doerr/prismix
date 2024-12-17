@@ -65,9 +65,9 @@ class TestRunTestsAndFix(unittest.TestCase):
         mock_run.assert_called_with(
             ["pytest", "-v"], check=False, stdout=-1, stderr=-2, text=True
         )
-
+ 
         mock_run.return_value.returncode = 1
-        mock_run.side_effect = subprocess.CalledProcessError(
+        mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["pytest", "-v"], stderr="Error output", stdout="Error output"
         )
         output = run_tests_and_fix.run_pytest()
@@ -84,9 +84,9 @@ class TestRunTestsAndFix(unittest.TestCase):
         mock_run.assert_called_with(
             ["pylint", "file2.py"], check=False, stdout=-1, stderr=-2, text=True
         )
-
+ 
         mock_run.return_value.returncode = 1
-        mock_run.side_effect = subprocess.CalledProcessError(
+        mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["pylint", "file1.py"], stderr="Error output", stdout="Error output"
         )
         output = run_tests_and_fix.run_random_pylint(files)
@@ -131,9 +131,9 @@ class TestRunTestsAndFix(unittest.TestCase):
         mock_run.assert_called_with(
             ["radon", "cc", "file2.py"], check=False, stdout=-1, stderr=-2, text=True
         )
-
+ 
         mock_run.return_value.returncode = 1
-        mock_run.side_effect = subprocess.CalledProcessError(
+        mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["radon", "cc", "file1.py"], stderr="Error output", stdout="Error output"
         )
         output = run_tests_and_fix.run_radon_cc(files)
@@ -153,9 +153,9 @@ class TestRunTestsAndFix(unittest.TestCase):
         mock_run.assert_called_with(
             ["radon", "mi", "file2.py"], check=False, stdout=-1, stderr=-2, text=True
         )
-
+ 
         mock_run.return_value.returncode = 1
-        mock_run.side_effect = subprocess.CalledProcessError(
+        mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["radon", "mi", "file1.py"], stderr="Error output", stdout="Error output"
         )
         output = run_tests_and_fix.run_radon_mi(files)
