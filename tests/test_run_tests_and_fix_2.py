@@ -65,7 +65,7 @@ class TestRunTestsAndFix(unittest.TestCase):
         mock_run.assert_called_with(
             ["pytest", "-v"], check=False, stdout=-1, stderr=-2, text=True
         )
- 
+
         mock_run.return_value.returncode = 1
         mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["pytest", "-v"], stderr="Error output", stdout="Error output"
@@ -84,7 +84,7 @@ class TestRunTestsAndFix(unittest.TestCase):
         mock_run.assert_called_with(
             ["pylint", "file2.py"], check=False, stdout=-1, stderr=-2, text=True
         )
- 
+
         mock_run.return_value.returncode = 1
         mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["pylint", "file1.py"], stderr="Error output", stdout="Error output"
@@ -131,7 +131,7 @@ class TestRunTestsAndFix(unittest.TestCase):
         mock_run.assert_called_with(
             ["radon", "cc", "file2.py"], check=False, stdout=-1, stderr=-2, text=True
         )
- 
+
         mock_run.return_value.returncode = 1
         mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["radon", "cc", "file1.py"], stderr="Error output", stdout="Error output"
@@ -153,7 +153,7 @@ class TestRunTestsAndFix(unittest.TestCase):
         mock_run.assert_called_with(
             ["radon", "mi", "file2.py"], check=False, stdout=-1, stderr=-2, text=True
         )
- 
+
         mock_run.return_value.returncode = 1
         mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["radon", "mi", "file1.py"], stderr="Error output", stdout="Error output"
@@ -221,7 +221,7 @@ class TestRunTestsAndFix(unittest.TestCase):
         self.assertIn("notes.md", command)
         self.assertIn("questions.md", command)
         self.assertIn("test content", command[-1])
- 
+
         mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["aider"], stderr="Error output", stdout="Error output"
         )
@@ -232,10 +232,10 @@ class TestRunTestsAndFix(unittest.TestCase):
         files = ["file1.py", "file2.py"]
         run_tests_and_fix.run_black(files)
         mock_run.assert_called()
-       mock_run.assert_called_with(["black", "file2.py"], check=True)
- 
-       mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
-           1, ["black", "file1.py"], stderr="Error output", stdout="Error output"
+        mock_run.assert_called_with(["black", "file2.py"], check=True)
+
+        mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
+            1, ["black", "file1.py"], stderr="Error output", stdout="Error output"
        )
         run_tests_and_fix.run_black(files)
 
