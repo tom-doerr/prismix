@@ -76,7 +76,7 @@ class IterativeProgrammer(dspy.Module):
 
             # Apply the changes to the original content
             file_editor = FileEditor()
-            modified_content, _ = file_editor._apply_line_edits(original_content, code)
+            modified_content, _ = file_editor.apply_line_edits(original_content, code)
 
             # Write the modified content back to the original file
             with open(file_path, "w", encoding="utf-8") as f:
@@ -100,26 +100,12 @@ class IterativeProgrammer(dspy.Module):
             error = result.stderr
 
             return CodeResult(code=code, success=True, output=output, error=error)
-        except subprocess.CalledProcessError as e:
+        except (CalledProcessError, FileNotFoundError, PermissionError) as e:
             return CodeResult(
                 code=code,
                 success=False,
                 output="",
-                error=f"Function execution failed in {file_path}: {str(e.stderr)}",
-            )
-        except FileNotFoundError as e:
-            return CodeResult(
-                code=code,
-                success=False,
-                output="",
-                error=f"File not found: {str(e)}",
-            )
-        except PermissionError as e:
-            return CodeResult(
-                code=code,
-                success=False,
-                output="",
-                error=f"Permission error: {str(e)}",
+                error=f"Function execution failed in {file_path}: {str(e)}",
             )
         except (subprocess.CalledProcessError, FileNotFoundError, PermissionError) as e:
             return CodeResult(

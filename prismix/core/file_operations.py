@@ -198,6 +198,10 @@ class FileEditor:
 
         return "\n".join(lines), changes
 
+    def apply_line_edits(self, content: str, line_edits: Union[str, List[Tuple[str, int, str]]]) -> tuple[str, list[str]]:
+        """Public method to apply line edits to content"""
+        return self._apply_line_edits(content, line_edits)
+
     def edit_file(self, filepath: str, instruction: str) -> FileContext:
         """Edit file based on instruction"""
         # Read current file
