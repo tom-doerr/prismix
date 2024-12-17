@@ -27,7 +27,6 @@ class GenerateScript(dspy.Signature):
 
 class GenerateEditInstruction(dspy.Signature):
     """Generate an edit instruction for a script"""
-
     script = dspy.InputField(desc="Original Python script")
     instruction = dspy.OutputField(
         desc="Natural language instruction for editing the script (e.g., 'add error handling', 'improve documentation')"
