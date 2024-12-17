@@ -143,7 +143,10 @@ def filter_files_by_output(output, all_files):
 
 import requests
 
-debugging_and_testing_file_url = "https://gist.githubusercontent.com/mwanginjuguna/545f983b12c76af238861d9af2e551a5/raw/9d8a8d47ca64cc340db69960011b368ab00179a9/introduction-to-debugging-and-testing-software.md"
+DEBUGGING_AND_TESTING_FILE_URL = (
+    "https://gist.githubusercontent.com/mwanginjuguna/545f983b12c76af238861d9af2e551a5/"
+    "raw/9d8a8d47ca64cc340db69960011b368ab00179a9/introduction-to-debugging-and-testing-software.md"
+)
 debugging_and_testing_file = (
     "prompt_text/introduction-to-debugging-and-testing-software.md"
 )
@@ -183,7 +186,12 @@ def call_aider(file_paths, combined_output, model):
             + ["--file", "questions.md"]
             + [
                 "--message",
-                f"{debugging_and_testing_content}\n\n\nDon't work on too many things at the same time. There are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. If you have commands I should run, please put them into commands.sh. Refactor notes.md and questions.md when necessary to avoid redundancy and to reduce length. Output: {combined_output}. What should we do next?",
+                f"{DEBUGGING_AND_TESTING_CONTENT}\n\n\nDon't work on too many things at the same time. "
+                "There are multiple LLMs working on this project, if you have information that could be useful for others, "
+                "please update notes.md. If you have questions, please write them into questions.md. "
+                "I might update the notes.md with answers to those questions. If you have commands I should run, "
+                "please put them into commands.sh. Refactor notes.md and questions.md when necessary to avoid redundancy "
+                "and to reduce length. Output: {combined_output}. What should we do next?",
             ]
         )
         print("Aider command:", " ".join(command))
@@ -265,7 +273,7 @@ if __name__ == "__main__":
                     files_potentially_being_tested.append(file)
 
         print("files_potentially_being_tested:", files_potentially_being_tested)
-        combined_output = (
+        COMBINED_OUTPUT = (
             f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_output}"
         ).strip()
         if "All checks passed" not in ruff_output:
