@@ -26,3 +26,10 @@
 ### Additional Notes
 - The `PydanticDeprecatedSince20` warning indicates that the code is using deprecated features from Pydantic. Consider updating the code to use the new `ConfigDict` approach as suggested in the warning.
 - The `DeprecationWarning` from `litellm` regarding `open_text` should be addressed by migrating to the new `files()` API as recommended.
+### Pylint and Pytest Issues
+- **Pylint Error**: The `tests/test_factorial.py` file contains an f-string with an invalid backslash, causing a syntax error. The backslash was removed to resolve the issue.
+- **Pytest ImportError**: The `FileEditorModule` could not be imported from `prismix.core.file_editor_module`. Ensure the import statement is correct and there are no circular dependencies.
+
+### Action Items
+1. **Fix Syntax Error**: Updated the f-string in `tests/test_factorial.py` to remove the invalid backslash.
+2. **Ensure Proper Import**: Verified the import statement in `tests/test_file_editor_module.py` and ensured there are no circular dependencies.
