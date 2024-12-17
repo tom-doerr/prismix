@@ -31,7 +31,6 @@ def temp_file():
 def test_file_edit_module_no_change(file_editor_module, temp_file):
     """Test file edit with no change."""
     """Test file edit with no change."""
-    """Test file edit with no change."""
     updated_content = file_editor_module.forward(
         context=f"{temp_file} Content: def hello():\n    print('hello')\n",
         instruction="Do not change 'print(\\'hello\\')'",
@@ -41,9 +40,6 @@ def test_file_edit_module_no_change(file_editor_module, temp_file):
 
 
 def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
-    """Test file edit with multiple replacements."""
-    """Test file edit with multiple replacements."""
-    """Test file edit with multiple replacements."""
     """Test file edit with multiple replacements."""
     """Test file edit with multiple replacements."""
     updated_content = file_editor_module.forward(
@@ -62,9 +58,6 @@ def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
 def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file):
     """Test file edit with overlapping replacements."""
     """Test file edit with overlapping replacements."""
-    """Test file edit with overlapping replacements."""
-    """Test file edit with overlapping replacements."""
-    """Test file edit with overlapping replacements."""
     updated_content = file_editor_module.forward(
         context=f"{temp_file} Content: def hello():\n    print('hello')\n",
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and "
@@ -81,14 +74,10 @@ def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file
 def test_file_edit_module_empty_file(file_editor_module, temp_file):
     """Test file edit with an empty file."""
     """Test file edit with an empty file."""
-    """Test file edit with an empty file."""
-    """Test file edit with an empty file."""
-    """Test file edit with an empty file."""
-    """Test file edit with an empty file."""
     # Test file edit with an empty file
     with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
         f.write("")
-        temp_file_path = f.name
+        temp_file_path_empty = f.name
 
     updated_content = file_editor_module.forward(
         context=f"{temp_file} Content: ",
@@ -109,14 +98,11 @@ def test_file_edit_module_empty_file(file_editor_module, temp_file):
 def test_file_edit_module_file_not_found(file_editor_module):
     """Test file edit with file not found."""
     """Test file edit with file not found."""
-    """Test file edit with file not found."""
-    """Test file edit with file not found."""
-    """Test file edit with file not found."""
     result = file_editor_module.forward(
         context="non_existent_file.py Content: def hello():\n    print('hello')\n",
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')'.",
     )
-    assert result.error == "File does not exist"  # Check the error message
+    assert result.error == "File does not exist"
 
 
 def test_apply_single_replacement_function_def(file_editor_module):

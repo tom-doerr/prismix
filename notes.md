@@ -4,7 +4,6 @@
 - The code has been rated at 10.00/10 (previous run: 10.00/10, +0.00).
 - **Warnings**:
   - Missing class docstring in `CodeIndexer`.
-  - Pointless string statement in `CodeIndexer`.
   - Duplicate except blocks in `CodeIndexer`.
   - Broad exception caught in `CodeIndexer`.
 
