@@ -32,7 +32,7 @@ def temp_dir():
         yield tmpdir
 
 
-def test_search_code_on_the_fly(code_indexer_fixture: CodeIndexer, temp_dir: str):
+def test_search_code_on_the_fly(code_indexer: CodeIndexer, temp_directory: str):
     """Test the search_code_on_the_fly method."""
     # Test search with a query that exists in some files
     results = code_indexer_fixture.search_code_on_the_fly(
