@@ -13,5 +13,5 @@ class SomeModel(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-with resources.open_text("some_module", "some_file.txt") as f:
+with importlib.resources.open_text("some_module", "some_file.txt") as f:
     content = f.read()
