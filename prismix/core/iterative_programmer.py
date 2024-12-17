@@ -111,93 +111,10 @@ class IterativeProgrammer(dspy.Module):
 
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
         """Generate and execute code or edit files based on the command."""
-        # Check if this is a file editing command
         if command.startswith("edit"):
-            command = command.strip()
-            if command == "edit":
-                return FileContext(
-                    filepath="",
-                    content="",
-                    changes=[],
-                    error="Invalid edit command. Use: edit <filepath> <instruction>",
-                )
+            return self._handle_edit_command(command)
 
-            # Extract filepath and instruction
-            parts = command[4:].strip().split(" ", 1)
-            if not parts or len(parts) != 2:
-                return FileContext(
-                    filepath="",
-                    content="",
-                    changes=[],
-                    error="Invalid edit command. Use: edit <filepath> <instruction>",
-                )
-            filepath, instruction = parts
-            print(f"Editing file: {filepath}")
-            print(f"Instruction: {instruction}\n")
-            file_context = self.file_editor.edit_file(filepath, instruction)
-            return file_context
-
-        # Regular code generation flow
-        print("1. Generating program specification...")
-        context = self.generator.generate_spec(command)
-        print(f"Requirements: {context.requirements}")
-        print(f"Approach: {context.approach}\n")
-
-        # Iterative improvement loop
-        for i in range(self.max_iterations):
-            print(f"Iteration {i+1}/{self.max_iterations}")
-            print("------------------------")
-
-            # Generate implementation
-            print("2. Generating implementation...")
-            code = self.generator.generate_implementation(context)
-
-            # Safety check
-            print("3. Running safety check...")
-            is_safe, safety_msg = self.is_code_safe(code)
-            print(f"Safety check result: {'PASSED' if is_safe else 'FAILED'}")
-            print(f"Safety analysis: {safety_msg}\n")
-
-            if not is_safe:
-                print("Code generation failed due to safety concerns.")
-                return CodeResult(
-                    code=code,
-                    success=False,
-                    output="",
-                    error=f"Safety check failed: {safety_msg}",
-                )
-
-            # Test implementation
-            print("4. Testing implementation...")
-            print("Code to be executed:")
-            print("----------")
-            print(code)
-            print("----------")
-            result = self.execute_code(code)
-
-            if result.success:
-                print("Success! Implementation passed testing.\n")
-                return result
-
-            # Try to improve failed implementation
-            print(f"Test failed: {result.error}")
-            print("5. Reviewing and improving code...")
-
-            if i == self.max_iterations - 1:
-                return result
-
-            improved_code = self.generator.improve_implementation(code, result.error)
-            context.previous_code = code
-            context.previous_error = result.error
-
-            improved_result = self.execute_code(improved_code)
-            if improved_result.success:
-                return improved_result
-
-        if not result.success:
-            return result
-
-        return result
+        return self._handle_code_generation(command)
 
 
 def setup_agent() -> IterativeProgrammer:
