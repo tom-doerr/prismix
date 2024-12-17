@@ -18,7 +18,8 @@ class GenerateScript(dspy.Signature):
     """Generate a Python script based on a theme"""
 
     theme = dspy.InputField(
-        desc="Theme or topic for the script (e.g., 'file processing', 'data structures')"
+        desc="Theme or topic for the script "
+             "(e.g., 'file processing', 'data structures')"
     )
     script = dspy.OutputField(desc="Complete Python script following best practices")
 
@@ -28,7 +29,8 @@ class GenerateEditInstruction(dspy.Signature):
 
     script = dspy.InputField(desc="Original Python script")
     instruction = dspy.OutputField(
-        desc="Natural language instruction for editing the script (e.g., 'add error handling', 'improve documentation')"
+        desc="Natural language instruction for editing the script "
+             "(e.g., 'add error handling', 'improve documentation')"
     )
 
 
