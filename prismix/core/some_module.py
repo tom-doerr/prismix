@@ -2,7 +2,6 @@
 This module demonstrates the use of Pydantic and litellm libraries.
 """
 
-
 from pydantic import BaseModel
 
 
