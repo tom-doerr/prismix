@@ -133,6 +133,14 @@ def filter_files_by_output(output, all_files):
             files_to_fix.add(file_path)
     return list(files_to_fix)
 
+debugging_and_testing_file = 'introduction-to-debugging-and-testing-software.md'
+try:
+    with open(debugging_and_testing_file, 'r') as file:
+        debugging_and_testing_content = file.read()
+except FileNotFoundError:
+    # warn
+    print(f"File {debugging_and_testing_file} not found.")
+    debugging_and_testing_content = ''
 
 def call_aider(file_paths, combined_output, model):
     """Call aider to fix issues based on combined output."""
@@ -154,7 +162,7 @@ def call_aider(file_paths, combined_output, model):
             + ["--file", "questions.md"]
             + [
                 "--message",
-                f"There are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. Refactor notes.md and questions.md when necessary to avoid redundancy and to reduce length. Output: {combined_output}. What should we do next?",
+                f"{debugging_and_testing_content}\n\n\nThere are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. Refactor notes.md and questions.md when necessary to avoid redundancy and to reduce length. Output: {combined_output}. What should we do next?",
             ]
         )
         print("Aider command:", " ".join(command))
