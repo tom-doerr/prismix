@@ -3,7 +3,6 @@ import random
 from pathlib import Path
 from dataclasses import dataclass
 import dspy
-from typing import List, Dict, Any, Tuple
 from prismix.core.file_operations import FileEditor
 from prismix.core.metrics import calculate_levenshtein_similarity
 
@@ -190,7 +189,7 @@ class EditDatasetGenerator(dspy.Module):
             original_script, generated_script
         )
 
-        print(f"\nSimilarity scores:")
+        print("\nSimilarity scores:")
         print(f"Editor version: {editor_similarity:.3f}")
         print(f"Generated version: {generated_similarity:.3f}")
 
