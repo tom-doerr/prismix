@@ -19,7 +19,7 @@ def read_file(self, filename: str) -> FileContext:
                 filepath=filename, content="", changes=[], error="File does not exist"
             )
 
-    def apply_replacements(self, content: str, instruction: str) -> str:
+        def apply_replacements(self, content: str, instruction: str) -> str:
         """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
