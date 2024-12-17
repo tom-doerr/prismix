@@ -63,9 +63,7 @@ def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file
         "Replace 'hello' with 'greet'",
     )
     # Ensure the file was written
-    assert (
-        updated_content.content == "def greet():\n    print('hi')\n"
-    )
+    assert updated_content.content == "def greet():\n    print('hi')\n"
 
 
 def test_file_edit_module_empty_file(file_editor_module, temp_file):
