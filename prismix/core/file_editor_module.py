@@ -17,6 +17,21 @@ class FileEditorModule:
             content = content.replace(search_pattern, replacement_code)
         return content
 
+    def read_file(self, filename: str) -> FileContext:
+        """Reads the content of the file."""
+        return self.file_manager.read_file(filename)
+
+    def write_file(self, filename: str, content: str) -> FileContext:
+        """Writes the updated content back to the file."""
+        return self.file_manager.write_file(filename, content)
+
+    def apply_replacements(self, content: str, instruction: str) -> str:
+        """Applies multiple replacements based on the instruction."""
+        replacements = self.parse_instructions(instruction)
+        for search_pattern, replacement_code in replacements:
+            content = content.replace(search_pattern, replacement_code)
+        return content
+
     def apply_single_replacement(
         self, content: str, search_pattern: str, replacement_code: str
     ) -> str:

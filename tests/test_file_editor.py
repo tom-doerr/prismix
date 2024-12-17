@@ -38,6 +38,8 @@ def test_read_file_not_existing():
 
 import os
 
+# Move the import statement to the top of the file
+
 
 def test_write_file():
     """Test writing to a file."""
