@@ -49,7 +49,8 @@ def test_factorial_negative():
 
     # Safer execution using CodeExecutor
     cleaned_code = result.code.replace("```python", "").replace("```", "").strip()
-    code_result = CodeExecutor.execute(cleaned_code)
+    function_code = ast.unparse(function_def)
+    code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
     factorial = locals().get("factorial")
     assert factorial(5) == 120

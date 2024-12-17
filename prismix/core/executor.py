@@ -38,57 +38,9 @@ class CodeExecutor:
     @staticmethod
     def execute(code: str) -> CodeResult:
         """Execute code in isolated environment and return results"""
+        import ast
         try:
-            # Set up isolated execution environment
-            local_vars = {}
-            # Safely parse and execute the code
-            parsed_code = ast.parse(code)
-            # Necessary for executing the code in a controlled environment
-            # Safely parse and execute the code
-            # Safely execute the code in a controlled environment
-            # Safely evaluate the code using ast.literal_eval
-            local_vars = {}
-            # Safely evaluate the code using ast.literal_eval
-            try:
-                evaluated_code = ast.literal_eval(parsed_code)
-                local_vars.update(evaluated_code)
-            except (ValueError, SyntaxError) as e:
-                return CodeResult(
-                    code=code,
-                    success=False,
-                    output="",
-                    error=f"Code evaluation failed: {str(e)}",
-                )
-
-            # Get the main function from the generated code
-            main_func = None
-            for _, obj in local_vars.items():
-                if callable(obj) and obj.__name__ == "main":
-                    main_func = obj
-                    break
-
-            if main_func is None:
-                return CodeResult(
-                    code=code,
-                    success=False,
-                    output="",
-                    error="No callable 'main' function found in generated code",
-                )
-
-            # Test the function with a sample input
-            try:
-                result = main_func(5)  # Test with simple input
-                return CodeResult(
-                    code=code,
-                    success=True,
-                    output=f"Code executed successfully. Test main(5) = {result}",
-                )
-            except TypeError as e:
-                return CodeResult(
-                    code=code,
-                    success=False,
-                    output="",
-                    error=f"Function execution failed: {str(e)}",
-                )
-        except (SyntaxError, NameError) as e:
-            return CodeResult(code=code, success=False, output="", error=str(e))
+            result = ast.literal_eval(code)
+            return CodeResult(code=code, success=True, output=str(result))
+        except Exception as e:
+            return CodeResult(code=code, success=False, error=str(e))

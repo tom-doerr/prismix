@@ -67,15 +67,12 @@ class DataInserter:
                 )  # Provide file_operations
                 if file_context and file_context.content:
                     embedding = indexer.embed_code(file_context.content)
-                    self.qdrant_manager.insert_embeddings(
-                        [
-                            {
-                                "id": filepath,
-                                "vector": embedding,
-                                "payload": {"content": file_context.content},
-                            }
-                        ]
+                    point = models.PointStruct(
+                        id=filepath,
+                        vector=embedding,
+                        payload={"content": file_context.content},
                     )
+                    self.qdrant_manager.insert_embeddings([point])
                     logging.info("Added to Qdrant: %s", filepath)
             except (FileNotFoundError, PermissionError) as e:  # Specific exceptions
                 logging.error("Error adding %s to Qdrant: %s", filepath, e)

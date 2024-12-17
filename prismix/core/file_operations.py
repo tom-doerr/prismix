@@ -2,20 +2,21 @@
 Module for handling file operations and editing.
 """
 
-from dataclasses import dataclass
+from pydantic import BaseModel, ConfigDict
 from typing import Optional, List, Union, Tuple
 from abc import ABC, abstractmethod
 import dspy
 
 
-@dataclass
-class FileContext:
+class FileContext(BaseModel):
     """Context for file operations"""
 
     filepath: str
     content: str
     changes: List[str]
     error: Optional[str] = None
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class FileEdit(dspy.Signature):
