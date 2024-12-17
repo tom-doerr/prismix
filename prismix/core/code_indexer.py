@@ -56,10 +56,14 @@ class CodeIndexer:
                 filepath = os.path.join(root, file)
                 if not self._is_ignored(filepath):
                     try:
-                        file_context = FileManager(file_operations=DefaultFileOperations()).read_file(filepath)
+                        file_context = FileManager(
+                            file_operations=DefaultFileOperations()
+                        ).read_file(filepath)
                         if file_context and file_context.content:
                             embedding = self.embedder.embed_code(file_context.content)
-                            indexed_code = IndexedCode(filepath, file_context.content, embedding)
+                            indexed_code = IndexedCode(
+                                filepath, file_context.content, embedding
+                            )
                             self.indexed_code[filepath] = indexed_code
                             print(f"Indexed: {filepath}")
                     except FileNotFoundError as e:
@@ -87,10 +91,18 @@ class CodeIndexer:
                 filepath = os.path.join(root, file)
                 if not self._is_ignored(filepath):
                     try:
-                        file_context = FileManager(file_operations=DefaultFileOperations()).read_file(filepath)
-                        if file_context and file_context.content and query in file_context.content:
+                        file_context = FileManager(
+                            file_operations=DefaultFileOperations()
+                        ).read_file(filepath)
+                        if (
+                            file_context
+                            and file_context.content
+                            and query in file_context.content
+                        ):
                             embedding = self.embedder.embed_code(file_context.content)
-                            indexed_code = IndexedCode(filepath, file_context.content, embedding)
+                            indexed_code = IndexedCode(
+                                filepath, file_context.content, embedding
+                            )
                             results.append(indexed_code)
                     except FileNotFoundError as e:
                         print(f"File not found: {filepath}: {e}")
