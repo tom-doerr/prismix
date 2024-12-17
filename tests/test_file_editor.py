@@ -1,3 +1,6 @@
+"""
+Test module for the FileEditorModule class.
+"""
 from prismix.core.file_editor_module import FileEditorModule
 
 
@@ -31,6 +34,8 @@ def test_read_file_not_existing():
     assert file_context.error == "File does not exist"
 
 
+import os
+
 def test_write_file():
     """Test writing to a file."""
     editor = FileEditorModule()
@@ -50,5 +55,3 @@ Test module for the FileEditorModule class.
 """
 
 import os
-
-"""Test module for the FileEditorModule class."""
