@@ -45,6 +45,7 @@ class GenerateHindsightEdit(dspy.Signature):
 @dataclass
 class EditDataPoint:
     """Represents a single edit transformation example."""
+
     original_script: str
     edited_script: str
     edit_instruction: str
