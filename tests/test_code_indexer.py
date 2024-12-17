@@ -8,7 +8,6 @@ import pytest
 from prismix.core.code_indexer import CodeIndexer, IndexedCode
 from prismix.core.code_embedder import CodeEmbedder
 from prismix.core.file_operations import FileManager, DefaultFileOperations
-from prismix.core.code_embedder import CodeEmbedder
 
 
 @pytest.fixture
