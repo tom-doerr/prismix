@@ -84,7 +84,7 @@ class FileEditorModule:
             )
 
         if not changes:
-            return FileContext(filepath="", content=content, changes=changes)
+            return FileContext(filepath="", content=content, changes=[])
 
         # Convert changes from tuples to strings
         changes_str = [f"Replaced '{old}' with '{new}'" for old, new in changes]
