@@ -2,6 +2,7 @@
 This module contains a basic function to calculate the sum of three numbers.
 """
 
+
 def calculate_sum(a: int, b: int, c: int) -> int:
     """Calculate the sum of three numbers."""
     print(f"The sum is: {a + b + c}")

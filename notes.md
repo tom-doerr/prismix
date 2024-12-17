@@ -8,17 +8,12 @@
 - Pytest failed to run `tests/test_file_editor_module.py` due to an `ImportError`. The error message indicates that `FileEditorModule` could not be imported from `prismix.core.file_editor_module`. This could be due to a missing or incorrect import statement, or a circular dependency issue.
 
 ### Action Items
-1. **Resolve Pylint Crash**:
-   - Check the version of `isort` and ensure it is compatible with the installed version of Pylint.
-   - Consider updating or downgrading `isort` to a version that works with the current Pylint setup.
-   - Alternatively, disable the `isort` integration in Pylint if it is not critical.
-
-2. **Fix Pytest ImportError**:
+1. **Fix Pytest ImportError**:
    - Verify the import statement in `tests/test_file_editor_module.py`. Ensure that `FileEditorModule` is correctly defined and accessible.
    - Check for circular dependencies in the `prismix.core` module.
    - If necessary, refactor the code to avoid circular imports.
 
-3. **Address Pylint Warnings**:
+2. **Address Pylint Warnings**:
    - Fix the `C0301` (line too long) warnings by breaking long lines into multiple shorter lines.
    - Move the import statement `from prismix.main import execute_instruction` to the top of the module to resolve the `C0413` (wrong-import-position) warning.
    - Add docstrings to the functions in `tests/test_main.py` to address the `C0116` (missing-function-docstring) warnings.
