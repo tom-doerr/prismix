@@ -17,7 +17,7 @@ def test_factorial_basic():
     # Safer execution using CodeExecutor
     # Wrap the generated code in a callable function
     wrapped_code = f"""def main():
-        {result.code.replace('```python', '').replace('```', '').strip().replace('\\n', '\n    ').replace('{', '{{').replace('}', '}}')}
+        {result.code.replace('```python', '').replace('```', '').strip().replace(r'\\n', '\n    ').replace('{', '{{').replace('}', '}}')}
     main()"""
     code_result = CodeExecutor.execute(wrapped_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
