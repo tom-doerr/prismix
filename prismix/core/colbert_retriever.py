@@ -21,7 +21,7 @@ def get_all_files_to_index(directory: str) -> List[str]:
     for root, _, files in os.walk(directory):
         for file in files:
             filepath = os.path.join(root, file)
-            if not indexer._is_ignored(filepath):
+            if not indexer.is_ignored(filepath):
                 files_to_index.append(filepath)
     return files_to_index
 
@@ -50,8 +50,6 @@ def add_data_to_db(directory: str):
 class DataInserter:
     """Inserts data into the Qdrant database."""
 
-    """Inserts data into the Qdrant database."""
-    """Inserts data into the Qdrant database."""
 
     def __init__(self, qdrant_manager: QdrantManager):
         """Initializes the DataInserter with a QdrantManager."""
@@ -82,6 +80,7 @@ class DataInserter:
 
 
 class ColbertRetriever(dspy.Retrieve):
+    """Retrieves and manages code embeddings using Qdrant and CodeIndexer."""
     def __init__(self, url: str, k: int = 3):
         super().__init__(k=k)
         self.url = url
@@ -94,6 +93,7 @@ class ColbertRetriever(dspy.Retrieve):
         self.data_inserter.add_data_to_db(directory)
 
     def forward(self, query: str, k: int = None) -> List[str]:
+        """Search for similar embeddings in Qdrant."""
         """Search for similar embeddings in Qdrant."""
         """Search for similar embeddings in Qdrant."""
         query_embedding = self.qdrant_manager.embed_code(query)

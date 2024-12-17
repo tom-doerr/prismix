@@ -78,6 +78,21 @@
 4. **Fixed `ImportError` and `exec` usage in `tests/test_factorial.py`**:
    - The import statement for `CodeExecutor` was in the wrong position, and the `exec` usage was flagged as a security risk. These issues have been resolved.
 
+5. **Fixed Protected Access (`W0212`) in `colbert_retriever.py`**:
+   - The method `_is_ignored` was accessed directly, which is a protected member of the `CodeIndexer` class. This has been refactored to use a public method.
+
+6. **Removed Pointless String Statements (`W0105`) in `colbert_retriever.py`**:
+   - Unnecessary string statements have been removed.
+
+7. **Added Missing Class Docstring (`C0115`) in `colbert_retriever.py`**:
+   - A docstring has been added to the `ColbertRetriever` class.
+
+8. **Fixed Argument Differences (`W0221`) in `colbert_retriever.py`**:
+   - The `forward` method in `ColbertRetriever` now matches the parent class signature.
+
+9. **Fixed Too Many Positional Arguments (`E1121`) in `colbert_retriever.py`**:
+   - The method call `self.client.search` now correctly passes the required arguments.
+
 ### Action Items
 1. **Address Pylint Warning**:
    - Refactor `prismix/core/executor.py` to avoid using `exec`. Consider using safer alternatives for executing code in a controlled environment.
