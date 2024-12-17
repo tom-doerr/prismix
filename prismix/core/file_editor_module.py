@@ -72,5 +72,4 @@ class FileEditorModule:
         updated_content = self.apply_replacements(content, instruction)
 
         # Return a FileContext object with changes
-        changes = []
-        return FileContext(filepath=filepath, content=updated_content, changes=changes)
+        return FileContext(filepath=filepath, content=updated_content.content, changes=updated_content.changes)

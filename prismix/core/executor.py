@@ -43,12 +43,13 @@ class CodeExecutor:
         try:
             # Safer alternative to `exec`: use `ast.literal_eval` for simple evaluations
             loc = {}
+            output_buffer = []
+            loc["print"] = lambda *args, **kwargs: output_buffer.append(" ".join(map(str, args)))
             exec(code, CodeExecutor.get_safe_builtins(), loc)
-            result = loc.get("result", "No result returned")
             return CodeResult(
                 code=code,
                 success=True,
-                output=f"Code executed successfully. Result: {result}",
+                output="\n".join(output_buffer),
             )
         except (SyntaxError, ValueError) as e:
             return CodeResult(code=code, success=False, output="", error=str(e))

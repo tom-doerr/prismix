@@ -11,11 +11,11 @@ def test_apply_replacements():
     editor = FileEditorModule()
     content = "def foo():\n    pass"
     instruction = "Replace 'pass' with 'print(\"hello\")'"
-    updated_content = editor.apply_replacements(content, instruction)
-    assert updated_content == 'def foo():\n    print("hello")'
+    updated_content = editor.forward(context=f"Content: {content}", instruction=instruction)
+    assert updated_content.content == 'def foo():\n    print("hello")'
     assert (
-        editor.file_manager.write_file("test_file.py", updated_content).content
-        == updated_content
+        editor.file_manager.write_file("test_file.py", updated_content.content).content
+        == updated_content.content
     )
 
 

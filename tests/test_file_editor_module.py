@@ -32,11 +32,11 @@ def test_file_edit_module_no_change(file_editor_module):
     """Test file edit with no change."""
     updated_content = file_editor_module.apply_replacements(
         content="def hello():\n    print('hello')\n",
-        instruction="Do not change 'print('hello')'.",
+        instruction="Do not change 'print(\\'hello\\')'.",
     )
 
     # Ensure the file was written
-    assert updated_content == "def hello():\n    print('hello')\n"
+    assert updated_content.content == "def hello():\n    print('hello')\n"
     assert updated_content.changes == []
 
 
