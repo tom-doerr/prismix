@@ -48,11 +48,17 @@ class CodeExecutor:
             # Safely execute the code in a controlled environment
             # Safely evaluate the code using ast.literal_eval
             local_vars = {}
-            exec(
-                compile(parsed_code, filename="<string>", mode="exec"),
-                {"__builtins__": CodeExecutor.get_safe_builtins()},
-                local_vars,
-            )  # Consider using a safer alternative to exec
+            # Safely evaluate the code using ast.literal_eval
+            try:
+                evaluated_code = ast.literal_eval(parsed_code)
+                local_vars.update(evaluated_code)
+            except (ValueError, SyntaxError) as e:
+                return CodeResult(
+                    code=code,
+                    success=False,
+                    output="",
+                    error=f"Code evaluation failed: {str(e)}",
+                )
 
             # Get the main function from the generated code
             main_func = None

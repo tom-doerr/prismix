@@ -7,7 +7,7 @@ import pytest
 from prismix.core.iterative_programmer import IterativeProgrammer
 
 
-        """Mock implementation of the __call__ method."""
+    """Mock implementation of the __call__ method."""
         if "unsafe" in prompt.lower():
             return dspy.Prediction(
                 is_safe=False,
