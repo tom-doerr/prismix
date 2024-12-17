@@ -1,4 +1,3 @@
-
 from prismix.core.file_editor_module import FileEditorModule
 
 
