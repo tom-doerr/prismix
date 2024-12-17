@@ -16,11 +16,11 @@ def run_pylint():
             capture_output=True,
             text=True,
         )
-        pylint_output = result.stdout + result.stderr
+        local_pylint_output = result.stdout + result.stderr
     except subprocess.CalledProcessError as e:
-        pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
-        return False, pylint_output
-    return True, pylint_output
+        local_pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
+        return False, local_pylint_output
+    return True, local_pylint_output
 
 
 def run_ruff_fix():
@@ -32,11 +32,11 @@ def run_ruff_fix():
             capture_output=True,
             text=True,
         )
-        ruff_output = result.stdout + result.stderr
+        local_ruff_output = result.stdout + result.stderr
     except subprocess.CalledProcessError as e:
-        ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
-        return False, ruff_output
-    return True, ruff_output
+        local_ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
+        return False, local_ruff_output
+    return True, local_ruff_output
 
 
 def is_test_file(file_path):
@@ -96,6 +96,6 @@ if __name__ == "__main__":
     combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
     combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
     for file_path in all_files:
-        call_aider(find_related_files(file_path), combined_output)
+        call_aider(find_related_files(file_path), combined_output) # file_path is not redefined here
     if pylint_success and ruff_success:
         print("Pylint and Ruff checks and fixes applied successfully.")
