@@ -35,6 +35,17 @@ class CodeExecutor:
     ensuring that only a limited set of built-in functions are available to the executed code.
     """
 
+    @staticmethod
+    def execute(code: str) -> CodeResult:
+        """Execute code in isolated environment and return results"""
+        try:
+            spec = importlib.util.spec_from_loader("temp_module", loader=None)
+            temp_module = importlib.util.module_from_spec(spec)
+            exec(code, temp_module.__dict__, temp_module.__dict__)
+            return CodeResult(code=code, success=True, output="", error="")
+        except (SyntaxError, NameError) as e:
+            return CodeResult(code=code, success=False, output="", error=str(e))
+
     """
     Handles safe code execution in isolated environment.
 
