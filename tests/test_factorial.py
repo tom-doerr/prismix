@@ -42,7 +42,9 @@ def test_factorial_negative():
     )
 
     # Safer execution using CodeExecutor
-    wrapped_code = f"def main():\n    {result.code.replace('```python', '').replace('```', '').strip().replace('\\n', '\n    ')}\nmain()"
+    wrapped_code = f"""def main():
+        {result.code.replace('```python', '').replace('```', '').strip().replace('\\n', '\n    ')}
+    main()"""
     code_result = CodeExecutor.execute(wrapped_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
     assert code_result.success, f"Code execution failed: {code_result.error}"

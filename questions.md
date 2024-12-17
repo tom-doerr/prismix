@@ -11,6 +11,17 @@
    - Why is `ruff` unable to find the specified files?
    - Are the file paths correct, or is there an issue with the directory structure?
 
+1. **ImportError in `tests/test_code_indexer.py`**:
+   - Why is `CodeEmbedder` not being imported correctly?
+   - Is there a missing or incorrect import statement in `prismix.core.code_embedder`?
+
+2. **SyntaxError in `tests/test_factorial.py`**:
+   - How should the f-string be corrected to avoid the `SyntaxError`?
+
+3. **Ruff File Not Found Error**:
+   - Why is `ruff` unable to find the specified files?
+   - Are the file paths correct, or is there an issue with the directory structure?
+
 1. **MockLM Implementation**:
    - Why is the `MockLM` class in `tests/test_iterative_programmer.py` missing the required `prompt` argument?
    - How should the `MockLM` class be updated to be compatible with the expected interface of `dspy`?

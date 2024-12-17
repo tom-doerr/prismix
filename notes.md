@@ -3,6 +3,9 @@
 ### Pylint Output
 - The code has been rated at 7.69/10 for `tests/test_iterative_programmer.py` and 5.79/10 for `tests/test_file_editor_module.py`.
 - **Warnings**:
+  - Redefining names from outer scope (`W0621`) in `tests/test_colbert_retriever.py`.
+  - Line too long (`C0301`) in `tests/test_safety.py`.
+- **Warnings**:
   - Redundant reimports (`W0404`).
   - Signature mismatch in `MockLM` (`W0222`).
   - Import order issues (`C0411`, `C0412`).
