@@ -53,7 +53,6 @@ class FileOperations(ABC):
     @abstractmethod
     def write_file(self, filepath: str, content: str) -> None:
         """Write content to a file."""
-        pass
 
 
 class DefaultFileOperations(FileOperations):
@@ -91,7 +90,6 @@ class FileManager:
                 filepath=filepath, content="", changes=[], error="File does not exist"
             )
         except Exception as e:
-            return FileContext(filepath=filepath, content="", changes=[], error=str(e))
             return FileContext(filepath=filepath, content="", changes=[], error=str(e))
 
     def write_file(self, filepath: str, content: str) -> FileContext:
@@ -165,7 +163,7 @@ class FileEditor:
                             )
                         elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
                             lines.insert(line_num - 1, new_text)
-                            changes.append(f"inserted '{new_text}'")
+                            changes.append(f"Inserted at line {line_num}: '{new_text}'")
                             # Adjust line numbers for subsequent edits after insert
                             for j in range(len(edit_lines)):
                                 if j > edit_lines.index(edit):
@@ -186,7 +184,7 @@ class FileEditor:
                                                 pass
                         elif mode == "DELETE" and 1 <= line_num <= len(lines):
                             old_text = lines.pop(line_num - 1)
-                            changes.append(f"deleted '{old_text}'")
+                            changes.append(f"Deleted line {line_num}: '{old_text}'")
                             # Adjust line numbers for subsequent edits after delete
                             for j in range(len(edit_lines)):
                                 if j > edit_lines.index(edit):

@@ -15,20 +15,21 @@ def test_factorial_basic():
     )
 
     # Safer execution using CodeExecutor
-    # Wrap the generated code in a callable function
-    # Replace newline escape sequences outside of the f-string
     cleaned_code = result.code.replace("```python", "").replace("```", "").strip()
-    indented_code = (
-        cleaned_code.replace("{{", "{").replace("}}", "}").replace("\n", "\n    ")
-    )
-    wrapped_code = f"""def main():
-        {indented_code}
-    """
-    code_result = CodeExecutor.execute(wrapped_code)
+    
+    # Extract the factorial function definition
+    tree = ast.parse(cleaned_code)
+    function_def = next((node for node in tree.body if isinstance(node, ast.FunctionDef)), None)
+    if function_def:
+        function_code = ast.unparse(function_def)
+    else:
+        raise ValueError("No function definition found in the generated code.")
+
+    code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
-    # Retrieve the factorial function from the locals
-    factorial = locals().get("factorial") or locals().get("main")
-    assert factorial is not None, "Factorial function not found in generated code"
+    
+    # Execute the factorial function directly
+    factorial = locals().get("factorial")
 
     # Test basic cases
     assert factorial(0) == 1
@@ -55,8 +56,10 @@ def test_factorial_negative():
     wrapped_code = f"""def main():
         {indented_code}
     """
-    code_result = CodeExecutor.execute(wrapped_code)
+    code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
+    
+    # Execute the factorial function directly
     factorial = locals().get("factorial")
 
     # Test negative input

@@ -7,8 +7,6 @@ import tempfile
 import pytest
 from prismix.core.code_indexer import CodeIndexer, IndexedCode
 from prismix.core.code_embedder import CodeEmbedder
-from prismix.core.code_embedder import CodeEmbedder
-from prismix.core.file_operations import FileManager, DefaultFileOperations
 
 
 @pytest.fixture
@@ -36,7 +34,7 @@ def temp_dir():
 def test_search_code_on_the_fly(code_indexer, temp_dir):
     """Test the search_code_on_the_fly method."""
     # Test search with a query that exists in some files
-    results = code_indexer.search_code_on_the_fly(temp_dir, "print")
+    results = code_indexer.search_code_on_the_fly(temp_dir, "print",)
     assert len(results) == 2
     assert any("test1.py" in r.filepath for r in results)
     assert any("test3.py" in r.filepath for r in results)
