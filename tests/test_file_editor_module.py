@@ -219,7 +219,9 @@ def test_forward_with_different_replacements(file_editor_module, temp_file):
         context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n    return 1",
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and Replace 'def hello():' with 'def greet():'",
     )
-    assert updated_content.content.strip() == "def greet():\n    print('hi')\n    return 1"
+    assert (
+        updated_content.content.strip() == "def greet():\n    print('hi')\n    return 1"
+    )
     assert updated_content.changes == [
         ("def hello():", "def greet():"),
         ("    print('hello')", "    print('hi')"),
