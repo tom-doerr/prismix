@@ -19,7 +19,6 @@ openai = "^1.0.0"
 isort = "^5.10.1"  # Known compatible version with Pylint
 pytest-xdist = "^1.35.0"
 
-[tool.poetry.group.dev.dependencies]
 
 [build-system]
 requires = ["poetry-core"]

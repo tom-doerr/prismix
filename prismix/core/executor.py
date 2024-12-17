@@ -28,6 +28,7 @@ class FileContext(BaseModel):
     error: Optional[str]
 
 
+"""Handles safe code execution in isolated environment."""
 class CodeExecutor:
     """
     Handles safe code execution in isolated environment.
