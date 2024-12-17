@@ -2,19 +2,12 @@
 Module for handling file editing operations.
 """
 
+from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
 import dspy
 import re
 import logging
 from typing import List, Tuple
-from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
 from prismix.core.signatures import FileEdit
-
-
-class FileEditorModule(dspy.Module):
-    def __init__(self):
-        super().__init__()
-        self.file_edit_predictor = dspy.Predict(FileEdit)
-        logging.basicConfig(level=logging.INFO)
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the file and returns its content."""
