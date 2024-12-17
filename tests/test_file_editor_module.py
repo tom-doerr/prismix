@@ -293,6 +293,6 @@ def test_forward_with_file_not_found(file_editor_module):
         context="non_existent_file.py def hello():\n    print('hello')\n",
         instruction=instruction,
     )
-    assert "Error reading file" in file_context.error  # Corrected the assertion
+    assert file_context.error and "Error reading file" in file_context.error  # Corrected the assertion
     assert file_context.changes == [], f"Changes were: {file_context.changes}"
     assert file_context.changes == []
