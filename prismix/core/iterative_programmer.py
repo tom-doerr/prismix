@@ -10,8 +10,6 @@ from .generator import CodeGenerator, GenerationContext
 from .file_operations import FileEditor, FileContext
 
 
-
-
 def is_code_safe(code: str, safety_checker: dspy.TypedPredictor) -> Tuple[bool, str]:
     if "import os" in code or "os.system" in code:
         return (
