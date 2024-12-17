@@ -59,12 +59,12 @@ def find_related_files(current_file_path):
 
     if is_test_file(current_file_path):
         base_name = os.path.basename(current_file_path).replace("_test.py", ".py")
-        potential_related_file = os.path.join(
+        potential_related_file_path = os.path.join(
             os.path.dirname(current_file_path), base_name
         )
-        if os.path.exists(potential_related_file):
-            ensure_file_exists(potential_related_file)
-            return [current_file_path, potential_related_file]
+        if os.path.exists(potential_related_file_path):
+            ensure_file_exists(potential_related_file_path)
+            return [current_file_path, potential_related_file_path]
     return [current_file_path]
 
 
