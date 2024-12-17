@@ -147,9 +147,7 @@ DEBUGGING_AND_TESTING_FILE_URL = (
     "https://gist.githubusercontent.com/mwanginjuguna/545f983b12c76af238861d9af2e551a5/"
     "raw/9d8a8d47ca64cc340db69960011b368ab00179a9/introduction-to-debugging-and-testing-software.md"
 )
-debugging_and_testing_file = (
-    "prompt_text/introduction-to-debugging-and-testing-software.md"
-)
+DEBUGGING_AND_TESTING_FILE = "prompt_text/introduction-to-debugging-and-testing-software.md"
 
 if not os.path.exists(debugging_and_testing_file):
     os.makedirs(os.path.dirname(debugging_and_testing_file), exist_ok=True)
@@ -277,7 +275,7 @@ if __name__ == "__main__":
             f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_output}"
         ).strip()
         if "All checks passed" not in ruff_output:
-            combined_output += f"\nRuff output:\n{ruff_output}"
+            COMBINED_OUTPUT += f"\nRuff output:\n{ruff_output}"
         files_to_fix = filter_files_by_output(combined_output, all_python_files)
         files_to_fix.extend(files_potentially_being_tested)
         files_to_fix.extend(selected_files)
