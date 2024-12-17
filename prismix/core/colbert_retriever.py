@@ -3,13 +3,14 @@ Module for retrieving and managing code embeddings using Qdrant and CodeIndexer.
 """
 
 import logging
+import logging
 import os
 from typing import List
 
 import dspy
 
 from prismix.core.code_indexer import CodeIndexer, IndexedCode
-from prismix.core.file_operations import FileManager
+from prismix.core.file_operations import FileManager, DefaultFileOperations
 from prismix.core.qdrant_manager import QdrantManager
 
 
@@ -20,7 +21,7 @@ def get_all_files_to_index(directory: str) -> List[str]:
     for root, _, files in os.walk(directory):
         for file in files:
             filepath = os.path.join(root, file)
-            if not indexer.is_ignored(filepath):
+            if not indexer._is_ignored(filepath):  # Corrected method name
                 files_to_index.append(filepath)
     return files_to_index
 
@@ -31,20 +32,15 @@ def add_data_to_db(directory: str):
     files_to_index = get_all_files_to_index(directory)
     for filepath in files_to_index:
         try:
-            file_context = FileManager().read_file(filepath)
+            file_context = FileManager(file_operations=DefaultFileOperations()).read_file(filepath)  # Provide file_operations
             if file_context and file_context.content:
                 embedding = indexer.embed_code(file_context.content)
                 indexer.indexed_code[filepath] = IndexedCode(
                     filepath, file_context.content, embedding
                 )
                 logging.info("Added to db: %s", filepath)
-        except Exception as e:
+        except (FileNotFoundError, PermissionError) as e:  # Specific exceptions
             logging.error("Error reading file %s: %s", filepath, e)
-
-
-from prismix.core.qdrant_manager import QdrantManager
-
-import logging
 
 
 class DataInserter:
@@ -60,7 +56,7 @@ class DataInserter:
         files_to_index = get_all_files_to_index(directory)
         for filepath in files_to_index:
             try:
-                file_context = FileManager().read_file(filepath)
+                file_context = FileManager(file_operations=DefaultFileOperations()).read_file(filepath)  # Provide file_operations
                 if file_context and file_context.content:
                     embedding = indexer.embed_code(file_context.content)
                     self.qdrant_manager.insert_embeddings(
@@ -73,7 +69,7 @@ class DataInserter:
                         ]
                     )
                     logging.info("Added to Qdrant: %s", filepath)
-            except Exception as e:
+            except (FileNotFoundError, PermissionError) as e:  # Specific exceptions
                 logging.error("Error adding %s to Qdrant: %s", filepath, e)
 
 
