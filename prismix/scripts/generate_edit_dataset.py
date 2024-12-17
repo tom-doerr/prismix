@@ -4,12 +4,13 @@ Script to generate an edit dataset for training purposes.
 
 import json
 import random
-import tempfile
-from pathlib import Path
-from dataclasses import dataclass
 import re
+import tempfile
+from dataclasses import dataclass
+from pathlib import Path
 
 import dspy
+
 from prismix.core.file_operations import FileEditor
 from prismix.core.metrics import calculate_levenshtein_similarity
 
@@ -113,10 +114,14 @@ class EditDatasetGenerator(dspy.Module):
         generated_script = self._generate_alternative_version(theme, edit_instruction)
 
         # 5. Compare versions and choose the best one
-        edited_script = self._choose_best_version(original_script, editor_script, generated_script)
+        edited_script = self._choose_best_version(
+            original_script, editor_script, generated_script
+        )
 
         # 6. Generate hindsight edit command
-        hindsight_command = self._generate_hindsight_command(original_script, edited_script)
+        hindsight_command = self._generate_hindsight_command(
+            original_script, edited_script
+        )
 
         return EditDataPoint(
             original_script=original_script,
@@ -149,7 +154,9 @@ class EditDatasetGenerator(dspy.Module):
         print("Edit instruction:", edit_instruction)
         return edit_instruction
 
-    def _apply_edits(self, original_script: str, edit_instruction: str) -> Optional[str]:
+    def _apply_edits(
+        self, original_script: str, edit_instruction: str
+    ) -> Optional[str]:
         """Apply the edit instruction using FileEditor."""
         editor = FileEditor()
         with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
@@ -168,7 +175,9 @@ class EditDatasetGenerator(dspy.Module):
 
     def _generate_alternative_version(self, theme: str, edit_instruction: str) -> str:
         """Generate an alternative version of the script."""
-        modified_result = self.script_generator(theme=theme, instruction=edit_instruction)
+        modified_result = self.script_generator(
+            theme=theme, instruction=edit_instruction
+        )
         generated_script = modified_result.script.strip()
         if generated_script.startswith("```python"):
             generated_script = generated_script[8:].strip()
@@ -177,10 +186,18 @@ class EditDatasetGenerator(dspy.Module):
         print("Generated alternative length:", len(generated_script))
         return generated_script
 
-    def _choose_best_version(self, original_script: str, editor_script: Optional[str], generated_script: str) -> str:
+    def _choose_best_version(
+        self, original_script: str, editor_script: Optional[str], generated_script: str
+    ) -> str:
         """Choose the best version based on similarity scores."""
-        editor_similarity = calculate_levenshtein_similarity(original_script, editor_script) if editor_script else 1.0
-        generated_similarity = calculate_levenshtein_similarity(original_script, generated_script)
+        editor_similarity = (
+            calculate_levenshtein_similarity(original_script, editor_script)
+            if editor_script
+            else 1.0
+        )
+        generated_similarity = calculate_levenshtein_similarity(
+            original_script, generated_script
+        )
 
         print("\nSimilarity scores:")
         print(f"Editor version: {editor_similarity:.3f}")
@@ -191,9 +208,13 @@ class EditDatasetGenerator(dspy.Module):
         else:
             return generated_script
 
-    def _generate_hindsight_command(self, original_script: str, edited_script: str) -> str:
+    def _generate_hindsight_command(
+        self, original_script: str, edited_script: str
+    ) -> str:
         """Generate a hindsight edit command."""
-        hindsight = self.hindsight_generator(original=original_script, edited=edited_script)
+        hindsight = self.hindsight_generator(
+            original=original_script, edited=edited_script
+        )
         return hindsight.edit_command
 
     def forward(
