@@ -19,6 +19,7 @@ class CodeResult:
     error: str = ""
 
 
+
 class FileContext(BaseModel):
     model_config = ConfigDict(extra="forbid")
     filepath: str
