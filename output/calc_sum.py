@@ -1,3 +1,7 @@
+"""
+This module provides a function to calculate the sum of two numbers and print the result.
+"""
+
 if __name__ == "__main__":
 
     # samples/basic_function.py
@@ -14,9 +18,7 @@ if __name__ == "__main__":
         int or float: The sum of a and b.
         """
         result = a + b
-        print(
-            f"The sum of {a} and {b} is: {result}"
-        )  # Print the result before returning
+        print(f"The sum of {a} and {b} is: {result}")  # Print the result before returning
         return result
 
     if __name__ == "__main__":

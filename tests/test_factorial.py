@@ -49,7 +49,7 @@ def test_factorial_negative():
 
     # Safer execution using CodeExecutor
     cleaned_code = result.code.replace("```python", "").replace("```", "").strip()
-    function_code = ast.unparse(function_def)
+    function_code = ast.unparse(ast.Module(body=[function_def], type_ignores=[]))
     code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
     factorial = locals().get("factorial")

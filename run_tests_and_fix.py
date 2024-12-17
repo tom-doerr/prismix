@@ -13,12 +13,10 @@ def run_pylint():
         result = subprocess.run(
             ["pylint", "."],
             check=True,
-            capture_output=True,  # Capture both stdout and stderr
+            capture_output=True,
             text=True,
         )
-        pylint_result_output = (
-            result.stdout + result.stderr
-        )  # Combine stdout and stderr
+        pylint_output = result.stdout + result.stderr
     except subprocess.CalledProcessError as e:
         pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
         return False, pylint_output
@@ -31,10 +29,10 @@ def run_ruff_fix():
         result = subprocess.run(
             ["ruff", ".", "--fix"],
             check=True,
-            capture_output=True,  # Capture both stdout and stderr
+            capture_output=True,
             text=True,
         )
-        ruff_result_output = result.stdout + result.stderr  # Combine stdout and stderr
+        ruff_output = result.stdout + result.stderr
     except subprocess.CalledProcessError as e:
         ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
         return False, ruff_output
@@ -54,6 +52,7 @@ MAX_RECURSION_DEPTH = 1
 
 
 def find_related_files(file_path):
+    """Find related files for a given file path."""
     ensure_file_exists(file_path)
 
     if is_test_file(file_path):

@@ -31,4 +31,6 @@ def test_execute_instruction_file_edit():
         )
         assert "Updated file contents:" in mock_stdout.getvalue()
         with open("samples/basic_function.py", "r", encoding="utf-8") as f:
-            assert 'print(f"The sum is: {a + b + c}")' in f.read()
+            content = f.read()
+            assert 'print(f"The sum is: {a + b + c}")' in content
+            assert 'print(f"Calculated sum: {a + b + c}")' not in content

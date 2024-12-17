@@ -59,6 +59,7 @@ if __name__ == "__main__":
     assert result.success
     assert "Sum: 8" in result.output
     assert "Function execution failed" not in result.error
+    assert result.output.strip() == "Calculated sum: 8\nSum: 8"
 
 
 def test_execute_code_fail():
