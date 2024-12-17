@@ -30,15 +30,10 @@ def temp_file():
 
 def test_file_edit_module_no_change(file_editor_module):
     """Test file edit with no change."""
-    """Test file edit with no change."""
-    """Test file edit with no change."""
-
     updated_content = file_editor_module.forward(
         context=f"{temp_file} Content: def hello():\n    print('hello')\n",
         instruction="Do not change 'print(\\'hello\\')'",
     )
-
-    # Ensure the file was written
     assert updated_content.content.strip() == "def hello():\n    print('hello')\n"
 
 
