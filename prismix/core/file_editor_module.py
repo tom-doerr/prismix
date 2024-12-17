@@ -17,9 +17,10 @@ from prismix.core.file_operations import (
 class FileEditorModule:
     """Handles file editing operations."""
 
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     def __init__(self):
         self.file_manager = FileManager(file_operations=DefaultFileOperations())
-        self.model_config = ConfigDict(arbitrary_types_allowed=True)
 
     def read_file(self, filename: str) -> FileContext:
         """Read the content of a file."""
