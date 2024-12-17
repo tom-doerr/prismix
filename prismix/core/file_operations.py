@@ -87,7 +87,7 @@ class FileManager:
             return FileContext(
                 filepath=filepath, content="", changes=[], error="File does not exist"
             )
-        except (FileNotFoundError, PermissionError) as e:
+        except PermissionError as e:
             return FileContext(
                 filepath=filepath,
                 content="",
@@ -104,7 +104,11 @@ class FileManager:
                 content=content,
                 changes=["File updated successfully"],
             )
-        except Exception as e:
+        except PermissionError as e:
+            return FileContext(
+                filepath=filepath, content=content, changes=[], error=str(e)
+            )
+        except IOError as e:
             return FileContext(
                 filepath=filepath, content=content, changes=[], error=str(e)
             )
