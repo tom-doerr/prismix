@@ -1,1 +1,3 @@
-dummy_code
+"""
+Module for generating code.
+"""
