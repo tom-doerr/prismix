@@ -9,6 +9,7 @@ from prismix.core.iterative_programmer import IterativeProgrammer
 
 class TestSafetyCheck(unittest.TestCase):
     """Test class for safety checks in the IterativeProgrammer module."""
+
     def setUp(self):
         """Set up the test environment with a mock language model."""
         dspy.configure(lm=dspy.LM(model="gpt-4o-mini", max_tokens=2000))
