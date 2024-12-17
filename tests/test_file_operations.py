@@ -36,6 +36,7 @@ def agent():
 
 
 def test_file_read(test_file_fixture):
+    """Test reading file content."""
     """Test reading file content"""
     file_manager = FileManager(DefaultFileOperations())
     result = file_manager.read_file(test_file_fixture)

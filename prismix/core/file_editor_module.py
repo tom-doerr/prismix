@@ -91,7 +91,6 @@ class FileEditorModule:
     def forward(self, context: str, instruction: str) -> FileContext:
         """Edit the file based on the context and instruction."""
         filepath = ""
-        # content = ""  # Unused variable
         if "File: " in context:
             try:
                 filepath = context.split("File: ")[1].split("\n")[0].strip()
@@ -99,9 +98,9 @@ class FileEditorModule:
                 pass
         if "Content: " in context:
             try:
-                _ = context.split("Content: ")[1].strip()
+                content = context.split("Content: ")[1].strip()
             except IndexError:
-                pass
+                content = ""
 
         if not os.path.exists(filepath):
             return FileContext(
