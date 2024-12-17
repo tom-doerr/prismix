@@ -34,8 +34,8 @@ def temp_dir():
 
 def test_search_code_on_the_fly(code_indexer_fixture: CodeIndexer, temp_dir: str):
     """Test the search_code_on_the_fly method."""
-    indexer = indexer_fixture
-    directory = temp_directory
+    indexer = code_indexer_fixture
+    directory = temp_dir
     results = indexer.search_code_on_the_fly(directory, "print")
     assert len(results) == 2
     assert any("test1.py" in r.filepath for r in results)
