@@ -17,16 +17,15 @@ class FileEditorModule:
     def apply_replacements(self, content: str, instruction: str) -> FileContext:
         """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
-        for search_pattern, replacement_code in replacements:
-            content = content.replace(search_pattern, replacement_code)
-        return FileContext(
-            filepath="",
-            content=content,
-            changes=[
-                f"{search_pattern} -> {replacement_code}"
-                for search_pattern, replacement_code in replacements
-            ],
-        )
++        changes = []
++        for search_pattern, replacement_code in replacements:
++            changes.append(f"{search_pattern} -> {replacement_code}")
++            content = content.replace(search_pattern, replacement_code)
++        return FileContext(
++            filepath="",
++            content=content,
++            changes=changes,
++        )
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the content of the file."""
