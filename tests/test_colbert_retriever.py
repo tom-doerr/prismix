@@ -11,6 +11,7 @@ from prismix.core.colbert_retriever import ColbertRetriever
 
 @pytest.fixture
 def colbert_retriever_instance():
+    """Fixture to create an instance of ColbertRetriever."""
     return ColbertRetriever(url="http://example.com/colbert", k=3)
 
 
