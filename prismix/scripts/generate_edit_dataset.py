@@ -55,6 +55,9 @@ class EditDataPoint:
 
 
 class EditDatasetGenerator(dspy.Module):
+    """
+    Generates a dataset of edit examples for training purposes.
+    """
 
     def __init__(self):
         super().__init__()
@@ -96,7 +99,8 @@ class EditDatasetGenerator(dspy.Module):
         print(f"Selected theme: {theme}")
 
         result = self.script_generator(theme=theme)
-        print("Generated original script length:", len(result.script))
+        print("Generated original script length:",
+              len(result.script))
 
         # Clean and validate the generated script
         original_script = self._clean_script(result.script)
@@ -182,7 +186,8 @@ class EditDatasetGenerator(dspy.Module):
             generated_script = generated_script[8:].strip()
         if generated_script.endswith("```"):
             generated_script = generated_script[:-3].strip()
-        print("Generated alternative length:", len(generated_script))
+        print("Generated alternative length:",
+              len(generated_script))
         return generated_script
 
     def _choose_best_version(
