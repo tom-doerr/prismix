@@ -12,7 +12,7 @@ def test_apply_replacements():
     content = "def foo():\n    pass"
     instruction = "Replace 'pass' with 'print(\"hello\")'"
     updated_content = editor.forward(
-        context=f"Content: {content}", instruction=instruction
+        context=f"Content: {content}", instruction=instruction,
     )
     assert updated_content.content == 'def foo():\n    print("hello")'
     assert (
