@@ -147,3 +147,4 @@ def main() -> NoReturn:
 
 if __name__ == "__main__":
     main()
+# This file is intentionally left empty.
