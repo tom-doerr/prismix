@@ -108,13 +108,6 @@ class IterativeProgrammer(dspy.Module):
                 output="",
                 error=f"Function execution failed in {file_path}: {str(e)}",
             )
-        except (subprocess.CalledProcessError, FileNotFoundError, PermissionError) as e:
-            return CodeResult(
-                code=code,
-                success=False,
-                output="",
-                error=f"Function execution failed in {file_path}: {str(e)}",
-            )
 
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
         """Generate and execute code or edit files based on the command."""
