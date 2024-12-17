@@ -394,6 +394,8 @@ def test_write_to_new_directory(tmp_path):
     assert os.path.exists(file_path)
     with open(file_path, encoding="utf-8") as f:
         assert f.read() == content
+
+
 @pytest.fixture
 def test_file_fixture_read(tmp_path):
     """Create a temporary test file"""
@@ -407,6 +409,7 @@ def test_file_fixture_read(tmp_path):
     with open(file_path, "w", encoding="utf-8") as f:
         f.write(content)
     return str(file_path)
+
 
 @pytest.fixture
 def tmp_path_write(tmp_path):
