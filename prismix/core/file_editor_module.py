@@ -2,12 +2,10 @@
 Module for handling file editing operations.
 """
 
-from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
-import dspy
-import re
-import logging
-from typing import List, Tuple
-from prismix.core.signatures import FileEdit
+class FileEditorModule:
+    """Handles file editing operations."""
+    def __init__(self):
+        pass
 
 def apply_replacements(self, content: str, instruction: str) -> str:
         """Applies multiple replacements based on the instruction."""
