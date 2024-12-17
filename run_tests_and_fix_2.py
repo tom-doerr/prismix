@@ -26,13 +26,15 @@ def run_pylint():
     return True, pylint_output
 
 
-def run_random_pytest(n, all_files):
+# def run_random_pytest(n, all_files):
+def run_random_pytest(files):
     """Runs n random pytest tests and captures the output."""
-    test_files = [file_path for file_path in all_files if is_test_file(file_path)]
-    random.shuffle(test_files)
-    selected_test_files = test_files[:n]
+    # test_files = [file_path for file_path in all_files if is_test_file(file_path)]
+    # random.shuffle(test_files)
+    # selected_test_files = test_files[:n]
     pytest_output = ""
-    for test_file in selected_test_files:
+    # for test_file in selected_test_files:
+    for test_file in files:
         try:
             result = subprocess.run(
                 ["pytest", test_file],
@@ -177,14 +179,22 @@ if __name__ == "__main__":
         random.shuffle(all_python_files)
         selected_files = all_python_files[: args.lint_files]
         ruff_success, ruff_output = run_ruff_fix(selected_files)
-        pytest_output = run_random_pytest(args.pytest_files, all_python_files)
+        
+        test_files = [file_path for file_path in all_python_files if is_test_file(file_path)]
+        random.shuffle(test_files)
+        selected_test_files = test_files[: args.pytest_files]
+        # pytest_output = run_random_pytest(args.pytest_files, all_python_files)
+        pytest_output = run_random_pytest(selected_test_files)
         pylint_result_output = run_random_pylint(selected_files)
+        files_being_tested = [file_path.replace('test_', '') for file_path in selected_test_files if file_path.replace('test_', '') in all_python_files]
+        print("files_being_tested:", files_being_tested)
         combined_output = (
             f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_output}"
         )
         if "All checks passed" not in ruff_output:
             combined_output += f"\nRuff output:\n{ruff_output}"
         files_to_fix = filter_files_by_output(combined_output, all_python_files)
+        files_to_fix.extend(files_being_tested)
         run_black(files_to_fix)
         call_aider(files_to_fix, combined_output)
         if pylint_success and ruff_success and not files_to_fix:
