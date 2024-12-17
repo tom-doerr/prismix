@@ -35,10 +35,10 @@ def agent():
     return setup_agent()
 
 
-def test_file_read(test_file_fixture):
+def test_file_read(test_file_fixture_read):
     """Test reading file content."""
     file_manager = FileManager(DefaultFileOperations())
-    result = file_manager.read_file(test_file_fixture)
+    result = file_manager.read_file(test_file_fixture_read)
     assert isinstance(result, FileContext)
     assert result.error is None
     assert "def main():" in result.content
