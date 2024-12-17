@@ -3,8 +3,8 @@ This module provides functions for calculating and evaluating metrics related to
 """
 
 from typing import List
-from rapidfuzz.distance import Levenshtein
 from dataclasses import dataclass
+from rapidfuzz.distance import Levenshtein
 
 
 @dataclass
