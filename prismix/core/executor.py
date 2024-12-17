@@ -82,13 +82,3 @@ class CodeExecutor:
         except (SyntaxError, NameError) as e:
             return CodeResult(code=code, success=False, output="", error=str(e))
 
-    @staticmethod
-    def execute(code: str) -> CodeResult:
-        """Execute code in isolated environment and return results"""
-        try:
-            spec = importlib.util.spec_from_loader("temp_module", loader=None)
-            temp_module = importlib.util.module_from_spec(spec)
-            exec(code, temp_module.__dict__, temp_module.__dict__)
-            return CodeResult(code=code, success=True, output="", error="")
-        except (SyntaxError, NameError) as e:
-            return CodeResult(code=code, success=False, output="", error=str(e))
