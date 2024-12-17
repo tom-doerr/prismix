@@ -39,8 +39,6 @@ def test_read_file_not_existing():
 import os
 
 
-import os
-
 def test_write_file():
     """Test writing to a file."""
     editor = FileEditorModule()
