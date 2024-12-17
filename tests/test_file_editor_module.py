@@ -161,7 +161,7 @@ def test_write_file(file_editor_module):
     file_context = file_editor_module.write_file("test_write_file.txt", new_content)
     assert file_context.content == new_content
     assert file_context.filepath == temp_file
-    assert not file_context.error
+    assert not file_context.error, f"Error: {file_context.error}"
     assert file_context.changes == []
 
     # Read the file again to ensure the changes were written

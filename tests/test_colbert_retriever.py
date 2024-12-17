@@ -45,18 +45,18 @@ def test_add_data_to_db_basic(colbert_retriever, temp_dir):
     )
 
 
-def test_colbert_retriever(colbert_retriever_fixture):
+def test_colbert_retriever(colbert_retriever):
     """Test the ColbertRetriever class."""
     query = "quantum computing"
-    colbert_retriever_fixture.forward = lambda q: [
+    colbert_retriever.forward = lambda q: [
         {"long_text": f"This is a dummy result for {q}"} for _ in range(3)
     ]
-    results = colbert_retriever_fixture.forward(query)
+    results = colbert_retriever.forward(query)
     assert len(results) == 3
     for result in results:
         assert "dummy result" in result["long_text"]
     assert (
-        colbert_retriever_fixture.qdrant_manager.client.count(
+        colbert_retriever.qdrant_manager.client.count(
             collection_name="colbert_embeddings"
         ).count  # Access the count attribute
         > 0

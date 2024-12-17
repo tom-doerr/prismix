@@ -27,7 +27,10 @@ def run_ruff_fix():
     """Runs ruff to fix code style issues and captures the output."""
     try:
         result = subprocess.run(
-            ["ruff", ".", "--fix"],
+            [
+                "ruff",
+                "check",
+                *glob.glob("./**/*.py", recursive=True), "--fix"],
             check=True,
             capture_output=True,
             text=True,
@@ -40,10 +43,12 @@ def run_ruff_fix():
 
 
 def is_test_file(file_path):
+    """Check if a file is a test file."""
     return file_path.endswith("_test.py") or "tests" in file_path.split("/")
 
 
 def ensure_file_exists(file_path):
+    """Ensure that a file exists."""
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
 

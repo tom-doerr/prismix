@@ -43,7 +43,7 @@ class FileEditorModule:
         """Applies replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
-            content = content.replace(search_pattern, replacement_code)
+            content = self.apply_single_replacement(content, search_pattern, replacement_code)
         return FileContext(filepath="", content=content, changes=[])
 
     def forward(self, context: str, instruction: str) -> FileContext:
@@ -64,9 +64,9 @@ class FileEditorModule:
         # Apply replacements
         updated_content = self.apply_replacements(content, instruction)
 
-        # Return a FileContext object with changes
+        # Return a FileContext object with changes, but with the content as a string
         return FileContext(
             filepath=filepath,
-            content=updated_content,
+            content=updated_content.content,
             changes=[],
         )

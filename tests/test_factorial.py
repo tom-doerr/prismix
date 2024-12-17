@@ -28,7 +28,7 @@ def test_factorial_basic():
     else:
         raise ValueError("No function definition found in the generated code.")
 
-    code_result = CodeExecutor.execute(function_code)  # Use CodeExecutor
+    code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
 
     # Execute the factorial function directly
