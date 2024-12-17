@@ -22,8 +22,8 @@ def test_factorial_basic():
         cleaned_code.replace("{{", "{").replace("}}", "}").replace("\n", "\n    ")
     )
     wrapped_code = f"""def main():
-    {indented_code}
-"""
+        {indented_code}
+    """
     code_result = CodeExecutor.execute(wrapped_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
     # Retrieve the factorial function from the locals

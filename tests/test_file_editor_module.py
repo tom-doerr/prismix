@@ -35,7 +35,7 @@ def test_file_edit_module_no_change(file_editor_module, temp_file):
     )
 
     # Ensure the file was written
-    assert updated_content.content.strip() == "def hello():\n    print('hello')\n"
+    assert updated_content.strip() == "def hello():\n    print('hello')\n"
     assert updated_content.changes == []
 
 
