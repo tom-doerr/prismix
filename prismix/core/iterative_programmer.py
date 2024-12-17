@@ -115,11 +115,9 @@ class IterativeProgrammer(dspy.Module):
 
     def _handle_edit_command(self, command: str) -> FileContext:
         """Handle file editing based on the command."""
-        pass
 
     def _handle_code_generation(self, command: str) -> CodeResult:
         """Handle code generation based on the command."""
-        pass
 
     def _handle_code_generation(self, command: str) -> CodeResult:
         """Handle code generation based on the command."""
