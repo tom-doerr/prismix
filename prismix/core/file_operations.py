@@ -2,10 +2,11 @@
 Module for handling file operations and editing.
 """
 
-from typing import Optional, List, Union, Tuple
 from abc import ABC, abstractmethod
-from pydantic import BaseModel, ConfigDict
+from typing import List, Optional, Tuple, Union
+
 import dspy
+from pydantic import BaseModel, ConfigDict
 
 
 class FileContext(BaseModel):
@@ -87,7 +88,12 @@ class FileManager:
                 filepath=filepath, content="", changes=[], error="File does not exist"
             )
         except (FileNotFoundError, PermissionError) as e:
-            return FileContext(filepath=filepath, content="", changes=[], error=f"Error reading file: {str(e)}")
+            return FileContext(
+                filepath=filepath,
+                content="",
+                changes=[],
+                error=f"Error reading file: {str(e)}",
+            )
 
     def write_file(self, filepath: str, content: str) -> FileContext:
         """Write content to a file and return a FileContext."""

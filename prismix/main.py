@@ -1,12 +1,12 @@
 """Main module for the Prismix application."""
 
-import sys
 import os
-import re
+import sys
 from typing import NoReturn
-from prismix.core.iterative_programmer import setup_agent
+
 from prismix.core.code_indexer import CodeIndexer
 from prismix.core.colbert_retriever import ColbertRetriever  # Add this import
+from prismix.core.iterative_programmer import setup_agent
 
 
 def execute_instruction(instruction: str) -> None:

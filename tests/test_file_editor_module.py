@@ -175,7 +175,7 @@ def test_write_file(file_editor_module, temp_file):
     assert (
         file_context.error is None
     ), f"Error: {file_context.error}, changes were: {file_context.changes}"
-    assert file_context.changes == ['File updated successfully']
+    assert file_context.changes == ["File updated successfully"]
 
     # Read the file again to ensure the changes were written
     with open("test_write_file.txt", "r", encoding="utf-8") as f:
@@ -287,7 +287,7 @@ def test_forward_with_file_not_found(file_editor_module, temp_file):
     instruction = "Replace 'print(\\'hello\\')' with 'print(\\'hi\\')'"
     file_context = file_editor_module.forward(
         context="non_existent_file.py Content: def hello():\n    print('hello')\n",
-        instruction=instruction
+        instruction=instruction,
     )
     assert file_context.error and "File does not exist" in file_context.error
     assert file_context.changes == [], f"Changes were: {file_context.changes}"
