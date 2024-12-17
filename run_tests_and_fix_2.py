@@ -331,7 +331,7 @@ if __name__ == "__main__":
         files_to_fix = []
         if COMBINED_OUTPUT:
             call_aider(files_to_fix, args.model)
-        if pylint_success and ruff_success and not files_to_fix:
+        if pylint_success and ruff_success and not files_to_fix and "All tests passed" in pytest_output:
             print("No more issues found. Stopping early.")
             break
 
