@@ -2,20 +2,20 @@
 Test module for the ColbertRetriever class.
 """
 
-import pytest
-import dspy
 import os
 import tempfile
+import pytest
+import dspy
 from prismix.core.colbert_retriever import ColbertRetriever
 
 
 @pytest.fixture
-def colbert_retriever():
+def colbert_retriever_instance():
     return ColbertRetriever(url="http://example.com/colbert", k=3)
 
 
 @pytest.fixture
-def temp_dir():
+def temp_dir_instance():
     """Fixture to create a temporary directory with dummy files."""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create some dummy files
@@ -30,16 +30,15 @@ def temp_dir():
         yield tmpdir
 
 
-def test_add_data_to_db_basic(colbert_retriever, temp_dir):
+def test_add_data_to_db_basic(colbert_retriever_instance, temp_dir_instance):
     """Test adding data to the database."""
-    """Test adding data to the database."""
-    colbert_retriever.add_data_to_db(temp_dir)
+    colbert_retriever_instance.add_data_to_db(temp_dir_instance)
     # Ensure that the data was added to the Qdrant database
     # This is a placeholder for a more detailed check
     assert True
 
 
-def test_colbert_retriever(colbert_retriever):
+def test_colbert_retriever(colbert_retriever_instance):
     """Test the ColbertRetriever class."""
     query = "quantum computing"
     # Set a mock RM for testing
@@ -47,7 +46,7 @@ def test_colbert_retriever(colbert_retriever):
         [{"long_text": f"This is a dummy result for {q}"} for _ in range(k)]
         for q in queries
     ]
-    results = colbert_retriever.forward(query)
+    results = colbert_retriever_instance.forward(query)
     assert len(results) == 3
     for result in results:
         assert "dummy result" in result
