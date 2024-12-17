@@ -117,9 +117,12 @@ class FileEditorModule:
                 file_content, search_pattern, replacement_code
             )
 
+        # Convert changes from tuples to strings
+        changes_str = [f"Replaced '{old}' with '{new}'" for old, new in replacements]
+
         # Return the updated file content
         return FileContext(
-            filepath="", content=file_content, changes=replacements, error=None
+            filepath="", content=file_content, changes=changes_str, error=None
         )
 
     def _parse_context(self, context: str) -> Tuple[str, str]:
