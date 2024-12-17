@@ -73,7 +73,8 @@ def run_ruff_fix(files):
             capture_output=True,
             text=True,
         )
-        ruff_result_output = result.stdout + result.stderr
+        # ruff_result_output = result.stdout + result.stderr
+        ruff_output = f"stdout: {result.stdout}\nstderr: {result.stderr}"
     except subprocess.CalledProcessError as e:
         ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
         return False, ruff_output
@@ -120,9 +121,11 @@ def call_aider(file_paths, combined_output):
                 "--yes-always",
                 "--no-detect-urls",
                 "--no-suggest-shell-commands",
+                "--file notes.md",
+                "--file questions.md",
             ]
             + [item for file_path in file_paths for item in ["--file", file_path]]
-            + ["--message", f"Output: {combined_output}. What should we do next?"]
+            + ["--message", f"There are multiple LLMs working on this project, if you have information that could be useful for others, please update notes.md. If you have questions, please write them into questions.md. I might update the notes.md with answers to those questions. Output: {combined_output}. What should we do next?"]
         )
         print("Aider command:", " ".join(command))
         subprocess.run(command, check=True)
