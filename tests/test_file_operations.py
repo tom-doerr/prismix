@@ -1,4 +1,4 @@
-import os
+import os  # Move this to the top
 import pytest
 from prismix.core.iterative_programmer import setup_agent
 from prismix.core.file_operations import (
