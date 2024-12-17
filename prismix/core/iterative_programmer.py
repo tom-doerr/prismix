@@ -117,7 +117,9 @@ class IterativeProgrammer(dspy.Module):
         """Handle file editing based on the command."""
         # Implement file editing logic here
         # For now, return a dummy FileContext to pass the test
-        return FileContext(filepath="dummy_path", content="dummy_content", changes=[], error=None)
+        return FileContext(
+            filepath="dummy_path", content="dummy_content", changes=[], error=None
+        )
 
     def _handle_code_generation(self, command: str) -> CodeResult:
         """Handle code generation based on the command."""
