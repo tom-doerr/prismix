@@ -28,6 +28,7 @@ def test_factorial_basic():
     assert code_result.success, f"Code execution failed: {code_result.error}"
     # Retrieve the factorial function from the locals
     factorial = locals().get("factorial") or locals().get("main")
+    assert factorial is not None, "Factorial function not found in generated code"
 
     # Test basic cases
     assert factorial(0) == 1
