@@ -53,17 +53,17 @@ def ensure_file_exists(file_path):
 MAX_RECURSION_DEPTH = 1
 
 
-def find_related_files(file_path):
+def find_related_files(current_file_path):
     """Find related files for a given file path."""
-    ensure_file_exists(file_path)
+    ensure_file_exists(current_file_path)
 
-    if is_test_file(file_path):
-        base_name = os.path.basename(file_path).replace("_test.py", ".py")
-        potential_related_file = os.path.join(os.path.dirname(file_path), base_name)
+    if is_test_file(current_file_path):
+        base_name = os.path.basename(current_file_path).replace("_test.py", ".py")
+        potential_related_file = os.path.join(os.path.dirname(current_file_path), base_name)
         if os.path.exists(potential_related_file):
             ensure_file_exists(potential_related_file)
-            return [file_path, potential_related_file]
-    return [file_path]
+            return [current_file_path, potential_related_file]
+    return [current_file_path]
 
 
 def call_aider(file_paths, combined_output):
