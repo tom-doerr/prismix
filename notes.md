@@ -22,6 +22,18 @@
 - The `PydanticDeprecatedSince20` warning indicates that the code is using deprecated features from Pydantic. Consider updating the code to use the new `ConfigDict` approach as suggested in the warning.
 - The `DeprecationWarning` from `litellm` regarding `open_text` should be addressed by migrating to the new `files()` API as recommended.
 ### Pylint and Pytest Issues
+
+- **Pylint Error**: The `examples/example.py` file contains an `exec` statement, which is flagged as a security risk by Pylint (W0122: exec-used). Consider refactoring the code to avoid using `exec`.
+
+- **Pytest Error**: The `tests/test_factorial.py` file contains an f-string with an invalid backslash, causing a syntax error. The backslash should be removed to resolve the issue.
+
+### Action Items
+
+1. **Refactor `exec` in `examples/example.py`**:
+   - Replace the `exec` statement with a safer alternative, such as using `eval` or directly invoking the function.
+
+2. **Fix Syntax Error in `tests/test_factorial.py`**:
+   - Update the f-string to remove the invalid backslash.
 - **Pylint Error**: The `tests/test_code_safety.py` file contains missing function docstrings and redefined outer names. The code has been rated at 7.50/10.
 - **Pytest Output**: All tests in `tests/test_metrics.py` passed successfully.
 

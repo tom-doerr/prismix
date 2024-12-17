@@ -21,9 +21,13 @@ def main():
     # Test the generated factorial function
     if result.success:
         # Get access to the defined function
-        local_vars = {}
-        exec(result.code, {}, local_vars)
-        factorial = local_vars["factorial"]
+        # Safer execution using CodeExecutor
+        wrapped_code = f"""def main():
+        {result.code.replace('```python', '').replace('```', '').strip().replace('\\n', '\n    ')}
+    main()"""
+        code_result = CodeExecutor.execute(wrapped_code)
+        assert code_result.success, f"Code execution failed: {code_result.error}"
+        factorial = locals().get("factorial") or locals().get("main")
 
         # Test cases
         test_cases = [0, 1, 5]
