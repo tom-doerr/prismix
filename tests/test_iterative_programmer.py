@@ -16,6 +16,8 @@ class MockLM(dspy.LM):
     def __call__(self, prompt=None, messages=None):
         if messages:
             prompt = messages[-1]["content"]
+        if prompt is None:
+            raise ValueError("Prompt cannot be None")
         if "unsafe" in prompt.lower():
             return dspy.Prediction(
                 is_safe=False,
