@@ -268,6 +268,12 @@ if __name__ == "__main__":
         help="Mode for running pytest tests. 'all' runs all tests, 'selected' runs a random selection.",
     )
     parser.add_argument(
+        "--model",
+        type=str,
+        default="deepseek",
+        help="Model to use for aider.",
+    )
+    parser.add_argument(
         "--lint-files",
         type=int,
         default=3,
@@ -344,6 +350,24 @@ if __name__ == "__main__":
             call_aider(files_to_fix, args.model)
         if (
             args.pytest_mode == "all"
+            and pylint_success
+            and ruff_success
+            and not files_to_fix
+            and "All tests passed" in pytest_output
+        ):
+            print("No more issues found. Stopping early.")
+            break
+        if (
+            args.pytest_mode == "selected"
+            and pylint_success
+            and ruff_success
+            and not files_to_fix
+            and "All tests passed" in pytest_output
+        ):
+            print("No more issues found. Stopping early.")
+            break
+        if (
+            args.pytest_mode == "selected"
             and pylint_success
             and ruff_success
             and not files_to_fix
