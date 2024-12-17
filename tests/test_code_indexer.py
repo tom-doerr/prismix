@@ -15,6 +15,7 @@ from prismix.core.file_operations import FileManager, DefaultFileOperations
 def code_indexer():
     """Fixture to create an instance of CodeIndexer."""
     code_embedder = CodeEmbedder()
+    code_embedder.embed_code = lambda x: [0.0] * 128  # Mock embedding
     return CodeIndexer(code_embedder)
 
 
