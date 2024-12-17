@@ -2,13 +2,12 @@
 CodeIndexer module: Indexes and searches code files using embeddings.
 """
 
-import os
 import fnmatch
-from typing import List, Dict
+import os
 from dataclasses import dataclass
-from prismix.core.file_operations import FileManager
+from typing import Dict, List
 
-from prismix.core.file_operations import DefaultFileOperations
+from prismix.core.file_operations import DefaultFileOperations, FileManager
 
 file_manager = FileManager(file_operations=DefaultFileOperations())
 
