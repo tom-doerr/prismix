@@ -30,6 +30,47 @@ def execute_instruction(instruction: str) -> None:
 
     if hasattr(result, "code"):
         # Handle CodeResult
+        function_match = re.search(r"def\s+(\w+)", result.code)
+        function_name = function_match.group(1) if function_match else "generated_code"
+
+        output_file = f"output/{function_name}.py"
+        os.makedirs("output", exist_ok=True)
+        with open(output_file, "w", encoding="utf-8") as f:
+            f.write(result.code)
+
+        print("\nGeneration Result:")
+        print("----------------")
+        print("Success:", result.success)
+        if result.error:
+            print("Error:", result.error)
+        if result.output:
+            print("\nExecution Output:", result.output)
+        print("\nSafety Check:", "PASSED" if result.success else "FAILED")
+        print("\nGenerated code saved to:", output_file)
+        print("\nContents:")
+        print("----------")
+        print(result.code)
+        print("----------")
+    else:
+        # Handle FileContext
+        print("\nFile Edit Result:")
+        print("----------------")
+        if result.error:
+            print("Error:", result.error)
+        else:
+            print("Changes made:")
+            for change in result.changes:
+                print(f"- {change}")
+            print("\nUpdated file contents:")
+            print("---------------------")
+            print(result.content)
+    print("----------")
+
+    # Create output directory if it doesn't exist
+    os.makedirs("output", exist_ok=True)
+
+    if hasattr(result, "code"):
+        # Handle CodeResult
 
         function_match = re.search(r"def\s+(\w+)", result.code)
         function_name = function_match.group(1) if function_match else "generated_code"
