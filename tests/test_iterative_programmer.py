@@ -13,7 +13,9 @@ class MockLM(dspy.LM):
     def __init__(self, model: str):
         super().__init__(model)
 
-    def __call__(self, prompt):
+    def __call__(self, prompt=None, messages=None):
+        if messages:
+            prompt = messages[-1]["content"]
         if "unsafe" in prompt.lower():
             return dspy.Prediction(
                 is_safe=False,
