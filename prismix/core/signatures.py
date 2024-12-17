@@ -50,6 +50,4 @@ class FileEdit(dspy.Signature):
     instruction = dspy.InputField(desc="The instruction for the edit operation.")
     filename = dspy.OutputField(desc="The filename where the edit will be applied.")
     search = dspy.OutputField(desc="The search pattern to be replaced.")
-    replacement = dspy.OutputField(
-        desc="The replacement code."
-    )
+    replacement = dspy.OutputField(desc="The replacement code.")
