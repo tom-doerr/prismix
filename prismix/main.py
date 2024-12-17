@@ -51,7 +51,7 @@ def execute_instruction(instruction: str) -> None:
         print("----------")
         print(result.code)
         print("----------")
-    else:
+    elif hasattr(result, "content"):
         # Handle FileContext
         print("\nFile Edit Result:")
         print("----------------")
@@ -64,7 +64,7 @@ def execute_instruction(instruction: str) -> None:
             print("\nUpdated file contents:")
             print("---------------------")
             print(result.content)
-    print("----------")
+        print("----------")
 
     # Create output directory if it doesn't exist
     os.makedirs("output", exist_ok=True)
