@@ -43,7 +43,9 @@ def test_factorial_basic():
 def test_factorial_negative():
     """Test factorial calculation with negative input."""
     programmer = setup_agent()
-    result = programmer.forward("Create a function that calculates factorial of a number")
+    result = programmer.forward(
+        "Create a function that calculates factorial of a number"
+    )
     exec(result.code, globals())
     factorial = globals().get("factorial")
     assert factorial(5) == 120
