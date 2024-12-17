@@ -18,7 +18,9 @@ def test_factorial_basic():
     # Wrap the generated code in a callable function
     # Replace newline escape sequences outside of the f-string
     cleaned_code = result.code.replace("```python", "").replace("```", "").strip()
-    indented_code = cleaned_code.replace("{{", "{").replace("}}", "}").replace("\n", "\n    ")
+    indented_code = (
+        cleaned_code.replace("{{", "{").replace("}}", "}").replace("\n", "\n    ")
+    )
     wrapped_code = f"""def main():
     {indented_code}
     main()"""
