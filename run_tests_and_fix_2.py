@@ -31,7 +31,7 @@ def run_random_pytest(n, all_files):
     test_files = [file_path for file_path in all_files if is_test_file(file_path)]
     random.shuffle(test_files)
     selected_test_files = test_files[:n]
-    pytest_result_output = ""
+    pytest_output = ""
     for test_file in selected_test_files:
         try:
             result = subprocess.run(
