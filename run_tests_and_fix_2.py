@@ -177,7 +177,7 @@ if __name__ == "__main__":
         pytest_output = run_random_pytest(args.pytest_files, all_files)
         pylint_result_output = run_random_pylint(selected_files)
         combined_output = (
-            f"Pylint output:\n{pylint_output}\nPytest output:\n{pytest_output}"
+            f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_result_output}"
         )
         if "All checks passed" not in ruff_output:
             combined_output += f"\nRuff output:\n{ruff_output}"
