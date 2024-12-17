@@ -27,10 +27,7 @@ def run_ruff_fix():
     """Runs ruff to fix code style issues and captures the output."""
     try:
         result = subprocess.run(
-            [
-                "ruff",
-                "check",
-                *glob.glob("./**/*.py", recursive=True), "--fix"],
+            ["ruff", "check", *glob.glob("./**/*.py", recursive=True), "--fix"],
             check=True,
             capture_output=True,
             text=True,
