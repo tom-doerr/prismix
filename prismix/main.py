@@ -2,10 +2,10 @@
 
 import sys
 import os
+import re
 from typing import NoReturn
 from prismix.core.iterative_programmer import setup_agent
 from prismix.core.code_indexer import CodeIndexer
-import re
 from prismix.core.colbert_retriever import ColbertRetriever  # Add this import
 
 
