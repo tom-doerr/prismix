@@ -1,7 +1,6 @@
 """
 Module for handling file editing operations.
 """
-
 import os
 from typing import List, Tuple
 
@@ -102,5 +101,6 @@ class FileEditorModule:
         return FileContext(
             filepath=filepath,
             content=updated_file_context.content,
+            error=updated_file_context.error,
             changes=updated_file_context.changes,
         )

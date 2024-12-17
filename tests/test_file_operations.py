@@ -37,8 +37,8 @@ def agent():
 
 def test_file_read(test_file_fixture):
     """Test reading file content"""
-    file_manager = FileManager(DefaultFileOperations())  # Create an instance here
-    result = file_manager.read_file(test_file_fixture)  # Use the instance here
+    file_manager = FileManager(DefaultFileOperations())
+    result = file_manager.read_file(test_file_fixture)
     assert isinstance(result, FileContext)
     assert result.error is None
     assert "def main():" in result.content
@@ -49,8 +49,8 @@ def test_file_write(tmp_path):
     """Test writing file content"""
     file_path = str(tmp_path / "output.py")
     content = "print('test')"
-    file_manager = FileManager(DefaultFileOperations())  # Create an instance here
-    result = file_manager.write_file(file_path, content)  # Use the instance here
+    file_manager = FileManager(DefaultFileOperations())
+    result = file_manager.write_file(file_path, content)
 
     assert isinstance(result, FileContext)
     assert result.error is None
@@ -62,7 +62,7 @@ def test_file_write(tmp_path):
 def test_line_numbering(test_file_fixture):
     """Test line numbering functionality"""
     editor = FileEditor()
-    with open(test_file_fixture) as f:
+    with open(test_file_fixture, encoding="utf-8") as f:
         content = f.read()
 
     numbered = editor._number_lines(content)
@@ -105,7 +105,7 @@ def test_apply_line_edits_string():
 
 
 def test_file_edit(agent, test_file_fixture):
-    """Test editing file content"""
+    """Test editing file content."""
     instruction = "add a docstring to the main function"
     result = agent.forward(f"edit {test_file_fixture} '{instruction}'")
 
@@ -370,8 +370,8 @@ def test_apply_line_edits_debug():
 
 def test_invalid_file():
     """Test handling non-existent file"""
-    file_manager = FileManager(DefaultFileOperations())  # Create an instance here
-    result = file_manager.read_file("nonexistent.py")  # Use the instance here
+    file_manager = FileManager(DefaultFileOperations())
+    result = file_manager.read_file("nonexistent.py")
     assert isinstance(result, FileContext)
     assert result.error is not None
     assert "not exist" in result.error.lower()
@@ -390,10 +390,10 @@ def test_write_to_new_directory(tmp_path):
     file_path = str(tmp_path / "new_dir" / "test.py")
     os.makedirs(
         os.path.dirname(file_path), exist_ok=True
-    )  # Ensure the directory exists
+    )
     content = "print('test')"
-    file_manager = FileManager(DefaultFileOperations())  # Create an instance here
-    result = file_manager.write_file(file_path, content)  # Use the instance here
+    file_manager = FileManager(DefaultFileOperations())
+    result = file_manager.write_file(file_path, content)
 
     assert isinstance(result, FileContext)
     assert result.error is None
