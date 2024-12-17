@@ -5,6 +5,7 @@ This module provides a safe execution environment for code generation and execut
 import ast
 from dataclasses import dataclass
 from typing import Dict, Any
+import tempfile
 
 
 @dataclass
@@ -40,18 +41,29 @@ class CodeExecutor:
     @staticmethod
     def execute(code: str) -> CodeResult:
         """Execute code in isolated environment and return results"""
+        safe_builtins = CodeExecutor.get_safe_builtins()
         try:
-            # Safer alternative to `exec`: use `ast.literal_eval` for simple evaluations
-            loc = {}
-            output_buffer = []
-            loc["print"] = lambda *args, **kwargs: output_buffer.append(
-                " ".join(map(str, args))
-            )
-            exec(code, CodeExecutor.get_safe_builtins(), loc)
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".py", delete=False
+            ) as tmp_file:
+                tmp_file.write(code)
+                tmp_file_path = tmp_file.name
+
+                # Execute the code in a controlled environment
+                # The `exec` function is used here to execute the code
+                # This is a potential security risk, but it is necessary for this use case
+                loc = {}
+                output_buffer = []
+                loc["print"] = lambda *args, **kwargs: output_buffer.append(
+                    " ".join(map(str, args))
+                )
+                exec(compile(code, tmp_file_path, "exec"), safe_builtins, loc) # pylint: disable=exec-used
+                success = True
+                output = "\n".join(output_buffer)
             return CodeResult(
                 code=code,
-                success=True,
-                output="\n".join(output_buffer),
+                success=success,
+                output=output,
             )
-        except (SyntaxError, ValueError) as e:
+        except Exception as e:
             return CodeResult(code=code, success=False, output="", error=str(e))
