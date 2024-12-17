@@ -274,7 +274,7 @@ class EditDatasetGenerator(dspy.Module):
                         "hindsight_command": datapoint.hindsight_command,
                     }
                 )
-            except Exception as e:
+            except (FileNotFoundError, PermissionError) as e:
                 print(f"Error generating example {i+1}: {str(e)}")
                 continue
 

@@ -40,7 +40,8 @@ class CodeExecutor:
         """Execute code in isolated environment and return results"""
         try:
             local_vars = {}
-            exec(code, CodeExecutor.get_safe_builtins(), local_vars)
+            # Use a safer alternative, such as `ast.literal_eval` for simple evaluations
+            result = ast.literal_eval(code)
             main_func = local_vars.get("main")
             if main_func:
                 result = main_func(5)
