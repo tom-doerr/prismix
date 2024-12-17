@@ -1,6 +1,7 @@
 """
 Module for retrieving and managing code embeddings using Qdrant and CodeIndexer.
 """
+
 import uuid
 import logging
 import os

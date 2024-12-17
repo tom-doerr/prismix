@@ -88,7 +88,6 @@ def test_file_edit_module_empty_file(file_editor_module):
     # Ensure the file remains empty
     assert updated_content.content.strip() == ""
     assert updated_content.changes == []
-    
 
     # Read the file again to ensure the changes were written
     with open(temp_file_path, "r", encoding="utf-8") as f:
@@ -270,9 +269,7 @@ def test_forward_with_edge_cases(file_editor_module):
         context=f"{temp_file_path_empty} Content: ",
         instruction="Replace 'non_existent' with 'new_text'",
     )
-    assert (
-        updated_content_empty.content == ""
-    )
+    assert updated_content_empty.content == ""
     assert updated_content_empty.changes == []
     os.remove(temp_file_path_empty)
 
