@@ -3,6 +3,7 @@ Test module for factorial calculations.
 """
 
 import pytest
+import ast
 from prismix.core.executor import CodeExecutor
 from prismix.core.iterative_programmer import CodeResult, setup_agent
 
