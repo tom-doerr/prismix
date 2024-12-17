@@ -1,10 +1,3 @@
-from prismix.core.metrics import (
-    calculate_levenshtein_similarity,
-    check_indentation_consistency,
-    check_formatting,
-    evaluate_edit,
-)
-
 """
 Test module for metrics calculations.
 """
