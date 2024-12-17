@@ -106,6 +106,7 @@ def run_ruff_fix(files):
     except subprocess.CalledProcessError as e:
         ruff_output = f"Error running ruff fix: {e}\n{e.stdout}"
         return False, ruff_output
+    ruff_output = ""
     return True, ruff_output
 
 
