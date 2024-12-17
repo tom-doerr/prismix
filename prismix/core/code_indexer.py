@@ -36,6 +36,7 @@ class CodeEmbedder:
 
 class CodeIndexer:
     """Class responsible for indexing and searching code files using embeddings."""
+
     """Indexes and searches code files using embeddings."""
 
     DEFAULT_IGNORE_PATTERNS = ["*.pyc", "__pycache__"]

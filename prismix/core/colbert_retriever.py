@@ -91,6 +91,8 @@ def forward(self, query: str, k: int = None) -> List[str]:
     query_embedding = self.qdrant_manager._embed_code(query)
     results = self.qdrant_manager.search_embeddings(query_embedding, top_k=k or self.k)
     return [result["payload"]["content"] for result in results]
+
+
 from prismix.core.file_operations import FileManager
 from prismix.core.code_indexer import CodeIndexer
 import logging

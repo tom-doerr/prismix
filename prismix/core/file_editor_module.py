@@ -6,8 +6,10 @@ from typing import List, Tuple
 from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
 from pydantic import ConfigDict
 
+
 class FileEditorModule:
     """Handles file editing operations."""
+
     def __init__(self):
         self.file_manager = FileManager(file_operations=DefaultFileOperations())
         self.config_dict = ConfigDict(arbitrary_types_allowed=True)
@@ -17,7 +19,9 @@ class FileEditorModule:
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
             content = content.replace(search_pattern, replacement_code)
-        return FileContext(filepath="", content=content, changes=replacements, error=None)
+        return FileContext(
+            filepath="", content=content, changes=replacements, error=None
+        )
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the content of the file."""
@@ -130,12 +134,14 @@ class FileEditorModule:
         # Write the updated content back to the file
         return self.write_file(filepath, updated_content)
 
+
 def apply_replacements(self, content: str, instruction: str) -> str:
-        """Applies multiple replacements based on the instruction."""
-        replacements = self.parse_instructions(instruction)
-        for search_pattern, replacement_code in replacements:
-            content = content.replace(search_pattern, replacement_code)
-        return content
+    """Applies multiple replacements based on the instruction."""
+    replacements = self.parse_instructions(instruction)
+    for search_pattern, replacement_code in replacements:
+        content = content.replace(search_pattern, replacement_code)
+    return content
+
 
 def apply_single_replacement(
     self, content: str, search_pattern: str, replacement_code: str

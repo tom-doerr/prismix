@@ -2,6 +2,7 @@
 Calculate the factorial of a non-negative integer.
 """
 
+
 def factorial(n: int) -> int:
     """Calculate the factorial of a non-negative integer."""
     if not isinstance(n, int):

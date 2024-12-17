@@ -9,6 +9,7 @@ from io import StringIO
 sys.path.append(".")
 from prismix.main import execute_instruction
 
+
 def test_execute_instruction_code_result():
     """Test the execution of an instruction that generates code."""
     with patch("sys.stdout", new_callable=StringIO) as mock_stdout:
@@ -31,5 +32,3 @@ def test_execute_instruction_file_edit():
         assert "Updated file contents:" in mock_stdout.getvalue()
         with open("samples/basic_function.py", "r", encoding="utf-8") as f:
             assert 'print(f"The sum is: {a + b + c}")' in f.read()
-
-

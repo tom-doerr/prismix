@@ -10,6 +10,7 @@ class User:
     """
     Represents a user with a username and email.
     """
+
     username: str
     email: str
 

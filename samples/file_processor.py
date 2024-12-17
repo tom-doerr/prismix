@@ -2,8 +2,8 @@
 Sample file processor module.
 """
 
-
 import sys
+
 
 def process_file(filepath: str) -> None:
     """Process a file and count the number of words."""

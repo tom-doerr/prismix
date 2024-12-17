@@ -382,7 +382,9 @@ def test_invalid_edit_command(agent):
 def test_write_to_new_directory(tmp_path):
     """Test writing file to new directory"""
     file_path = str(tmp_path / "new_dir" / "test.py")
-    os.makedirs(os.path.dirname(file_path), exist_ok=True)  # Ensure the directory exists
+    os.makedirs(
+        os.path.dirname(file_path), exist_ok=True
+    )  # Ensure the directory exists
     content = "print('test')"
     file_manager = FileManager(DefaultFileOperations())  # Create an instance here
     result = file_manager.write_file(file_path, content)  # Use the instance here

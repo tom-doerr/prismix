@@ -89,7 +89,7 @@ def run_ruff_fix(files):
     files_str = " ".join(files)
     try:
         result = subprocess.run(
-            ["ruff", "check", f'./{files_str}', "--fix"],
+            ["ruff", "check", f"./{files_str}", "--fix"],
             check=True,
             capture_output=True,
             text=True,
@@ -142,9 +142,9 @@ def call_aider(file_paths, combined_output):
                 "--yes-always",
                 "--no-detect-urls",
                 "--no-suggest-shell-commands",
-                "--file', 'notes.md",
-                "--file', 'questions.md",
             ]
+            + ["--file", "notes.md"]
+            + ["--file", "questions.md"]
             + [item for file_path in file_paths for item in ["--file", file_path]]
             + [
                 "--message",
