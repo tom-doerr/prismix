@@ -48,8 +48,8 @@ def test_factorial_basic():
     # Safely execute the factorial function
     code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
-    local_vars = code_result.output
-    factorial = local_vars.get("factorial")
+    local_vars = {}
+    exec(code_result.output, {}, local_vars)
     factorial = local_vars.get("factorial")
 
     # Test basic cases
