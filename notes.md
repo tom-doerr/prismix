@@ -21,7 +21,11 @@
 ### Additional Notes
 - The `PydanticDeprecatedSince20` warning indicates that the code is using deprecated features from Pydantic. Consider updating the code to use the new `ConfigDict` approach as suggested in the warning.
 - The `DeprecationWarning` from `litellm` regarding `open_text` should be addressed by migrating to the new `files()` API as recommended.
-### Pylint and Pytest Issues
+### Pylint Warning
+- The `temp.py` file contains a broad exception catch (`Exception`). This was flagged by Pylint as `broad-exception-caught`. The code has been updated to catch a more specific `IOError` instead.
+
+### Pytest Failure
+- The `tests/test_colbert_retriever.py` test failed due to an `AttributeError` caused by the mock RM returning a list of lists instead of a list of dictionaries. The mock RM has been updated to return a list of dictionaries, resolving the issue.
 
 - **Pylint Error**: The `examples/example.py` file contains an `exec` statement, which is flagged as a security risk by Pylint (W0122: exec-used). Consider refactoring the code to avoid using `exec`.
 

@@ -13,7 +13,7 @@ def count_words_in_file(input_file):
     except FileNotFoundError:
         print(f"Error: The file '{input_file}' was not found.")
         return None
-    except Exception as e:
+    except IOError as e:  # Catch a more specific exception
         print(f"An unexpected error occurred: {e}")
         return None
 
