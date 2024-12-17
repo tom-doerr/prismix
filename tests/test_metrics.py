@@ -8,10 +8,12 @@ from prismix.core.metrics import (
 """
 Test module for metrics calculations.
 """
-
-"""
-Test module for metrics calculations.
-"""
+from prismix.core.metrics import (
+    calculate_levenshtein_similarity,
+    check_indentation_consistency,
+    check_formatting,
+    evaluate_edit,
+)
 
 
 def test_levenshtein_similarity():
