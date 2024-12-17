@@ -119,27 +119,6 @@ class IterativeProgrammer(dspy.Module):
                 output="",
                 error=f"Permission error: {str(e)}",
             )
-        except subprocess.CalledProcessError as e:
-            return CodeResult(
-                code=code,
-                success=False,
-                output="",
-                error=f"Function execution failed in {file_path}: {str(e.stderr)}",
-            )
-        except FileNotFoundError as e:
-            return CodeResult(
-                code=code,
-                success=False,
-                output="",
-                error=f"File not found: {str(e)}",
-            )
-        except PermissionError as e:
-            return CodeResult(
-                code=code,
-                success=False,
-                output="",
-                error=f"Permission error: {str(e)}",
-            )
         except Exception as e:
             return CodeResult(
                 code=code,
