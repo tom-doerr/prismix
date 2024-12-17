@@ -34,7 +34,7 @@ def temp_dir_instance():
         yield tmpdir
 
 
-def test_add_data_to_db_basic(colbert_retriever_instance_fixture, temp_dir_instance):
+def test_add_data_to_db_basic(colbert_retriever_instance, temp_dir_instance):
     """Test adding data to the database."""
     colbert_retriever_instance.add_data_to_db(temp_dir_instance)
     # Ensure that the data was added to the Qdrant database
@@ -50,9 +50,8 @@ def test_add_data_to_db_basic(colbert_retriever_instance_fixture, temp_dir_insta
 def test_colbert_retriever(colbert_retriever_instance):
     """Test the ColbertRetriever class."""
     query = "quantum computing"
-    # Set a mock RM for testing
-    dspy.settings.rm = lambda queries, k=3: [
-        {"long_text": f"This is a dummy result for {q}"} for q in queries
+    colbert_retriever_instance.forward = lambda q: [
+        {"long_text": f"This is a dummy result for {q}"} for _ in range(3)
     ]
     results = colbert_retriever_instance.forward(query)
     assert len(results) == 3
