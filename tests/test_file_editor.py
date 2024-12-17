@@ -12,13 +12,13 @@ def test_apply_replacements():
     content = "def foo():\n    pass"
     instruction = "Replace 'pass' with 'print(\"hello\")'"
     updated_content = editor.forward(
-        context=f"Content: {content}",
+        context=f"test_file.py Content: {content}",
         instruction=instruction,
     )
     assert updated_content.content == 'def foo():\n    print("hello")'
     assert (
-        editor.file_manager.write_file("test_file.py", updated_content.content).content
-        == updated_content.content
+        editor.file_manager.read_file("test_file.py").content
+        == 'def foo():\n    print("hello")'
     )
 
 
@@ -31,6 +31,7 @@ def test_read_file_existing():
     file_context = editor.read_file("test_file.txt")
     assert file_context.content == "test content"
     assert file_context.error is None
+    assert file_context.filepath == "test_file.txt"
 
     os.remove("test_file.txt")
 
@@ -50,6 +51,7 @@ def test_write_file():
     file_context = editor.write_file("test_write_file.txt", content)
     assert file_context.content == content
     assert file_context.error is None
+    assert file_context.filepath == "test_write_file.txt"
     with open("test_write_file.txt", "r", encoding="utf-8") as f:
         file_content = f.read()
     assert file_content == content
