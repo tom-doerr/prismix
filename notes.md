@@ -76,32 +76,6 @@
    - Updated the code to use the new `ConfigDict` approach.
 5. **Addressed litellm Deprecation**:
    - Migrated to the new `files()` API in `litellm`.
-1. **Fixed `TypeError` in `prismix/core/colbert_retriever.py`**:
-   - The `embed_code` method in `CodeIndexer` was called with an unexpected argument. The method signature has been corrected.
-
-2. **Fixed `AttributeError` in `tests/test_file_editor_module.py`**:
-   - The `apply_replacements` method was returning a string instead of a `FileContext` object. This has been corrected.
-
-3. **Fixed `AssertionError` in `tests/test_iterative_programmer.py`**:
-   - The output of the executed code was not being captured correctly. The `subprocess.run` call has been updated to capture the output properly.
-
-4. **Fixed `ImportError` and `exec` usage in `tests/test_factorial.py`**:
-   - The import statement for `CodeExecutor` was in the wrong position, and the `exec` usage was flagged as a security risk. These issues have been resolved.
-
-5. **Fixed Protected Access (`W0212`) in `colbert_retriever.py`**:
-   - The method `_is_ignored` was accessed directly, which is a protected member of the `CodeIndexer` class. This has been refactored to use a public method.
-
-6. **Removed Pointless String Statements (`W0105`) in `colbert_retriever.py`**:
-   - Unnecessary string statements have been removed.
-
-7. **Added Missing Class Docstring (`C0115`) in `colbert_retriever.py`**:
-   - A docstring has been added to the `ColbertRetriever` class.
-
-8. **Fixed Argument Differences (`W0221`) in `colbert_retriever.py`**:
-   - The `forward` method in `ColbertRetriever` now matches the parent class signature.
-
-9. **Fixed Too Many Positional Arguments (`E1121`) in `colbert_retriever.py`**:
-   - The method call `self.client.search` now correctly passes the required arguments.
 
 ### Action Items
 1. **Address Pylint Warning**:
