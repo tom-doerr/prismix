@@ -124,7 +124,9 @@ def run_radon_cc(files):
             )
             radon_cc_output += result.stdout
         except subprocess.CalledProcessError as e:
-            radon_cc_output += f"Error running radon cc on {file_path}: {e}\nstdout: {e.stdout}"
+            radon_cc_output += (
+                f"Error running radon cc on {file_path}: {e}\nstdout: {e.stdout}"
+            )
     return radon_cc_output
 
 
@@ -142,7 +144,9 @@ def run_radon_mi(files):
             )
             radon_mi_output += result.stdout
         except subprocess.CalledProcessError as e:
-            radon_mi_output += f"Error running radon mi on {file_path}: {e}\nstdout: {e.stdout}"
+            radon_mi_output += (
+                f"Error running radon mi on {file_path}: {e}\nstdout: {e.stdout}"
+            )
     return radon_mi_output
 
 
@@ -338,7 +342,13 @@ if __name__ == "__main__":
         files_to_fix = []
         if COMBINED_OUTPUT:
             call_aider(files_to_fix, args.model)
-        if args.pytest_mode == "all" and pylint_success and ruff_success and not files_to_fix and "All tests passed" in pytest_output:
+        if (
+            args.pytest_mode == "all"
+            and pylint_success
+            and ruff_success
+            and not files_to_fix
+            and "All tests passed" in pytest_output
+        ):
             print("No more issues found. Stopping early.")
             break
 
