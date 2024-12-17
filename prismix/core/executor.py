@@ -68,7 +68,7 @@ class CodeExecutor:
                 )
                 # Refactor to avoid using exec
                 compiled_code = compile(code, tmp_file_path, "exec")
-                exec(compiled_code, safe_builtins, loc)
+                exec(compiled_code, safe_builtins, loc)  # Refactor to avoid using exec
                 success = True
                 output = "\n".join(output_buffer)
             return CodeResult(

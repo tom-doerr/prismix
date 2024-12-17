@@ -3,7 +3,6 @@ This module demonstrates the use of Pydantic and litellm libraries.
 """
 
 from pydantic import BaseModel, ConfigDict
-from litellm import files
 
 
 class SomeModel(BaseModel):

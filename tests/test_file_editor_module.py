@@ -54,10 +54,6 @@ def test_file_edit_module_multiple_replacements(file_editor_module):
     assert updated_content.changes == [
         ("def hello():", "def greet():"),
         ("    print('hello')", "    print('hi')"),
-    ], f"Unexpected changes: {updated_content.changes}"
-    assert updated_content.changes == [
-        ("def hello():", "def greet():"),
-        ("    print('hello')", "    print('hi')"),
     ]
 
 

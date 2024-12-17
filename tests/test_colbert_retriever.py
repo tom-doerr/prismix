@@ -10,7 +10,7 @@ from prismix.core.qdrant_manager import QdrantManager
 
 
 @pytest.fixture
-def colbert_retriever_instance():
+def colbert_retriever():
     """Fixture to create an instance of ColbertRetriever."""
     qdrant_manager = QdrantManager(collection_name="colbert_embeddings")
     qdrant_manager.embed_code = lambda x: [0.0] * 128  # Mock embedding
@@ -18,7 +18,7 @@ def colbert_retriever_instance():
 
 
 @pytest.fixture
-def temp_dir_instance():
+def temp_dir():
     """Fixture to create a temporary directory with dummy files."""
     with tempfile.TemporaryDirectory() as tmpdir:
         # Create some dummy files
@@ -41,7 +41,9 @@ def test_add_data_to_db_basic(colbert_retriever, temp_dir):
     count_result = colbert_retriever_instance.qdrant_manager.client.count(
         collection_name="colbert_embeddings"
     )
-    assert count_result.count > 0
+    assert colbert_retriever.qdrant_manager.client.count(
+        collection_name="colbert_embeddings"
+    ).count > 0
 
 
 def test_colbert_retriever(colbert_retriever_instance):
