@@ -1,8 +1,8 @@
 
 if __name__ == "__main__":
     def add_numbers(num1, num2):
-    """
-    Adds two numbers together.
+        """
+        Adds two numbers together.
 
     Parameters:
     num1 (int or float): The first number to add.
