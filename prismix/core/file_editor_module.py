@@ -73,7 +73,8 @@ class FileEditorModule:
 
                     if original_content == content:
                         print(
-                            f"No change was made for pattern: '{search_pattern}' with replacement: '{replacement_code}'"
+                            f"No change was made for pattern: '{search_pattern}' "
+                            f"with replacement: '{replacement_code}'"
                         )
 
         except (re.error, IndexError) as e:
