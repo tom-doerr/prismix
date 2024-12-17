@@ -34,7 +34,7 @@ def temp_dir_instance():
         yield tmpdir
 
 
-def test_add_data_to_db_basic(colbert_retriever_instance, temp_dir_instance):
+def test_add_data_to_db_basic(colbert_retriever_instance_fixture, temp_dir_instance):
     """Test adding data to the database."""
     colbert_retriever_instance.add_data_to_db(temp_dir_instance)
     # Ensure that the data was added to the Qdrant database

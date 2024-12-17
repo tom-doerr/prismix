@@ -53,7 +53,7 @@ def insert_data_into_milvus():
         client.insert(collection_name="demo_collection", data=data)
         logging.info("Data successfully inserted into the collection.")
         logging.info("Inserted %d documents.", len(data))
-    except Exception as e:
+    except (FileNotFoundError, PermissionError) as e:
         logging.error("Error inserting data into Milvus: %s", e)
 
 

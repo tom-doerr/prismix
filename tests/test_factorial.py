@@ -32,7 +32,8 @@ def test_factorial_basic():
     assert code_result.success, f"Code execution failed: {code_result.error}"
 
     # Execute the factorial function directly
-    factorial = locals().get("factorial")
+    exec(function_code, globals())
+    factorial = globals().get("factorial")
 
     # Test basic cases
     assert factorial(0) == 1
