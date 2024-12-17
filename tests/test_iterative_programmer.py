@@ -14,6 +14,7 @@ from prismix.core.iterative_programmer import IterativeProgrammer
 # Mock LM for testing
 class MockLM(dspy.LM):
     """Mock language model for testing purposes."""
+
     def __init__(self, model="mock"):
         super().__init__(model=model)
 
