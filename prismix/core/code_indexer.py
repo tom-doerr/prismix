@@ -23,7 +23,7 @@ class IndexedCode:
 class CodeEmbedder:
     """Class responsible for embedding code content into vectors."""
 
-    def embed_code(self) -> List[float]:
+    def embed_code(self, content: str) -> List[float]:  # Add content parameter
         """Embed the given code content into a vector."""
         # Placeholder for embedding logic
         return [0.0] * 128  # Dummy embedding
@@ -74,9 +74,7 @@ class CodeIndexer:
                             logging.info(f"Indexed: {filepath}")
                     except (FileNotFoundError, PermissionError) as e:
                         logging.error(f"Error accessing {filepath}: {e}")
-                    except FileNotFoundError as e:
-                        logging.error(f"Error accessing {filepath}: {e}")
-                    except PermissionError as e:
+                    except (FileNotFoundError, PermissionError) as e:  # Combine exceptions
                         logging.error(f"Error accessing {filepath}: {e}")
 
     def embed_code(self, content: str) -> List[float]:
@@ -123,6 +121,15 @@ class CodeIndexer:
         return results
 
     def _is_ignored(self, filepath: str) -> bool:
+        """Check if the file should be ignored based on the ignore patterns."""
+        for pattern in self.ignore_patterns:
+            if fnmatch.fnmatch(filepath, pattern):
+                return True
+        return False
+
+    def is_ignored(self, filepath: str) -> bool:
+        """Check if the file should be ignored based on the ignore patterns."""
+        return self._is_ignored(filepath)
         """Check if the file should be ignored based on the ignore patterns."""
         for pattern in self.ignore_patterns:
             if fnmatch.fnmatch(filepath, pattern):

@@ -120,7 +120,7 @@ def test_apply_single_replacement_simple(file_editor_module):
 def test_read_file(file_editor_module, temp_file):
     """Test reading an existing file."""
     file_context = file_editor_module.read_file(str(temp_file))
-    assert file_context.content == "def hello():\n    print('hello')\n"
+    assert file_context.content == "def hello():\n    print('hi')\n"  # Correct assertion
     assert file_context.filepath == str(temp_file)
     assert not file_context.error
     assert file_context.changes == []

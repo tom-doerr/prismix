@@ -21,7 +21,7 @@ def get_all_files_to_index(directory: str) -> List[str]:
     for root, _, files in os.walk(directory):
         for file in files:
             filepath = os.path.join(root, file)
-            if not indexer._is_ignored(filepath):
+            if not indexer.is_ignored(filepath):  # Use a public method instead
                 files_to_index.append(filepath)
     return files_to_index
 
@@ -48,7 +48,6 @@ def add_data_to_db(directory: str):
 
 
 class DataInserter:
-    """Inserts data into the Qdrant database."""
 
     """Inserts data into the Qdrant database."""
 
@@ -92,7 +91,7 @@ class ColbertRetriever(dspy.Retrieve):
         """Adds data from the given directory to the Qdrant database."""
         self.data_inserter.add_data_to_db(directory)
 
-    def forward(self, query: str, k: int = None, *args, **kwargs) -> List[str]:
+    def forward(self, query: str, k: int = None) -> List[str]:  # Remove 'args'
         """Search for similar embeddings in Qdrant."""
         query_embedding = self.qdrant_manager.embed_code(
             query
