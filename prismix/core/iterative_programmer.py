@@ -3,6 +3,7 @@ Module for iterative programming and code generation.
 """
 
 import subprocess
+from subprocess import CalledProcessError
 import sys
 import tempfile
 from io import StringIO
