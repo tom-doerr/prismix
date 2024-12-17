@@ -48,3 +48,6 @@
 
 3. **Exec Usage in Executor**:
    - How can we refactor the `exec` usage in `prismix/core/executor.py` to avoid the `W0122` warning and improve security?
+
+3. **Exec Usage in Executor**:
+   - How can we refactor the `exec` usage in `prismix/core/executor.py` to avoid the `W0122` warning and improve security?

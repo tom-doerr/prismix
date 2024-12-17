@@ -1,12 +1,10 @@
+import logging
+import numpy as np
 from pymilvus import MilvusClient
 
 """
 Module for setting up and interacting with a local Milvus database.
 """
-
-import numpy as np
-import logging
-from pymilvus import MilvusClient
 
 # Configure logging
 logging.basicConfig(
