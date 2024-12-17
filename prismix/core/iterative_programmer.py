@@ -89,13 +89,13 @@ class IterativeProgrammer(dspy.Module):
             redirected_error = sys.stderr = StringIO()
 
             # Execute the modified file
-            subprocess.run([sys.executable, file_path], check=True)
+            result = subprocess.run([sys.executable, file_path], check=True, text=True, capture_output=True)
 
             # Restore stdout and stderr
             sys.stdout = old_stdout
             sys.stderr = old_stderr
-            output = redirected_output.getvalue()
-            error = redirected_error.getvalue()
+            output = result.stdout
+            error = result.stderr
 
             return CodeResult(code=code, success=True, output=output, error=error)
         except subprocess.CalledProcessError as e:

@@ -64,6 +64,19 @@
   1. **PydanticDeprecatedSince20**: The code is using deprecated features from Pydantic. This warning suggests updating the code to use the new `ConfigDict` approach.
   2. **DeprecationWarning from litellm**: The `open_text` API is deprecated. The warning recommends migrating to the new `files()` API.
 
+### Resolved Issues
+1. **Fixed `TypeError` in `prismix/core/colbert_retriever.py`**:
+   - The `embed_code` method in `CodeIndexer` was called with an unexpected argument. The method signature has been corrected.
+
+2. **Fixed `AttributeError` in `tests/test_file_editor_module.py`**:
+   - The `apply_replacements` method was returning a string instead of a `FileContext` object. This has been corrected.
+
+3. **Fixed `AssertionError` in `tests/test_iterative_programmer.py`**:
+   - The output of the executed code was not being captured correctly. The `subprocess.run` call has been updated to capture the output properly.
+
+4. **Fixed `ImportError` and `exec` usage in `tests/test_factorial.py`**:
+   - The import statement for `CodeExecutor` was in the wrong position, and the `exec` usage was flagged as a security risk. These issues have been resolved.
+
 ### Action Items
 1. **Address Pylint Warning**:
    - Refactor `prismix/core/executor.py` to avoid using `exec`. Consider using safer alternatives for executing code in a controlled environment.
