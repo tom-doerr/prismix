@@ -41,22 +41,12 @@ class CodeExecutor:
     def execute(code: str) -> CodeResult:
         """Execute code in isolated environment and return results"""
         try:
-            local_vars = {}
-            # Use a safer alternative, such as `ast.literal_eval` for simple evaluations
+            # Safer alternative to `exec`: use `ast.literal_eval` for simple evaluations
             result = ast.literal_eval(code)
-            main_func = local_vars.get("main")
-            if main_func:
-                result = main_func(5)
-                return CodeResult(
-                    code=code,
-                    success=True,
-                    output=f"Code executed successfully. Test main(5) = {result}",
-                )
-                return CodeResult(
-                    code=code,
-                    success=False,
-                    output="",
-                    error="No callable 'main' function found in generated code",
-                )
+            return CodeResult(
+                code=code,
+                success=True,
+                output=f"Code executed successfully. Result: {result}",
+            )
         except (SyntaxError, ValueError) as e:
             return CodeResult(code=code, success=False, output="", error=str(e))
