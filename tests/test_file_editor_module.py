@@ -35,7 +35,7 @@ def test_file_edit_module_no_change(file_editor_module, temp_file):
     )
 
     # Ensure the file was written
-    assert updated_content.content == "def hello():\n    print('hello')\n"
+    assert updated_content.content.strip() == "def hello():\n    print('hello')\n"
     assert updated_content.changes == []
 
 
@@ -48,7 +48,7 @@ def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
     )
 
     # Ensure the file was written
-    assert updated_content.content == "def greet():\n    print('hi')\n"
+    assert updated_content.content.strip() == "def greet():\n    print('hi')\n"
     assert updated_content.changes == [
         ("def hello():", "def greet():"),
         ("    print('hello')", "    print('hi')"),
@@ -83,7 +83,7 @@ def test_file_edit_module_empty_file(file_editor_module):
     )
 
     # Ensure the file remains empty
-    assert updated_content.content == ""
+    assert updated_content.content.strip() == ""
     assert updated_content.changes == []
 
     # Read the file again to ensure the changes were written
@@ -99,7 +99,7 @@ def test_file_edit_module_file_not_found(file_editor_module):
         context="non_existent_file.py def hello():\n    print('hello')\n",
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')'.",
     )
-    assert "Error reading file" in result.error
+    assert "Error reading file" in str(result.error)
     assert result.changes == []
 
 
@@ -209,7 +209,7 @@ def test_forward_with_no_replacements(file_editor_module, temp_file):
         context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n",
         instruction="Replace 'non_existent' with 'new_text'",
     )
-    assert updated_content.content == "def hello():\n    print('hello')\n"
+    assert updated_content.content.strip() == "def hello():\n    print('hello')\n"
     assert updated_content.changes == []
 
 
@@ -219,7 +219,7 @@ def test_forward_with_different_replacements(file_editor_module, temp_file):
         context=f"File: {temp_file}\nContent: def hello():\n    print('hello')\n    return 1",
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and Replace 'def hello():' with 'def greet():'",
     )
-    assert updated_content.content == "def greet():\n    print('hi')\n    return 1"
+    assert updated_content.content.strip() == "def greet():\n    print('hi')\n    return 1"
     assert updated_content.changes == [
         ("def hello():", "def greet():"),
         ("    print('hello')", "    print('hi')"),

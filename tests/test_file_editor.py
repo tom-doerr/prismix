@@ -52,3 +52,5 @@ Test module for the FileEditorModule class.
 """
 
 import os
+"""Test module for the FileEditorModule class."""
+import os

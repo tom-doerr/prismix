@@ -54,7 +54,7 @@ class DataInserter:
         files_to_index = get_all_files_to_index(directory)
         for filepath in files_to_index:
             try:
-                file_context = FileManager.read_file(filepath)
+                file_context = FileManager().read_file(filepath)
                 if file_context and file_context.content:
                     embedding = indexer._embed_code(file_context.content)
                     self.qdrant_manager.insert_embeddings(
@@ -66,7 +66,7 @@ class DataInserter:
                             }
                         ]
                     )
-                    logging.info(f"Added to Qdrant: {filepath}")
+                    logging.info("Added to Qdrant: %s", filepath)
             except Exception as e:
                 logging.error(f"Error adding {filepath} to Qdrant: {e}")
 
@@ -91,3 +91,6 @@ def forward(self, query: str, k: int = None) -> List[str]:
     query_embedding = self.qdrant_manager._embed_code(query)
     results = self.qdrant_manager.search_embeddings(query_embedding, top_k=k or self.k)
     return [result["payload"]["content"] for result in results]
+from prismix.core.file_operations import FileManager
+from prismix.core.code_indexer import CodeIndexer
+import logging
