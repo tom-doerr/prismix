@@ -32,7 +32,11 @@ def add_data_to_db(directory: str):
     files_to_index = get_all_files_to_index(directory)
     for filepath in files_to_index:
         try:
-            file_context = FileManager(file_operations=DefaultFileOperations()).read_file(filepath)  # Provide file_operations
+            file_context = FileManager(
+                file_operations=DefaultFileOperations()
+            ).read_file(
+                filepath
+            )  # Provide file_operations
             if file_context and file_context.content:
                 embedding = indexer.embed_code(file_context.content)
                 indexer.indexed_code[filepath] = IndexedCode(
@@ -56,7 +60,11 @@ class DataInserter:
         files_to_index = get_all_files_to_index(directory)
         for filepath in files_to_index:
             try:
-                file_context = FileManager(file_operations=DefaultFileOperations()).read_file(filepath)  # Provide file_operations
+                file_context = FileManager(
+                    file_operations=DefaultFileOperations()
+                ).read_file(
+                    filepath
+                )  # Provide file_operations
                 if file_context and file_context.content:
                     embedding = indexer.embed_code(file_context.content)
                     self.qdrant_manager.insert_embeddings(
