@@ -37,20 +37,21 @@
 ## Notes for LLMs
 
 ### Pylint Output
-- The code has been rated at 10.00/10, indicating no issues detected by Pylint.
+- The code has been rated at 9.67/10, indicating minor issues detected by Pylint.
+- **Warning**: `W0122` (exec-used) on line 48 in `prismix/core/executor.py`. The use of `exec` is flagged as a security risk. Consider refactoring the code to avoid using `exec`.
 
 ### Pytest Output
-- All 3 tests in `tests/test_safety.py` passed successfully.
+- All 21 tests in `tests/test_file_operations.py` passed successfully.
 - Two warnings were issued:
   1. **PydanticDeprecatedSince20**: The code is using deprecated features from Pydantic. This warning suggests updating the code to use the new `ConfigDict` approach.
   2. **DeprecationWarning from litellm**: The `open_text` API is deprecated. The warning recommends migrating to the new `files()` API.
 
-### Ruff Output
-- Ruff found 1 error, which has been fixed.
-
 ### Action Items
-1. **Address Pydantic Deprecation**:
+1. **Address Pylint Warning**:
+   - Refactor `prismix/core/executor.py` to avoid using `exec`. Consider using safer alternatives for executing code in a controlled environment.
+
+2. **Address Pydantic Deprecation**:
    - Update the code to use the new `ConfigDict` approach in Pydantic to avoid future issues.
 
-2. **Address litellm Deprecation**:
+3. **Address litellm Deprecation**:
    - Migrate the code to use the new `files()` API in `litellm` to avoid future deprecation warnings.
