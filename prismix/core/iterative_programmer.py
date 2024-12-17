@@ -85,8 +85,8 @@ class IterativeProgrammer(dspy.Module):
             # Capture stdout and stderr
             old_stdout = sys.stdout
             old_stderr = sys.stderr
-            redirected_output = sys.stdout = StringIO()
-            redirected_error = sys.stderr = StringIO()
+            old_stdout, old_stderr = sys.stdout, sys.stderr
+            sys.stdout, sys.stderr = StringIO(), StringIO()
 
             # Execute the modified file
             result = subprocess.run(
@@ -121,7 +121,7 @@ class IterativeProgrammer(dspy.Module):
                 output="",
                 error=f"Permission error: {str(e)}",
             )
-        except Exception as e:
+        except (subprocess.CalledProcessError, FileNotFoundError, PermissionError) as e:
             return CodeResult(
                 code=code,
                 success=False,
