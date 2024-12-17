@@ -26,16 +26,25 @@ class FileEditorModule:
         try:
             with open(filename, "r", encoding="utf-8") as f:
                 content = f.read()
-            return FileContext(filepath=filename, content=content, changes=[], error=None)
+            return FileContext(
+                filepath=filename, content=content, changes=[], error=None
+            )
         except FileNotFoundError:
-            return FileContext(filepath=filename, content="", changes=[], error="File does not exist")
+            return FileContext(
+                filepath=filename, content="", changes=[], error="File does not exist"
+            )
 
     def write_file(self, filename: str, content: str) -> FileContext:
         """Write content to a file."""
         try:
             with open(filename, "w", encoding="utf-8") as f:
                 f.write(content)
-            return FileContext(filepath=filename, content=content, changes=["File updated successfully"], error=None)
+            return FileContext(
+                filepath=filename,
+                content=content,
+                changes=["File updated successfully"],
+                error=None,
+            )
         except Exception as e:
             return FileContext(filepath=filename, content="", changes=[], error=str(e))
 
@@ -51,7 +60,9 @@ class FileEditorModule:
             if "Replace" in part and len(part.split(" with ")) == 2
         ]
 
-    def apply_single_replacement(self, content: str, search_pattern: str, replacement_code: str) -> str:
+    def apply_single_replacement(
+        self, content: str, search_pattern: str, replacement_code: str
+    ) -> str:
         """Apply a single replacement to the content."""
         return content.replace(search_pattern, replacement_code)
 
@@ -102,10 +113,14 @@ class FileEditorModule:
 
         # Apply each replacement to the file content
         for search_pattern, replacement_code in replacements:
-            file_content = self.apply_single_replacement(file_content, search_pattern, replacement_code)
+            file_content = self.apply_single_replacement(
+                file_content, search_pattern, replacement_code
+            )
 
         # Return the updated file content
-        return FileContext(filepath="", content=file_content, changes=replacements, error=None)
+        return FileContext(
+            filepath="", content=file_content, changes=replacements, error=None
+        )
 
     def _parse_context(self, context: str) -> Tuple[str, str]:
         """Parses the context to extract the file path and content."""
