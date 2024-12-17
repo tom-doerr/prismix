@@ -16,10 +16,12 @@ def test_factorial_basic():
 
     # Safer execution using CodeExecutor
     cleaned_code = result.code.replace("```python", "").replace("```", "").strip()
-    
+
     # Extract the factorial function definition
     tree = ast.parse(cleaned_code)
-    function_def = next((node for node in tree.body if isinstance(node, ast.FunctionDef)), None)
+    function_def = next(
+        (node for node in tree.body if isinstance(node, ast.FunctionDef)), None
+    )
     if function_def:
         function_code = ast.unparse(function_def)
     else:
@@ -27,7 +29,7 @@ def test_factorial_basic():
 
     code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
-    
+
     # Execute the factorial function directly
     factorial = locals().get("factorial")
 
@@ -58,7 +60,7 @@ def test_factorial_negative():
     """
     code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
-    
+
     # Execute the factorial function directly
     factorial = locals().get("factorial")
 
