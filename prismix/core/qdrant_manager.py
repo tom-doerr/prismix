@@ -3,7 +3,8 @@ Manages Qdrant operations for storing and querying ColBERT embeddings.
 """
 
 import logging
-from typing import List, Dict
+from typing import Dict, List
+
 from qdrant_client import QdrantClient, models
 
 

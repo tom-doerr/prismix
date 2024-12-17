@@ -81,7 +81,6 @@ class DataInserter:
                 logging.error("Error adding %s to Qdrant: %s", filepath, e)
 
 
-
 class ColbertRetriever(dspy.Retrieve):
     def __init__(self, url: str, k: int = 3):
         super().__init__(k=k)
