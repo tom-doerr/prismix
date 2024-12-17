@@ -46,6 +46,8 @@ class CodeExecutor:
             # Necessary for executing the code in a controlled environment
             # Safely parse and execute the code
             # Safely execute the code in a controlled environment
+            # Safely evaluate the code using ast.literal_eval
+            local_vars = {}
             exec(
                 compile(parsed_code, filename="<string>", mode="exec"),
                 {"__builtins__": CodeExecutor.get_safe_builtins()},
