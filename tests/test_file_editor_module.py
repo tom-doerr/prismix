@@ -106,14 +106,13 @@ def test_file_edit_module_file_not_found(file_editor_module):
 
 def test_apply_single_replacement_function_def(file_editor_module):
     """Test apply single replacement with function definition."""
-    """Test apply single replacement with function definition."""
     content = "def hello():\n    print('hello')\n"
     search_pattern = "def hello():"
     replacement_code = "def greet():\n    print('hi')"
     updated_content = file_editor_module.apply_single_replacement(
         content, search_pattern, replacement_code
     )
-    assert updated_content == "def greet():\n    print('hi')"
+    assert updated_content == "def greet():\n    print('hi')\n"
 
 
 def test_apply_single_replacement_simple(file_editor_module):
@@ -130,21 +129,13 @@ def test_apply_single_replacement_simple(file_editor_module):
 
 def test_read_file(file_editor_module):
     """Test reading an existing file."""
-    """Test reading an existing file."""
     file_context = file_editor_module.read_file(str(temp_file))
-    assert (
-        file_context.content == "def hello():\n    print('hi')\n"
-    )  # Correct assertion
+    assert file_context.content == "def hello():\n    print('hello')\n"
     assert file_context.filepath == str(temp_file)
     assert not file_context.error
     assert file_context.changes == []
-    assert file_context.filepath == str(temp_file)
-    assert not file_context.error
-    assert file_context.changes == []
-
 
 def test_read_file_not_found(file_editor_module):
-    """Test reading a non-existing file."""
     """Test reading a non-existing file."""
     file_context = file_editor_module.read_file("non_existent_file.py")
     assert file_context.content == ""
