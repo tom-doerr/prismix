@@ -31,6 +31,7 @@ def temp_file():
 def test_file_edit_module_no_change(file_editor_module, temp_file):
     """Test file edit with no change."""
     """Test file edit with no change."""
+    """Test file edit with no change."""
     updated_content = file_editor_module.forward(
         context=f"{temp_file} Content: def hello():\n    print('hello')\n",
         instruction="Do not change 'print(\\'hello\\')'",
@@ -40,6 +41,7 @@ def test_file_edit_module_no_change(file_editor_module, temp_file):
 
 
 def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
+    """Test file edit with multiple replacements."""
     """Test file edit with multiple replacements."""
     """Test file edit with multiple replacements."""
     """Test file edit with multiple replacements."""
@@ -77,6 +79,7 @@ def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file
 
 
 def test_file_edit_module_empty_file(file_editor_module, temp_file):
+    """Test file edit with an empty file."""
     """Test file edit with an empty file."""
     """Test file edit with an empty file."""
     """Test file edit with an empty file."""
