@@ -19,7 +19,6 @@ def test_read_file_existing():
     file_context = editor.read_file("test_file.txt")
     assert file_context.content == "test content"
     assert file_context.error is None
-    import os
 
     os.remove("test_file.txt")
 
@@ -42,7 +41,6 @@ def test_write_file():
     with open("test_write_file.txt", "r", encoding="utf-8") as f:
         file_content = f.read()
     assert file_content == content
-    import os
 
     os.remove("test_write_file.txt")
 
@@ -54,4 +52,3 @@ Test module for the FileEditorModule class.
 import os
 
 """Test module for the FileEditorModule class."""
-import os

@@ -10,7 +10,7 @@ def run_pylint():
             ["pylint", "."],
             check=True,
             capture_output=True,  # Capture both stdout and stderr
-            text=True
+            text=True,
         )
         pylint_output = result.stdout + result.stderr  # Combine stdout and stderr
     except subprocess.CalledProcessError as e:
@@ -26,7 +26,7 @@ def run_ruff_fix():
             ["ruff", ".", "--fix"],
             check=True,
             capture_output=True,  # Capture both stdout and stderr
-            text=True
+            text=True,
         )
         ruff_output = result.stdout + result.stderr  # Combine stdout and stderr
     except subprocess.CalledProcessError as e:

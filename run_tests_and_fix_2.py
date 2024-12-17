@@ -42,9 +42,7 @@ def run_random_pytest(n, all_files):
             )
             pytest_output += result.stdout + result.stderr
         except subprocess.CalledProcessError as e:
-            pytest_output += (
-                f"Error running pytest on {test_file}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
-            )
+            pytest_output += f"Error running pytest on {test_file}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
     return pytest_output
 
 
@@ -61,9 +59,7 @@ def run_random_pylint(files):
             )
             pylint_output += result.stdout + result.stderr
         except subprocess.CalledProcessError as e:
-            pylint_output += (
-                f"Error running pylint on {file_path}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
-            )
+            pylint_output += f"Error running pylint on {file_path}: {e}\nstdout: {e.stdout}\nstderr: {e.stderr}"
     return pylint_output
 
 
