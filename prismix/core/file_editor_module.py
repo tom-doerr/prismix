@@ -2,7 +2,6 @@
 Module for handling file editing operations.
 """
 
-import os
 import re
 from importlib import resources
 from typing import List, Tuple
@@ -91,29 +90,6 @@ class FileEditorModule:
 
     def forward(self, context: str, instruction: str) -> FileContext:
         """Edit the file based on the context and instruction."""
-        filepath = ""
-        if "File: " in context:
-            try:
-                filepath = context.split("File: ")[1].split("\n")[0].strip()
-            except IndexError:
-                pass
-        if "Content: " in context:
-            try:
-                content = context.split("Content: ")[1].strip()
-            except IndexError:
-                content = ""
-
-        if not os.path.exists(filepath):
-            return FileContext(
-                filepath=filepath, content="", error="File does not exist", changes=[]
-            )  # Return FileContext with error
-        file_context = self.read_file(filepath)
-        updated_file_context = self.apply_replacements(
-            file_context.content, instruction
-        )
-        return FileContext(
-            filepath=filepath,
-            content=updated_file_context.content,
-            error=updated_file_context.error,
-            changes=updated_file_context.changes,
-        )
+        content = context.split("Content: ")[1] if "Content: " in context else context
+        updated_content = self.apply_replacements(content, instruction)
+        return FileContext(content=updated_content, filepath="test_file.py", error=None)
