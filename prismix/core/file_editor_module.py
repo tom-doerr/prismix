@@ -7,14 +7,11 @@ from typing import List, Tuple, Optional
 from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
 
 
-
-
 class FileEditorModule:
     """Handles file editing operations."""
 
     def __init__(self):
         self.file_manager = FileManager(file_operations=DefaultFileOperations())
-
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the content of the file."""
