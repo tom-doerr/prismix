@@ -22,4 +22,3 @@ if __name__ == "__main__":
         # Example usage
         calc_sum(3, 5)
         calc_sum(2.5, 4.5)
-    main()
