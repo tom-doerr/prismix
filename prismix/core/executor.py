@@ -2,6 +2,7 @@
 This module provides a safe execution environment for code generation and execution.
 """
 
+import importlib
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
