@@ -39,6 +39,7 @@ class CodeExecutor:
     def execute(code: str) -> CodeResult:
         """Execute code in isolated environment and return results"""
         import ast
+
         try:
             result = ast.literal_eval(code)
             return CodeResult(code=code, success=True, output=str(result))
