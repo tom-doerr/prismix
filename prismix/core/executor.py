@@ -5,7 +5,6 @@ This module provides a safe execution environment for code generation and execut
 import ast
 from dataclasses import dataclass
 from typing import Dict, Any
-import subprocess
 import tempfile
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
