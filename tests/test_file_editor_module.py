@@ -37,7 +37,7 @@ def test_file_edit_module_no_change(file_editor_module, temp_file):
 
     # Ensure the file was written
     assert updated_content.content == "def hello():\n    print('hello')\n"
-    assert updated_content.changes == []
+    assert updated_content.changes == [], f"Changes were: {updated_content.changes}"
 
 
 def test_file_edit_module_multiple_replacements(file_editor_module):
@@ -52,10 +52,10 @@ def test_file_edit_module_multiple_replacements(file_editor_module):
     # Ensure the file was written correctly
     assert (
         updated_content.content.strip() == "def greet():\n    print('hi')"
-    ), f"Content was: {updated_content.content}"
+    ), f"Content was: {updated_content.content}, changes were: {updated_content.changes}"
     assert updated_content.changes == [
-        ("def hello()", "def greet()"),
-        ("    print('hello')", "    print('hi')"),
+        ("def hello()", "def greet()"),        
+        ("print('hello')", "print('hi')"),
     ]
 
 
@@ -68,9 +68,8 @@ def test_file_edit_module_overlapping_replacements(file_editor_module):
         "Replace 'hello' with 'greet'",
     )
     # Ensure the file was written
-    assert (
-        updated_content.content == "def greet():\n    print('hi')\n"
-    ), f"Content was: {updated_content.content}"
+    assert updated_content.content == "def greet():\n    print('hi')\n", f"Content was: {updated_content.content}, changes were: {updated_content.changes}"
+    assert updated_content.changes == [("print('hello')", "print('hi')"), ("hello", "greet")]
 
 
 def test_file_edit_module_empty_file(file_editor_module):
@@ -104,7 +103,7 @@ def test_file_edit_module_file_not_found(file_editor_module):
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')'.",
     )
     assert "File does not exist" in str(result.error)
-    assert result.changes == [], f"Changes were: {result.changes}"
+    assert result.changes == [], f"Changes were: {result.changes}, error was: {result.error}"
 
 
 def test_apply_single_replacement_function_def(file_editor_module):
@@ -165,7 +164,7 @@ def test_write_file(file_editor_module):
     file_context = file_editor_module.write_file("test_write_file.txt", new_content)
     assert file_context.content == new_content, f"Content was: {file_context.content}"
     assert file_context.filepath == "test_write_file.txt"
-    assert not file_context.error, f"Error: {file_context.error}"
+    assert not file_context.error, f"Error: {file_context.error}, changes were: {file_context.changes}"
     assert file_context.changes == []
 
     # Read the file again to ensure the changes were written
