@@ -3,7 +3,6 @@ Module for retrieving and managing code embeddings using Qdrant and CodeIndexer.
 """
 
 import logging
-import logging
 import os
 from typing import List
 
@@ -48,6 +47,7 @@ def add_data_to_db(directory: str):
 
 
 class DataInserter:
+    """Inserts data into the Qdrant database."""
     """Inserts data into the Qdrant database."""
 
     def __init__(self, qdrant_manager: QdrantManager):
