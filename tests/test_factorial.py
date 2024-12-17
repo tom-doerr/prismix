@@ -27,14 +27,14 @@ def test_factorial_basic():
     else:
         raise ValueError("No function definition found in the generated code.")
 
-    code_result = CodeExecutor.execute(function_code) # Use CodeExecutor
+    code_result = CodeExecutor.execute(function_code)  # Use CodeExecutor
     assert code_result.success, f"Code execution failed: {code_result.error}"
-  
+
     # Execute the factorial function directly
-    exec(function_code, globals()) # Keep this for testing the function directly
+    exec(function_code, globals())  # Keep this for testing the function directly
     factorial = globals().get("factorial")
-  
-    # Test basic cases    
+
+    # Test basic cases
     assert factorial(0) == 1
     assert factorial(1) == 1
     assert factorial(5) == 120
@@ -46,10 +46,12 @@ def test_factorial_negative():
     result = programmer.forward(
         "Create a function that calculates factorial of a number"
     )
-    
+
     cleaned_code = result.code.replace("```python", "").replace("```", "").strip()
     tree = ast.parse(cleaned_code)
-    function_def = next((node for node in tree.body if isinstance(node, ast.FunctionDef)), None)
+    function_def = next(
+        (node for node in tree.body if isinstance(node, ast.FunctionDef)), None
+    )
     function_code = ast.unparse(function_def)
     exec(function_code, globals())
     factorial = globals().get("factorial")
