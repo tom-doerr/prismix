@@ -100,10 +100,10 @@ class TestRunTestsAndFix(unittest.TestCase):
     def test_run_ruff_fix(self, mock_run):
         mock_run.return_value.returncode = 0
         mock_run.return_value.stdout = "Ruff output"
-+        files = ["file1.py", "file2.py"]
-+        success, output = run_tests_and_fix.run_ruff_fix(files)
-+
-+        self.assertTrue(success)
+        files = ["file1.py", "file2.py"]
+        success, output = run_tests_and_fix.run_ruff_fix(files)
+
+        self.assertTrue(success)
         self.assertEqual(output, "stdout: Ruff output")
         mock_run.assert_called_with(
             ["ruff", "check", "./file1.py ./file2.py", "--fix"],
