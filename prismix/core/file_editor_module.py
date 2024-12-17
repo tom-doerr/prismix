@@ -24,20 +24,31 @@ class FileEditorModule:
     def read_file(self, filename: str) -> FileContext:
         """Reads the content of the file."""
         try:
-            with open(filename, 'r') as file:
+            with open(filename, "r") as file:
                 content = file.read()
-            return FileContext(filepath=filename, content=content, changes=[], error=None)
+            return FileContext(
+                filepath=filename, content=content, changes=[], error=None
+            )
         except FileNotFoundError:
-            return FileContext(filepath=filename, content="", changes=[], error="File does not exist")
+            return FileContext(
+                filepath=filename, content="", changes=[], error="File does not exist"
+            )
 
     def write_file(self, filename: str, content: str) -> FileContext:
         """Writes the updated content back to the file."""
         try:
-            with open(filename, 'w') as file:
+            with open(filename, "w") as file:
                 file.write(content)
-            return FileContext(filepath=filename, content=content, changes=["File updated successfully"], error=None)
+            return FileContext(
+                filepath=filename,
+                content=content,
+                changes=["File updated successfully"],
+                error=None,
+            )
         except Exception as e:
-            return FileContext(filepath=filename, content=content, changes=[], error=str(e))
+            return FileContext(
+                filepath=filename, content=content, changes=[], error=str(e)
+            )
 
     def parse_instructions(self, instruction: str) -> List[Tuple[str, str]]:
         """Parses the instruction string and returns a list of replacement pairs."""
@@ -51,7 +62,9 @@ class FileEditorModule:
             if "Replace" in part and len(part.split(" with ")) == 2
         ]
 
-    def apply_single_replacement(self, content: str, search_pattern: str, replacement_code: str) -> str:
+    def apply_single_replacement(
+        self, content: str, search_pattern: str, replacement_code: str
+    ) -> str:
         """Apply a single replacement in the content."""
         # Use regex to find and replace the search pattern
         return re.sub(search_pattern, replacement_code, content)
@@ -103,6 +116,7 @@ class FileEditorModule:
 
         # Write the updated content back to the file
         return self.write_file(file_path, updated_content)
+
     def _parse_context(self, context: str) -> Tuple[str, str]:
         """Parses the context to extract the file path and content."""
         file_path = context.split(" ")[0]
@@ -113,5 +127,7 @@ class FileEditorModule:
         """Applies the instructions to the content."""
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
-            content = self.apply_single_replacement(content, search_pattern, replacement_code)
+            content = self.apply_single_replacement(
+                content, search_pattern, replacement_code
+            )
         return content
