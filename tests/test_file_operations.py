@@ -1,3 +1,7 @@
+"""
+Test module for file operations.
+"""
+
 import os  # Move this to the top
 import pytest
 from prismix.core.iterative_programmer import setup_agent
