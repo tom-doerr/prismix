@@ -38,10 +38,23 @@ class CodeExecutor:
     @staticmethod
     def execute(code: str) -> CodeResult:
         """Execute code in isolated environment and return results"""
-        import ast
-
         try:
-            result = ast.literal_eval(code)
-            return CodeResult(code=code, success=True, output=str(result))
+            local_vars = {}
+            exec(code, CodeExecutor.get_safe_builtins(), local_vars)
+            main_func = local_vars.get("main")
+            if main_func:
+                result = main_func(5)
+                return CodeResult(
+                    code=code,
+                    success=True,
+                    output=f"Code executed successfully. Test main(5) = {result}",
+                )
+            else:
+                return CodeResult(
+                    code=code,
+                    success=False,
+                    output="",
+                    error="No callable 'main' function found in generated code",
+                )
         except Exception as e:
-            return CodeResult(code=code, success=False, error=str(e))
+            return CodeResult(code=code, success=False, output="", error=str(e))
