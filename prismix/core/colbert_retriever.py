@@ -50,7 +50,6 @@ def add_data_to_db(directory: str):
 class DataInserter:
     """Inserts data into the Qdrant database."""
 
-
     def __init__(self, qdrant_manager: QdrantManager):
         """Initializes the DataInserter with a QdrantManager."""
         self.qdrant_manager = qdrant_manager
@@ -81,6 +80,7 @@ class DataInserter:
 
 class ColbertRetriever(dspy.Retrieve):
     """Retrieves and manages code embeddings using Qdrant and CodeIndexer."""
+
     def __init__(self, url: str, k: int = 3):
         super().__init__(k=k)
         self.url = url
