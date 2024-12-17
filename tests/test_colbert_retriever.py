@@ -48,6 +48,7 @@ def test_add_data_to_db_basic(colbert_retriever_fixture, temp_dir):
         > 0
     )
 
+
 def test_colbert_retriever(colbert_retriever_fixture, temp_dir):
     """Test the ColbertRetriever class."""
     retriever = colbert_retriever_fixture
