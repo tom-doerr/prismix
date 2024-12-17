@@ -23,7 +23,7 @@ def main():
         # Get access to the defined function
         # Safer execution using CodeExecutor
         wrapped_code = f"""def main():
-        {result.code.replace('```python', '').replace('```', '').strip().replace('\\n', '\n    ')}
+        {result.code.replace('```python', '').replace('```', '').strip().replace('\n', '\n    ')}
     main()"""
         code_result = CodeExecutor.execute(wrapped_code)
         assert code_result.success, f"Code execution failed: {code_result.error}"
