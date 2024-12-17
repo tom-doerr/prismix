@@ -2,15 +2,15 @@
 Module for retrieving and managing code embeddings using Qdrant and CodeIndexer.
 """
 
-import uuid
 import logging
 import os
+import uuid
 from typing import List
 
 import dspy
 
 from prismix.core.code_indexer import CodeIndexer, IndexedCode
-from prismix.core.file_operations import FileManager, DefaultFileOperations
+from prismix.core.file_operations import DefaultFileOperations, FileManager
 from prismix.core.qdrant_manager import QdrantManager, models
 
 
@@ -20,10 +20,11 @@ def get_all_files_to_index(directory: str) -> List[str]:
     files_to_index = []
     for root, _, files in os.walk(directory):
         for file in files:
-            filepath = os.path.join(root, file)            
+            filepath = os.path.join(root, file)
             if not indexer._is_ignored(filepath):
                 files_to_index.append(filepath)
     return files_to_index
+
 
 def add_data_to_db(directory: str):
     """Add data to the database."""

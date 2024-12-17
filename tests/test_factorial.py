@@ -3,9 +3,11 @@ Test module for factorial calculations.
 """
 
 import ast
+
 import pytest
-from prismix.core.iterative_programmer import CodeResult, setup_agent
+
 from prismix.core.executor import CodeExecutor
+from prismix.core.iterative_programmer import CodeResult, setup_agent
 
 
 def test_factorial_basic():
@@ -30,7 +32,7 @@ def test_factorial_basic():
 
     code_result = CodeExecutor.execute(function_code)
     assert code_result.success, f"Code execution failed: {code_result.error}"
-    
+
     # Execute the factorial function directly
     local_vars = {}
     exec(function_code, globals(), local_vars)
@@ -75,6 +77,3 @@ def test_code_result_structure():
     assert isinstance(result.output, str)
     assert result.success is True
     assert "factorial" in result.code
-
-
-from prismix.core.executor import CodeExecutor

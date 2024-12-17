@@ -48,9 +48,7 @@ def test_file_edit_module_multiple_replacements(file_editor_module, temp_file):
         "Replace 'def hello()' with 'def greet()'",
     )
     # Ensure the file was written correctly
-    assert (
-        updated_content.content.strip() == "def greet():\n    print('hi')"
-    )
+    assert updated_content.content.strip() == "def greet():\n    print('hi')"
 
 
 def test_file_edit_module_overlapping_replacements(file_editor_module, temp_file):

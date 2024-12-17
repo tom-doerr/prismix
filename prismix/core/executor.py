@@ -13,11 +13,11 @@ from pydantic import BaseModel, ConfigDict
 @dataclass
 class CodeResult:
     """Represents the result of code execution."""
+
     code: str
     success: bool
     output: str
     error: str = ""
-
 
 
 class FileContext(BaseModel):
