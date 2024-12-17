@@ -50,7 +50,7 @@ def test_colbert_retriever(colbert_retriever):
     colbert_retriever.forward = lambda q: [
         {"long_text": f"This is a dummy result for {q}"} for _ in range(3)
     ]
-    colbert_retriever.add_data_to_db(temp_dir)
+    colbert_retriever.add_data_to_db(str(temp_dir))
     results = colbert_retriever.forward(query)
     assert len(results) == 3
     for result in results:
