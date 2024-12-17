@@ -19,8 +19,6 @@ class FileContext(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    model_config = ConfigDict(arbitrary_types_allowed=True)
-
 
 class FileEdit(dspy.Signature):
     """Analyze file and propose line-by-line edits"""
@@ -135,14 +133,11 @@ class FileEditor:
         lines = content.splitlines()
         changes = []
 
-        def apply_edit(mode, line_num, new_text):
-            """Helper function to apply a single edit."""
+        def _apply_edit(mode, line_num, new_text, lines, changes):
             if mode == "REPLACE" and 1 <= line_num <= len(lines):
                 old_text = lines[line_num - 1]
                 lines[line_num - 1] = new_text
-                changes.append(
-                    f"Replaced line {line_num}: '{old_text}' -> '{new_text}'"
-                )
+                changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
             elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
                 lines.insert(line_num - 1, new_text)
                 changes.append(f"Inserted at line {line_num}: '{new_text}'")
@@ -150,55 +145,57 @@ class FileEditor:
                 old_text = lines.pop(line_num - 1)
                 changes.append(f"Deleted line {line_num}: '{old_text}'")
 
-        if isinstance(line_edits, str):
-            for edit in line_edits.splitlines():
-                try:
-                    parts = edit.split("|", 1)
-                    if not parts:
+        def _apply_line_edits(content, line_edits):
+            lines = content.splitlines()
+            changes = []
+
+            if isinstance(line_edits, str):
+                for edit in line_edits.splitlines():
+                    try:
+                        parts = edit.split("|", 1)
+                        if not parts:
+                            continue
+
+                        mode_line = parts[0].strip().split()
+                        if len(mode_line) < 2:
+                            mode = "REPLACE"
+                            line_num = -1
+                            if mode_line:
+                                try:
+                                    line_num = int(mode_line[0])
+                                except ValueError:
+                                    pass
+                        else:
+                            mode = mode_line[0].upper()
+                            try:
+                                line_num = int(mode_line[1])
+                            except ValueError:
+                                line_num = -1
+
+                        new_text = parts[1].strip() if len(parts) > 1 else ""
+
+                        if line_num != -1:
+                            _apply_edit(mode, line_num, new_text, lines, changes)
+                    except (ValueError, IndexError) as e:
+                        changes.append(f"Failed to apply edit: Invalid line number {line_num}: {str(e)}")
+                        continue
+            else:
+                for edit in line_edits:
+                    if len(edit) == 2:
+                        line_num, new_text = edit
+                        mode = "REPLACE"
+                    else:
+                        mode, line_num, new_text = edit
+                    mode = mode.upper()
+                    try:
+                        _apply_edit(mode, line_num, new_text, lines, changes)
+                    except (ValueError, IndexError) as e:
+                        changes.append(f"Failed to apply {mode} at line {line_num}: {str(e)}")
                         continue
 
-                    mode_line = parts[0].strip().split()
-                    if len(mode_line) < 2:
-                        mode = "REPLACE"
-                        line_num = -1
-                        if mode_line:
-                            try:
-                                line_num = int(mode_line[0])
-                            except ValueError:
-                                pass
-                    else:
-                        mode = mode_line[0].upper()
-                        try:
-                            line_num = int(mode_line[1])
-                        except ValueError:
-                            line_num = -1
+            return "\n".join(lines), changes
 
-                    new_text = parts[1].strip() if len(parts) > 1 else ""
-
-                    if line_num != -1:
-                        apply_edit(mode, line_num, new_text)
-                except (ValueError, IndexError) as e:
-                    changes.append(
-                        f"Failed to apply edit: Invalid line number {line_num}: {str(e)}"
-                    )
-                    continue
-        else:
-            for edit in line_edits:
-                if len(edit) == 2:
-                    line_num, new_text = edit
-                    mode = "REPLACE"
-                else:
-                    mode, line_num, new_text = edit
-                mode = mode.upper()
-                try:
-                    apply_edit(mode, line_num, new_text)
-                except (ValueError, IndexError) as e:
-                    changes.append(
-                        f"Failed to apply {mode} at line {line_num}: {str(e)}"
-                    )
-                    continue
-
-        return "\n".join(lines), changes
+        return _apply_line_edits(content, line_edits)
 
     def apply_line_edits(
         self, content: str, line_edits: Union[str, List[Tuple[str, int, str]]]
