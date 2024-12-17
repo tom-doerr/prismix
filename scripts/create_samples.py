@@ -1,6 +1,3 @@
-"""
-Script to create sample files.
-"""
 
 """
 Script to create sample files.
@@ -8,6 +5,8 @@ Script to create sample files.
 
 from pathlib import Path
 
+
+from pathlib import Path
 
 def create_sample_files():
     """Create sample Python files for editing practice"""
