@@ -5,10 +5,11 @@ Script to run random pytest tests and pylint checks on specified number of files
 """
 
 import argparse
-import subprocess
-import os
 import glob
+import os
 import random
+import subprocess
+
 from tqdm import tqdm
 
 
@@ -22,9 +23,7 @@ def run_pylint():
             text=True,
         )
     except subprocess.CalledProcessError as e:
-        pylint_output = (
-            f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
-        )
+        pylint_output = f"Error running pylint: {e}\n{e.stdout}\n{e.stderr}"
         return False, pylint_output
     return True, pylint_output
 
@@ -67,9 +66,7 @@ def run_pytest():
         pytest_output += result.stdout + result.stderr
     except subprocess.CalledProcessError as e:
         pytest_output += (
-            f"Error running pytest: {e}\n"
-            f"stdout: {e.stdout}\n"
-            f"stderr: {e.stderr}"
+            f"Error running pytest: {e}\n" f"stdout: {e.stdout}\n" f"stderr: {e.stderr}"
         )
     return pytest_output
 
@@ -104,9 +101,7 @@ def run_ruff_fix(files):
         # ruff_result_output = result.stdout + result.stderr
         ruff_output = f"stdout: {result.stdout}\nstderr: {result.stderr}"
     except subprocess.CalledProcessError as e:
-        ruff_output = (
-            f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
-        )
+        ruff_output = f"Error running ruff fix: {e}\n{e.stdout}\n{e.stderr}"
         return False, ruff_output
     return True, ruff_output
 
@@ -143,12 +138,6 @@ debugging_and_testing_file_url = "https://gist.githubusercontent.com/mwanginjugu
 debugging_and_testing_file = (
     "prompt_text/introduction-to-debugging-and-testing-software.md"
 )
-import argparse
-import subprocess
-import os
-import glob
-import random
-from tqdm import tqdm
 import requests
 
 if not os.path.exists(debugging_and_testing_file):
