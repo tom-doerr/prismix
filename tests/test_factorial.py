@@ -60,8 +60,9 @@ def test_factorial_negative():
         (node for node in tree.body if isinstance(node, ast.FunctionDef)), None
     )
     function_code = ast.unparse(function_def)
-    exec(function_code, globals())
-    factorial = globals().get("factorial")
+    local_vars = {}
+    exec(function_code, globals(), local_vars)
+    factorial = local_vars.get("factorial")
     assert factorial(5) == 120
     with pytest.raises(ValueError):
         factorial(-1)
