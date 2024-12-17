@@ -2,18 +2,18 @@
 Module for iterative programming and code generation.
 """
 
-from typing import Tuple, Union
 import subprocess
 import sys
 import tempfile
 from io import StringIO
+from typing import Tuple, Union
 
 import dspy
 
-from prismix.core.signatures import CodeSafetyCheck
 from prismix.core.executor import CodeResult
+from prismix.core.file_operations import FileContext, FileEditor
 from prismix.core.generator import CodeGenerator
-from prismix.core.file_operations import FileEditor, FileContext
+from prismix.core.signatures import CodeSafetyCheck
 
 
 def is_code_safe(code: str, safety_checker: dspy.TypedPredictor) -> Tuple[bool, str]:
@@ -89,7 +89,9 @@ class IterativeProgrammer(dspy.Module):
             redirected_error = sys.stderr = StringIO()
 
             # Execute the modified file
-            result = subprocess.run([sys.executable, file_path], check=True, text=True, capture_output=True)
+            result = subprocess.run(
+                [sys.executable, file_path], check=True, text=True, capture_output=True
+            )
 
             # Restore stdout and stderr
             sys.stdout = old_stdout
