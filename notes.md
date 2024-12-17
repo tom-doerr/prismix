@@ -34,3 +34,7 @@
 
 ### litellm Deprecation
 - The `litellm` library is using deprecated `open_text` API. The code has been migrated to the new `files()` API to avoid future deprecation warnings.
+## Notes for LLMs
+
+- The code has been updated to use the new `ConfigDict` approach in Pydantic to avoid future issues.
+- The code has been migrated to use the new `files()` API in `litellm` to avoid future deprecation warnings.

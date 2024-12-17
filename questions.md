@@ -4,11 +4,6 @@
    - Why is the `MockLM` class in `tests/test_iterative_programmer.py` missing the required `prompt` argument?
    - How should the `MockLM` class be updated to be compatible with the expected interface of `dspy`?
 
-1. **Pydantic Deprecation**:
-   - Should we update the code to use the new `ConfigDict` approach in Pydantic to avoid future issues?
-
-2. **litellm Deprecation**:
-   - Should we migrate the code to use the new `files()` API in `litellm` to avoid future deprecation warnings?
 
 
 
