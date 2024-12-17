@@ -31,6 +31,6 @@ def test_execute_instruction_file_edit():
         )
         assert "Changes made:" in mock_stdout.getvalue()
         assert (
-            "- Replace 'print(f\"Calculated sum: {a + b + c}\")' with 'print(f\"The sum is: {a + b + c}\")'"
+            "Replace 'print(f\"Calculated sum: {a + b + c}\")' with 'print(f\"The sum is: {a + b + c}\")'"
             in mock_stdout.getvalue()
         )
