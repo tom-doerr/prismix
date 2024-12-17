@@ -33,22 +33,22 @@ def temp_dir():
 def test_search_code_on_the_fly(code_indexer, temp_directory):
     """Test the search_code_on_the_fly method."""
     # Test search with a query that exists in some files
-    results = indexer.search_code_on_the_fly(temp_directory, "print")
+    results = code_indexer.search_code_on_the_fly(temp_directory, "print")
     assert len(results) == 2
     assert any("test1.py" in r.filepath for r in results)
     assert any("test3.py" in r.filepath for r in results)
     assert all(isinstance(r, IndexedCode) for r in results)
 
     # Test search with a query that does not exist
-    results = indexer.search_code_on_the_fly(temp_directory, "nonexistent")
+    results = code_indexer.search_code_on_the_fly(temp_directory, "nonexistent")
     assert len(results) == 0
 
     # Test search with a query that exists in a specific file
-    results = indexer.search_code_on_the_fly(temp_directory, "test file")
+    results = code_indexer.search_code_on_the_fly(temp_directory, "test file")
     assert len(results) == 1
     assert any("test2.txt" in r.filepath for r in results)
 
     # Test search with a query that is a substring of another word
-    results = indexer.search_code_on_the_fly(temp_directory, "wor")
+    results = code_indexer.search_code_on_the_fly(temp_directory, "wor")
     assert len(results) == 1
     assert any("test3.py" in r.filepath for r in results)
