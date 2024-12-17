@@ -96,6 +96,8 @@ if __name__ == "__main__":
     combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
     combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
     for file_path in all_files:
-        call_aider(find_related_files(file_path), combined_output) # file_path is not redefined here
+        call_aider(
+            find_related_files(file_path), combined_output
+        )  # file_path is not redefined here
     if pylint_success and ruff_success:
         print("Pylint and Ruff checks and fixes applied successfully.")
