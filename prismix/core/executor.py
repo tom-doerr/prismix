@@ -7,7 +7,7 @@ import tempfile
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 @dataclass
@@ -21,7 +21,7 @@ class CodeResult:
 
 
 class FileContext(BaseModel):
-    model_config = ConfigDict(extra="forbid")  # Update to ConfigDict
+    model_config = ConfigDict(extra="forbid")
     filepath: str
     content: str
     changes: List[str]
