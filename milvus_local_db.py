@@ -11,10 +11,6 @@ except ImportError as e:
     logging.error(f"Failed to import pymilvus: {e}")
     raise
 
-"""
-Module for setting up and interacting with a local Milvus database.
-"""
-
 # Configure logging
 logging.basicConfig(
     level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s"
