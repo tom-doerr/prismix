@@ -145,12 +145,11 @@ class FileEditorModule:
         return self.write_file(filepath, updated_content)
 
 
-def apply_replacements(self, content: str, instruction: str) -> str:
-    """Applies multiple replacements based on the instruction."""
+def apply_replacements(self, content: str, instruction: str) -> FileContext:
     replacements = self.parse_instructions(instruction)
     for search_pattern, replacement_code in replacements:
         content = content.replace(search_pattern, replacement_code)
-    return content
+    return FileContext(content=content, changes=replacements)
 
 
 def apply_single_replacement(

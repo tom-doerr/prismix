@@ -38,13 +38,6 @@ class QdrantManager:
         )
         logging.info("Embeddings inserted into collection '%s'.", self.collection_name)
 
-    def embed_code(self, content: str) -> List[float]:
-        """Embed code content using a suitable embedding model."""
-        # Placeholder for embedding logic
-        # In a real implementation, this would use a model like SentenceTransformers
-        embedding = [0.0] * 128  # Dummy embedding
-        logging.info("Generated embedding for content: %s...", content[:50])
-        return embedding
 
     def search_embeddings(
         self, query_embedding: List[float], top_k: int = 3
