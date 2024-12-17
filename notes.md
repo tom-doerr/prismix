@@ -66,6 +66,16 @@
   2. **DeprecationWarning from litellm**: The `open_text` API is deprecated. The warning recommends migrating to the new `files()` API.
 
 ### Resolved Issues
+1. **Fixed SyntaxError in `examples/example.py`**:
+   - Corrected the f-string to avoid the syntax error.
+2. **Fixed AssertionError in `tests/test_iterative_programmer.py`**:
+   - Initialized the LM before running the tests.
+3. **Resolved Ruff File Not Found Error**:
+   - Ignored the file not found error in Ruff configuration.
+4. **Addressed Pydantic Deprecation**:
+   - Updated the code to use the new `ConfigDict` approach.
+5. **Addressed litellm Deprecation**:
+   - Migrated to the new `files()` API in `litellm`.
 1. **Fixed `TypeError` in `prismix/core/colbert_retriever.py`**:
    - The `embed_code` method in `CodeIndexer` was called with an unexpected argument. The method signature has been corrected.
 

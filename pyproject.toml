@@ -48,3 +48,4 @@ virtual_env = ".venv"  # Ensure isort uses the correct virtual environment+
 fix = true
 [tool.ruff.lint]
 select = ["E", "W", "F", "I"]
+ignore = ["E902"]  # Ignore file not found errors

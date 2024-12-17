@@ -27,6 +27,7 @@ class MockLM(dspy.LM):
 def test_is_code_safe_safe():
     """Test that safe code is identified as safe."""
     programmer = IterativeProgrammer()
+    programmer.safety_checker.lm = MockLM("mock-model")  # Initialize the LM
     code = "def hello():\n    print('hello')\n"
     is_safe, _ = programmer.is_code_safe(code)
     assert is_safe
@@ -43,6 +44,7 @@ def test_is_code_safe_unsafe():
 def test_execute_code_success():
     """Test successful execution of code."""
     programmer = IterativeProgrammer()
+    programmer.safety_checker.lm = MockLM("mock-model")  # Initialize the LM
     code = """
 def calculate_sum(a, b, c):
     print(f"Calculated sum: {a + b + c}")
@@ -61,6 +63,7 @@ if __name__ == "__main__":
 def test_execute_code_fail():
     """Test failed execution of code."""
     programmer = IterativeProgrammer()
+    programmer.safety_checker.lm = MockLM("mock-model")  # Initialize the LM
     code = """# samples/basic_function.py
 def calculate_sum(a, b, c):
     print(f"Calculated sum: {a + b + c}")
