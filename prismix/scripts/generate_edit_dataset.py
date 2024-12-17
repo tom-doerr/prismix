@@ -67,32 +67,6 @@ class EditDatasetGenerator(dspy.Module):
     along with corresponding edit instructions and hindsight commands.
     """
 
-    def __init__(self):
-        super().__init__()
-
-        class GenerateDatasetSignature(dspy.Signature):
-            num_examples = dspy.InputField(desc="Number of examples to generate")
-            output_file = dspy.InputField(desc="Path to the output JSON file")
-            dataset = dspy.OutputField(desc="Generated dataset containing examples")
-
-        self.signature = GenerateDatasetSignature()
-        self.script_generator = dspy.ChainOfThought(GenerateScript)
-        self.edit_generator = dspy.ChainOfThought(GenerateEditInstruction)
-        self.hindsight_generator = dspy.ChainOfThought(GenerateHindsightEdit)
-
-        # Themes for script generation
-        self.themes = [
-            "file processing",
-            "data structures implementation",
-            "API client",
-            "command line tool",
-            "database operations",
-            "text processing",
-            "mathematical calculations",
-            "system monitoring",
-            "data validation",
-            "configuration management",
-        ]
 
     def __init__(self):
         super().__init__()
