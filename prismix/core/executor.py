@@ -17,6 +17,7 @@ class CodeResult:
     output: str
     error: str = ""
 
+
 class FileContext(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
     filepath: str
