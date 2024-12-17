@@ -38,12 +38,10 @@ def test_add_data_to_db_basic(colbert_retriever, temp_dir):
     colbert_retriever_instance.add_data_to_db(temp_dir_instance)
     # Ensure that the data was added to the Qdrant database
     # This is a placeholder for a more detailed check
-    assert (
-        colbert_retriever_instance.qdrant_manager.client.count(
-            collection_name="colbert_embeddings"
-        ).count # Access the count attribute
-        > 0
+    count_result = colbert_retriever_instance.qdrant_manager.client.count(
+        collection_name="colbert_embeddings"
     )
+    assert count_result.count > 0
 
 
 def test_colbert_retriever(colbert_retriever_instance):
