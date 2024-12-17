@@ -67,9 +67,8 @@ class CodeExecutor:
                     " ".join(map(str, args))
                 )
                 # Refactor to avoid using exec
-                compiled_code = compile(code, tmp_file_path, "exec")
                 subprocess.run(
-                    ["python", "-c", code],
+                    ["python", tmp_file_path],
                     capture_output=True,
                     text=True,
                     check=True,
@@ -85,5 +84,5 @@ class CodeExecutor:
             return CodeResult(code=code, success=False, output="", error=str(e))
         except PermissionError as e:
             return CodeResult(code=code, success=False, output="", error=str(e))
-        except Exception as e:
+        except subprocess.CalledProcessError as e:
             return CodeResult(code=code, success=False, output="", error=str(e))

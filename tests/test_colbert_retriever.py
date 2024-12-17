@@ -49,7 +49,7 @@ def test_add_data_to_db_basic(colbert_retriever, temp_dir):
     )
 
 
-def test_colbert_retriever(colbert_retriever_instance):
+def test_colbert_retriever(colbert_retriever):
     """Test the ColbertRetriever class."""
     query = "quantum computing"
     colbert_retriever_instance.forward = lambda q: [
