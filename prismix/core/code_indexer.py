@@ -73,7 +73,7 @@ class CodeIndexer:
                                 filepath, file_context.content, embedding
                             )
                             self.indexed_code[filepath] = indexed_code
-                            logging.info(f"Indexed: {filepath}")
+                            logging.info("Indexed: %s", filepath)
                     except (FileNotFoundError, PermissionError) as e:
                         logging.error("Error accessing %s: %s", filepath, e)
 
@@ -112,8 +112,6 @@ class CodeIndexer:
                                 filepath, file_context.content, embedding
                             )
                             results.append(indexed_code)
-                    except (FileNotFoundError, PermissionError) as e:
-                        logging.error("Error accessing %s: %s", filepath, e)
                     except (FileNotFoundError, PermissionError) as e:
                         logging.error("Error accessing %s: %s", filepath, e)
         return results
