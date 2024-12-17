@@ -36,7 +36,7 @@
    - Should we migrate the code to use the new `files()` API in `litellm` to avoid future deprecation warnings? *(Resolved)*
 
 3. **Exec Usage in Executor**:
-   - How can we refactor the `exec` usage in `prismix/core/executor.py` to avoid the `W0122` warning and improve security?
+   - How can we refactor the `exec` usage in `prismix/core/executor.py` to avoid the `W0122` warning and improve security? *(Resolved)*
 
 3. **Exec Usage in Executor**:
    - How can we refactor the `exec` usage in `prismix/core/executor.py` to avoid the `W0122` warning and improve security?

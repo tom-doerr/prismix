@@ -66,23 +66,19 @@
   2. **DeprecationWarning from litellm**: The `open_text` API is deprecated. The warning recommends migrating to the new `files()` API.
 
 ### Resolved Issues
-1. **Fixed SyntaxError in `examples/example.py`**:
-   - Corrected the f-string to avoid the syntax error.
-2. **Fixed AssertionError in `tests/test_iterative_programmer.py`**:
-   - Initialized the LM before running the tests.
-3. **Resolved Ruff File Not Found Error**:
-   - Ignored the file not found error in Ruff configuration.
-4. **Addressed Pydantic Deprecation**:
-   - Updated the code to use the new `ConfigDict` approach.
-5. **Addressed litellm Deprecation**:
-   - Migrated to the new `files()` API in `litellm`.
+1. **Fixed Pylint Warnings in `executor.py`**:
+   - Added class docstring to `CodeExecutor`.
+   - Removed pointless string statement.
+   - Refactored exception handling to catch specific exceptions.
+   - Refactored `exec` usage to avoid security risks.
+
+2. **Fixed Pylint Warnings in `generate_edit_dataset.py`**:
+   - Broke long lines into multiple shorter lines.
+   - Added class docstring to `GenerateDatasetSignature`.
 
 ### Action Items
-1. **Address Pylint Warning**:
-   - Refactor `prismix/core/executor.py` to avoid using `exec`. Consider using safer alternatives for executing code in a controlled environment.
-
-2. **Address Pydantic Deprecation**:
+1. **Address Pydantic Deprecation**:
    - Update the code to use the new `ConfigDict` approach in Pydantic to avoid future issues.
 
-3. **Address litellm Deprecation**:
+2. **Address litellm Deprecation**:
    - Migrate the code to use the new `files()` API in `litellm` to avoid future deprecation warnings.
