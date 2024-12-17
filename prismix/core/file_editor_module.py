@@ -2,15 +2,15 @@
 Module for handling file editing operations.
 """
 
-"""
-Module for handling file editing operations.
-"""
-
 import os
 import re
 from typing import List, Tuple
 
-from prismix.core.file_operations import DefaultFileOperations, FileContext, FileManager
+from prismix.core.file_operations import (
+    DefaultFileOperations,
+    FileContext,
+    FileManager,
+)
 
 
 class FileEditorModule:
@@ -67,20 +67,24 @@ class FileEditorModule:
                             f"No change was made for pattern: '{search_pattern}' with replacement: '{replacement_code}'"
                         )
 
-        except Exception as e:
+        except (re.error, IndexError) as e:
             return FileContext(
-                filepath="", content=content, error=f"Error applying replacements: {e}"
+                filepath="",
+                content=content,
+                error=f"Error applying replacements: {e}",
             )
 
         if not changes:
-            return FileContext(filepath="", content=content, changes=changes)
+            return FileContext(
+                filepath="", content=content, changes=changes
+            )
 
         return FileContext(filepath="", content=content, changes=changes)
 
     def forward(self, context: str, instruction: str) -> FileContext:
         """Edit the file based on the context and instruction."""
         filepath = ""
-        content = ""
+        # content = ""  # Unused variable
         if "File: " in context:
             try:
                 filepath = context.split("File: ")[1].split("\n")[0].strip()

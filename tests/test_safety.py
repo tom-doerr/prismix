@@ -68,7 +68,9 @@ os.system("rm -rf /")
 """
         is_safe, message = self.programmer.is_code_safe(unsafe_code)
         self.assertFalse(is_safe)
-        self.assertIn("potentially unsafe operations", message)
+        self.assertIn(
+            "potentially unsafe operations", message
+        )
 
 
 if __name__ == "__main__":
