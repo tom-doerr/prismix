@@ -37,9 +37,10 @@ def agent():
 
 def test_file_read(test_file_fixture_read):
     """Test reading file content."""
+    """Test reading file content."""
     file_manager = FileManager(DefaultFileOperations())
     result = file_manager.read_file(test_file_fixture_read)
-    assert isinstance(result, FileContext)
+    assert isinstance(result, FileContext)()
     assert result.error is None
     assert "def main():" in result.content
     assert result.filepath == test_file_fixture
@@ -95,7 +96,7 @@ def test_apply_line_edits_string():
     original = "line 1\nline 2\nline 3"
     edits = "2 | modified line 2"
 
-    new_content, changes = editor._apply_line_edits(original, edits)
+    new_content, changes = editor.apply_line_edits(original, edits)
 
     assert "modified line 2" in new_content
     assert len(changes) == 1

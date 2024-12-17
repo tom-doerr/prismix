@@ -45,6 +45,38 @@ class IterativeProgrammer(dspy.Module):
 
     def execute_code(self, code: str) -> CodeResult:
         """Execute the generated code in a safe environment and return results."""
+        def _extract_file_path(code: str) -> str:
+            """Extract the file path from the code comment."""
+            lines = code.splitlines()
+            for line in lines:
+                if line.strip().startswith("#"):
+                    return line.strip()[1:].strip()
+            return None
+
+        def _apply_changes(file_path: str, code: str) -> str:
+            """Apply changes to the original file content."""
+            with open(file_path, "r", encoding="utf-8") as f:
+                original_content = f.read()
+            modified_content, _ = self.file_editor.apply_line_edits(original_content, code)
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(modified_content)
+            return modified_content
+
+        def _execute_file(file_path: str) -> Tuple[str, str]:
+            """Execute the file and capture output and error."""
+            old_stdout, old_stderr = sys.stdout, sys.stderr
+            sys.stdout, sys.stderr = StringIO(), StringIO()
+            try:
+                result = subprocess.run(
+                    [sys.executable, file_path], check=True, text=True, capture_output=True
+                )
+                output, error = result.stdout, result.stderr
+            except (CalledProcessError, FileNotFoundError, PermissionError) as e:
+                output, error = "", str(e)
+            finally:
+                sys.stdout, sys.stderr = old_stdout, old_stderr
+            return output, error
+
         is_safe, safety_msg = self.is_code_safe(code)
         print("is_safe:", is_safe)
         if not is_safe:
@@ -54,60 +86,19 @@ class IterativeProgrammer(dspy.Module):
                 output="",
                 error=f"Safety check failed: {safety_msg}",
             )
-        try:
-            # Extract the file path from the code comment
-            lines = code.splitlines()
-            file_path = None
-            for line in lines:
-                if line.strip().startswith("#"):
-                    file_path = line.strip()[1:].strip()
-                    break
-            if not file_path:
-                # If no file path is provided, use a temporary file
-                with tempfile.NamedTemporaryFile(
-                    mode="w", delete=False, suffix=".py", encoding="utf-8"
-                ) as temp_file:
-                    temp_file_path = temp_file.name
-                    temp_file.write(code)
-                file_path = temp_file_path
 
-            # Read the original file content
-            with open(file_path, "r", encoding="utf-8") as f:
-                original_content = f.read()
+        file_path = _extract_file_path(code)
+        if not file_path:
+            with tempfile.NamedTemporaryFile(
+                mode="w", delete=False, suffix=".py", encoding="utf-8"
+            ) as temp_file:
+                temp_file_path = temp_file.name
+                temp_file.write(code)
+            file_path = temp_file_path
 
-            # Apply the changes to the original content
-            file_editor = FileEditor()
-            modified_content, _ = file_editor.apply_line_edits(original_content, code)
-
-            # Write the modified content back to the original file
-            with open(file_path, "w", encoding="utf-8") as f:
-                f.write(modified_content)
-
-            # Capture stdout and stderr
-            old_stdout = sys.stdout
-            old_stderr = sys.stderr
-            old_stdout, old_stderr = sys.stdout, sys.stderr
-            sys.stdout, sys.stderr = StringIO(), StringIO()
-
-            # Execute the modified file
-            result = subprocess.run(
-                [sys.executable, file_path], check=True, text=True, capture_output=True
-            )
-
-            # Restore stdout and stderr
-            sys.stdout = old_stdout
-            sys.stderr = old_stderr
-            output = result.stdout
-            error = result.stderr
-
-            return CodeResult(code=code, success=True, output=output, error=error)
-        except (CalledProcessError, FileNotFoundError, PermissionError) as e:
-            return CodeResult(
-                code=code,
-                success=False,
-                output="",
-                error=f"Function execution failed in {file_path}: {str(e)}",
-            )
+        _apply_changes(file_path, code)
+        output, error = _execute_file(file_path)
+        return CodeResult(code=code, success=True, output=output, error=error)
 
     def forward(self, command: str) -> Union[CodeResult, FileContext]:
         """Generate and execute code or edit files based on the command."""
@@ -115,6 +106,14 @@ class IterativeProgrammer(dspy.Module):
             return self._handle_edit_command(command)
 
         return self._handle_code_generation(command)
+
+    def _handle_edit_command(self, command: str) -> FileContext:
+        """Handle file editing based on the command."""
+        pass
+
+    def _handle_code_generation(self, command: str) -> CodeResult:
+        """Handle code generation based on the command."""
+        pass
 
     def _handle_code_generation(self, command: str) -> CodeResult:
         """Handle code generation based on the command."""
