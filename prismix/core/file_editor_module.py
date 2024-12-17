@@ -4,11 +4,13 @@ Module for handling file editing operations.
 
 from typing import List, Tuple
 from prismix.core.file_operations import FileManager, FileContext, DefaultFileOperations
+from pydantic import ConfigDict
 
 class FileEditorModule:
     """Handles file editing operations."""
     def __init__(self):
         self.file_manager = FileManager(file_operations=DefaultFileOperations())
+        self.config_dict = ConfigDict(arbitrary_types_allowed=True)
 
     def apply_replacements(self, content: str, instruction: str) -> str:
         """Applies multiple replacements based on the instruction."""
