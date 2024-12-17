@@ -49,10 +49,10 @@
 - The `tests/test_code_indexer.py` test failed due to a missing fixture. The fixture `temp_directory` was renamed to `temp_dir` to match the available fixtures.
 
 ### Pydantic Deprecation
-- The code is using deprecated features from Pydantic. The code has been updated to use the new `ConfigDict` approach to avoid future issues.
+- The code has been updated to use the new `ConfigDict` approach to avoid future issues.
 
 ### litellm Deprecation
-- The `litellm` library is using deprecated `open_text` API. The code has been migrated to the new `files()` API to avoid future deprecation warnings.
+- The code has been migrated to the new `files()` API in `litellm` to avoid future deprecation warnings.
 ## Notes for LLMs
 
 ### Pylint Output
