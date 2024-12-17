@@ -20,7 +20,7 @@ def get_all_files_to_index(directory: str) -> List[str]:
     files_to_index = []
     for root, _, files in os.walk(directory):
         for file in files:
-            filepath = os.path.join(root, file)            
+            filepath = os.path.join(root, file)
             if not indexer._is_ignored(filepath):
                 files_to_index.append(filepath)
     return files_to_index
@@ -89,9 +89,9 @@ class ColbertRetriever(dspy.Retrieve):
         dspy.settings.configure(lm=dspy.OpenAI(api_key="your_openai_api_key"))
 
     def add_data_to_db(self, directory: str):
-       """Adds data from the given directory to the Qdrant database."""
-       self.data_inserter.add_data_to_db(directory)
- 
+        """Adds data from the given directory to the Qdrant database."""
+        self.data_inserter.add_data_to_db(directory)
+
     def forward(self, query: str, k: int = None, *args, **kwargs) -> List[str]:
         """Search for similar embeddings in Qdrant."""
         query_embedding = self.qdrant_manager.embed_code(
