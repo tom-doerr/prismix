@@ -186,7 +186,14 @@ if __name__ == "__main__":
         # pytest_output = run_random_pytest(args.pytest_files, all_python_files)
         pytest_output = run_random_pytest(selected_test_files)
         pylint_result_output = run_random_pylint(selected_files)
-        files_being_tested = [file_path.replace('test_', '') for file_path in selected_test_files if file_path.replace('test_', '') in all_python_files]
+        files_being_tested = []
+        files_potentially_being_tested = [file_path.replace('test_', '') for file_path in selected_test_files if file_path.replace('test_', '') in all_python_files]
+        for file in all_python_files:
+            for file_potentially in files_potentially_being_tested:
+                if file_potentially in file:
+                    files_being_tested.append(file)
+
+
         print("files_being_tested:", files_being_tested)
         combined_output = (
             f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_output}"
