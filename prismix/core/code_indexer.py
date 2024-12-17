@@ -71,14 +71,8 @@ class CodeIndexer:
                             print(
                                 f"Indexed: {filepath}"
                             )  # Consider logging instead of printing
-                    except FileNotFoundError as e:
-                        print(f"File not found: {filepath}: {e}")
-                    except PermissionError as e:
-                        print(f"Permission error accessing {filepath}: {e}")
-                    except FileNotFoundError as e:
-                        print(f"File not found: {filepath}: {e}")
-                    except PermissionError as e:
-                        print(f"Permission error accessing {filepath}: {e}")
+                    except (FileNotFoundError, PermissionError) as e:
+                        print(f"Error accessing {filepath}: {e}")
                     except Exception as e:
                         print(
                             f"Unexpected error indexing {filepath}: {e}"
@@ -115,19 +109,13 @@ class CodeIndexer:
                                 filepath, file_context.content, embedding
                             )
                             results.append(indexed_code)
-                    except FileNotFoundError as e:
-                        print(f"File not found: {filepath}: {e}")
-                    except PermissionError as e:
-                        print(f"Permission error accessing {filepath}: {e}")
-                    except FileNotFoundError as e:
-                        print(f"File not found: {filepath}: {e}")
-                    except PermissionError as e:
-                        print(f"Permission error accessing {filepath}: {e}")
+                    except (FileNotFoundError, PermissionError) as e:
+                        print(f"Error accessing {filepath}: {e}")
                     except Exception as e:
                         print(f"Unexpected error searching {filepath}: {e}")
         return results
 
-    def is_ignored(self, filepath: str) -> bool:
+    def _is_ignored(self, filepath: str) -> bool:
         """Check if the file should be ignored based on the ignore patterns."""
         for pattern in self.ignore_patterns:
             if fnmatch.fnmatch(filepath, pattern):
