@@ -32,10 +32,8 @@ def setup_milvus_local_db():
             index_file_size=1024,  # Optional parameter
         )
         logging.info("Milvus local database setup complete.")
-    except FileNotFoundError as e:
-        logging.error("File not found: %s", e)
-    except PermissionError as e:
-        logging.error("Permission denied: %s", e)
+    except (FileNotFoundError, PermissionError) as e:
+        logging.error("Error: %s", e)
 
 
 def insert_data_into_milvus():
@@ -84,7 +82,7 @@ def search_milvus_collection():
         logging.error("File not found: %s", e)
     except PermissionError as e:
         logging.error("Permission denied: %s", e)
-    except Exception as e:
+    except (FileNotFoundError, PermissionError) as e:
         logging.error("Error searching Milvus collection: %s", e)
 
 
