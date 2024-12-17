@@ -14,14 +14,12 @@ class FileEditorModule:
         self.file_manager = FileManager(file_operations=DefaultFileOperations())
         self.config_dict = ConfigDict(arbitrary_types_allowed=True)
 
-    def apply_replacements(self, content: str, instruction: str) -> FileContext:
-        """Applies multiple replacements based on the instruction and returns a FileContext object."""
+    def apply_replacements(self, content: str, instruction: str) -> str:
+        """Applies multiple replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
         for search_pattern, replacement_code in replacements:
             content = content.replace(search_pattern, replacement_code)
-        return FileContext(
-            filepath="", content=content, changes=replacements, error=None
-        )
+        return content
 
     def read_file(self, filename: str) -> FileContext:
         """Reads the content of the file."""

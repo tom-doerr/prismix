@@ -10,6 +10,9 @@ from prismix.core.iterative_programmer import IterativeProgrammer
 class MockLM(dspy.LM):
     """Mock implementation of a dspy LM."""
 
+    def __init__(self, model):  # Add 'model' argument
+        self.model = model  # Store the model
+
     def __call__(self, prompt):
         """Mock implementation of the __call__ method."""
         if "unsafe" in prompt.lower():
