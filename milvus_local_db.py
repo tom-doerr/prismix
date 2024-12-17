@@ -3,6 +3,7 @@ Module for setting up and interacting with a local Milvus database.
 """
 
 import logging
+
 import numpy as np
 
 try:
