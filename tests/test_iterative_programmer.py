@@ -1,6 +1,3 @@
-"""
-Test suite for the IterativeProgrammer module.
-"""
 
 """
 Test suite for the IterativeProgrammer module.
@@ -12,6 +9,11 @@ from prismix.core.iterative_programmer import IterativeProgrammer
 
 
 # Mock LM for testing
+import pytest
+import dspy
+from prismix.core.iterative_programmer import IterativeProgrammer
+
+
 class MockLM(dspy.LM):
     """Mock language model for testing purposes."""
 

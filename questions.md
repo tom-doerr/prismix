@@ -21,3 +21,10 @@
 
 4. **litellm Deprecation**:
    - Should we migrate the code to use the new `files()` API in `litellm` to avoid future deprecation warnings?
+## Questions
+
+1. **Pydantic Deprecation**:
+   - Should we update the code to use the new `ConfigDict` approach in Pydantic to avoid future issues?
+
+2. **litellm Deprecation**:
+   - Should we migrate the code to use the new `files()` API in `litellm` to avoid future deprecation warnings?

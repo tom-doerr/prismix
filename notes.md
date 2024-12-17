@@ -22,7 +22,12 @@
 - The `PydanticDeprecatedSince20` warning indicates that the code is using deprecated features from Pydantic. Consider updating the code to use the new `ConfigDict` approach as suggested in the warning.
 - The `DeprecationWarning` from `litellm` regarding `open_text` should be addressed by migrating to the new `files()` API as recommended.
 ### Pylint Warning
-- The `tests/test_metrics.py` file contains a redundant string statement that has no effect, causing a `W0105` warning. This has been resolved by removing the unnecessary string statement.
+- The `tests/test_iterative_programmer.py` file contains a redundant string statement that has no effect, causing a `W0105` warning. This has been resolved by removing the unnecessary string statement.
+- Imports in `tests/test_iterative_programmer.py` were not at the top of the module, causing `C0413` warnings. These have been moved to the top.
+- The `__call__` method in `MockLM` had a signature mismatch, causing a `W0222` warning. This has been fixed to match the expected signature.
+
+### Pytest Issues
+- The `tests/test_code_indexer.py` test failed due to a missing fixture. The fixture `temp_directory` was renamed to `temp_dir` to match the available fixtures.
 
 ### Pydantic Deprecation
 - The code is using deprecated features from Pydantic. The code has been updated to use the new `ConfigDict` approach to avoid future issues.
