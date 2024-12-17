@@ -47,9 +47,11 @@ def test_file_edit_module_multiple_replacements(file_editor_module):
         context=f"File: {str(temp_file)}\nContent: def hello():\n    print('hello')\n",
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and Replace 'def hello()' with 'def greet()'",  # Corrected instruction
     )
- 
+
     # Ensure the file was written correctly
-    assert updated_content.content.strip() == "def greet():\n    print('hi')\n", f"Content was: {updated_content.content}"
+    assert (
+        updated_content.content.strip() == "def greet():\n    print('hi')\n"
+    ), f"Content was: {updated_content.content}"
     assert updated_content.changes == [
         ("def hello():", "def greet():"),  # Corrected the expected changes
         ("    print('hello')", "    print('hi')"),  # Corrected the expected changes
@@ -65,7 +67,9 @@ def test_file_edit_module_overlapping_replacements(file_editor_module):
         instruction="Replace 'print(\\'hello\\')' with 'print(\\'hi\\')' and Replace 'hello' with 'greet'",
     )
     # Ensure the file was written
-    assert updated_content.content == "def greet():\n    print('hi')\n", f"Content was: {updated_content.content}"
+    assert (
+        updated_content.content == "def greet():\n    print('hi')\n"
+    ), f"Content was: {updated_content.content}"
 
 
 def test_file_edit_module_empty_file(file_editor_module):
@@ -150,7 +154,8 @@ def test_forward_with_no_file_content_in_context(file_editor_module):
         instruction=instruction,
     )
     assert (
-        file_context.content == "def hello():\n    print('hi')\n"  # Corrected the assertion
+        file_context.content
+        == "def hello():\n    print('hi')\n"  # Corrected the assertion
     )
     assert not file_context.error
     assert file_context.changes == [("    print('hello')", "    print('hi')")]
@@ -179,7 +184,8 @@ def test_forward_with_valid_edit(file_editor_module):
         instruction=instruction,
     )
     assert (
-        file_context.content == "def hello():\n    print('hi')\n"  # Corrected the assertion
+        file_context.content
+        == "def hello():\n    print('hi')\n"  # Corrected the assertion
     )
     assert not file_context.error
     assert file_context.changes == [("    print('hello')", "    print('hi')")]
@@ -193,7 +199,8 @@ def test_forward_with_no_change(file_editor_module):
         instruction=instruction,
     )
     assert (
-        file_context.content == "def hello():\n    print('hello')\n"  # Corrected the assertion
+        file_context.content
+        == "def hello():\n    print('hello')\n"  # Corrected the assertion
     )
     assert not file_context.error
     assert file_context.changes == []
@@ -226,7 +233,8 @@ def test_forward_with_no_replacements(file_editor_module):
         instruction="Replace 'non_existent' with 'new_text'",
     )
     assert (
-        updated_content.content.strip() == "def hello():\n    print('hello')\n"  # Corrected the assertion
+        updated_content.content.strip()
+        == "def hello():\n    print('hello')\n"  # Corrected the assertion
     )
     assert updated_content.changes == []
 
@@ -273,7 +281,9 @@ def test_forward_with_edge_cases(file_editor_module):
         context=f"File: {temp_file_path_empty}\nContent: ",
         instruction="Replace 'non_existent' with 'new_text'",
     )
-    assert updated_content_empty.content == ""  # Corrected the assertion, added missing newline
+    assert (
+        updated_content_empty.content == ""
+    )  # Corrected the assertion, added missing newline
     assert updated_content_empty.changes == []
     os.remove(temp_file_path_empty)
 

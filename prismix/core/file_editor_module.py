@@ -39,7 +39,9 @@ class FileEditorModule:
         """Applies a single replacement to the content."""
         return content.replace(search_pattern, replacement_code)
 
-    def apply_replacements(self, content: str, instruction: str) -> Tuple[str, List[Tuple[str, str]]]:
+    def apply_replacements(
+        self, content: str, instruction: str
+    ) -> Tuple[str, List[Tuple[str, str]]]:
         """Applies replacements based on the instruction."""
         replacements = self.parse_instructions(instruction)
         changes = []
