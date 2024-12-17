@@ -55,12 +55,12 @@ def test_colbert_retriever(colbert_retriever):
     colbert_retriever.forward = lambda q: [
         {"long_text": f"This is a dummy result for {q}"} for _ in range(3)
     ]
-    results = colbert_retriever_instance.forward(query)
+    results = colbert_retriever.forward(query)
     assert len(results) == 3
     for result in results:
         assert "dummy result" in result["long_text"]
     assert (
-        colbert_retriever_instance.qdrant_manager.client.count(
+        colbert_retriever.qdrant_manager.client.count(
             collection_name="colbert_embeddings"
         ).count  # Access the count attribute
         > 0
