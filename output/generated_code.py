@@ -1,4 +1,3 @@
-```python
 from datetime import datetime
 import pytz
 
@@ -20,4 +19,3 @@ def show_time_in_la():
 # Example usage
 if __name__ == "__main__":
     print(show_time_in_la())
-```
