@@ -100,6 +100,7 @@ class FileEditorModule:
                 pass
         if "Content: " in context:
             try:
+                content = context.split("Content: ")[1].strip()
             except IndexError:
                 content = ""
 
