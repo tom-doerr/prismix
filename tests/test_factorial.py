@@ -61,6 +61,7 @@ def test_factorial_negative():
     )
     function_code = ast.unparse(function_def)
     local_vars = {}
+    local_vars = {}
     exec(function_code, globals(), local_vars)
     factorial = local_vars.get("factorial")
     assert factorial(5) == 120

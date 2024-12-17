@@ -26,6 +26,10 @@ mypy = "^1.13.0"
 # Explicitly remove pytest-parallel to avoid conflicts
 # pytest-parallel = "*"
 
+[tool.poetry.group.dev.dependencies]
+pydantic = "^2.0.0"
+litellm = "^0.1.0"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

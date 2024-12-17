@@ -134,6 +134,9 @@ def test_read_file(file_editor_module, temp_file):
     assert file_context.filepath == str(temp_file)
     assert not file_context.error
     assert file_context.changes == []
+    assert file_context.filepath == str(temp_file)
+    assert not file_context.error
+    assert file_context.changes == []
 
 
 def test_read_file_not_found(file_editor_module):
