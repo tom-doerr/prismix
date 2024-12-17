@@ -48,6 +48,10 @@ class FileEditorModule:
             )
         except FileNotFoundError:
             return FileContext(filepath=filename, content="", changes=[], error="File does not exist")
+        except PermissionError as e:
+            return FileContext(filepath=filename, content="", changes=[], error=f"Permission error: {e}")
+        except IOError as e:
+            return FileContext(filepath=filename, content="", changes=[], error=f"IO error: {e}")
         except IOError as e:
             return FileContext(filepath=filename, content="", changes=[], error=str(e))
 
