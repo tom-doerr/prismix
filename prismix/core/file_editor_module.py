@@ -9,28 +9,18 @@ import logging
 from typing import List, Tuple
 from prismix.core.signatures import FileEdit
 
-def read_file(self, filename: str) -> FileContext:
-    """Reads the file and returns its content."""
-    file_manager = FileManager(file_operations=DefaultFileOperations())
-    try:
-        return file_manager.read_file(filename)
-    except FileNotFoundError:
-        return FileContext(
-            filepath=filename, content="", changes=[], error="File does not exist"
-        )
+    def apply_replacements(self, content: str, instruction: str) -> str:
+        """Applies multiple replacements based on the instruction."""
+        replacements = self.parse_instructions(instruction)
+        for search_pattern, replacement_code in replacements:
+            content = content.replace(search_pattern, replacement_code)
+        return content
 
-def apply_replacements(self, content: str, instruction: str) -> str:
-    """Applies multiple replacements based on the instruction."""
-    replacements = self.parse_instructions(instruction)
-    for search_pattern, replacement_code in replacements:
-        content = content.replace(search_pattern, replacement_code)
-    return content
-
-def apply_single_replacement(
-    self, content: str, search_pattern: str, replacement_code: str
-) -> str:
-    """Applies a single replacement to the content."""
-    return content.replace(search_pattern, replacement_code)
+    def apply_single_replacement(
+        self, content: str, search_pattern: str, replacement_code: str
+    ) -> str:
+        """Applies a single replacement to the content."""
+        return content.replace(search_pattern, replacement_code)
 
     def parse_instructions(self, instruction: str) -> List[Tuple[str, str]]:
         """Parses the instruction string and returns a list of replacement pairs."""
