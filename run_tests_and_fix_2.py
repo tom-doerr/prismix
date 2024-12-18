@@ -216,6 +216,7 @@ def call_aider(file_paths, model, combined_output):
                 "--yes-always",
                 "--no-detect-urls",
                 "--no-suggest-shell-commands",
+                "--subtree-only",
                 "--verbose",
             ]
             + ["--model", model]
@@ -230,7 +231,7 @@ def call_aider(file_paths, model, combined_output):
                     "please update notes.md. If you have questions, please write them into questions.md. "
                     "I might update the notes.md with answers to those questions. If you have commands I should run, "
                     "please put them into commands.sh. Refactor notes.md and questions.md when necessary to avoid redundancy "
-                    "and to reduce length. Output: {combined_output}. What should we do next?"
+                    f"and to reduce length. Output: {combined_output}. What should we do next?"
                 ),
             ]
         )
