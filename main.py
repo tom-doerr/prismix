@@ -14,23 +14,6 @@ dspy.settings.configure(lm=llm)
 retriever = QdrantRetriever()
 retriever.add_files(include_glob="*.py", exclude_glob="*test*")
 
-# Example usage
-import os
-import sys
-
-import dspy
-
-from qdrant_retriever import QdrantRetriever
-
-# Setup the LLM
-llm = dspy.LM(model="gpt-4o-mini", api_key=os.environ.get("OPENAI_API_KEY"))
-dspy.settings.configure(lm=llm)
-
-# Initialize the retriever
-retriever = QdrantRetriever()
-retriever.add_files(include_glob="*.py", exclude_glob="*test*")
-
-# Example usage
 if __name__ == "__main__":
     predict = dspy.ChainOfThought(CodeEdit)
 
