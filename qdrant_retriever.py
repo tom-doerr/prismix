@@ -1,10 +1,11 @@
 import glob
 import os
-from typing import List
+from typing import List, Optional
 
 import requests
 from qdrant_client import QdrantClient, models
 from qdrant_client.http.models import Batch
+from sentence_transformers import SentenceTransformer
 
 
 class QdrantRetriever:
@@ -16,8 +17,9 @@ class QdrantRetriever:
         self.embedding_size = 256
         self.jina_api_key = os.environ.get("JINA_API_KEY")
         self.jina_model = "jina-embeddings-v3"
+        self.model = None
         if not self.jina_api_key:
-            raise ValueError("JINA_API_KEY environment variable not set.")
+            self.model = SentenceTransformer('all-MiniLM-L6-v2')
         self._create_collection()
 
     def _create_collection(self):
@@ -54,7 +56,10 @@ class QdrantRetriever:
 
     def retrieve(self, query: str, top_k: int = 5) -> List[str]:
         """Retrieves the top_k most relevant documents for a given query."""
-        query_embedding = self.model.encode(query).tolist()
+        if self.model:
+            query_embedding = self.model.encode(query).tolist()
+        else:
+            query_embedding = self._get_jina_embedding(query)
         search_result = self.client.search(
             collection_name=self.collection_name,
             query_vector=query_embedding,
@@ -64,27 +69,30 @@ class QdrantRetriever:
 
     def _get_jina_embedding(self, text: str) -> List[float]:
         """Gets the Jina embedding for the given text."""
-        url = "https://api.jina.ai/v1/embeddings"
-        headers = {
-            "Content-Type": "application/json",
-            "Authorization": f"Bearer {self.jina_api_key}",
-        }
-        data = {
-            "input": [text],
-            "model": self.jina_model,
-            "dimensions": self.embedding_size,
-            "task": "retrieval.passage",
-            "late_chunking": True,
-        }
-        response = requests.post(url, headers=headers, json=data)
-        if response.status_code != 200:
-            raise Exception(f"Jina API request failed with status code: {response.status_code}, response: {response.text}")
-        response_json = response.json()
-        if "data" in response_json and response_json["data"]:
-            embeddings = response_json["data"][0]["embedding"]
-            return embeddings
+        if self.jina_api_key:
+            url = "https://api.jina.ai/v1/embeddings"
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.jina_api_key}",
+            }
+            data = {
+                "input": [text],
+                "model": self.jina_model,
+                "dimensions": self.embedding_size,
+                "task": "retrieval.passage",
+                "late_chunking": True,
+            }
+            response = requests.post(url, headers=headers, json=data)
+            if response.status_code != 200:
+                raise Exception(f"Jina API request failed with status code: {response.status_code}, response: {response.text}")
+            response_json = response.json()
+            if "data" in response_json and response_json["data"]:
+                embeddings = response_json["data"][0]["embedding"]
+                return embeddings
+            else:
+                raise KeyError(f"Unexpected response structure: {response_json}")
         else:
-            raise KeyError(f"Unexpected response structure: {response_json}")
+            return self.model.encode(text).tolist()
 
 
 if __name__ == "__main__":
