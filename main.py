@@ -32,7 +32,6 @@ retriever.add_files(include_glob="*.py", exclude_glob="*test*")
 
 # Example usage
 if __name__ == "__main__":
-    # predict = dspy.Predict(CodeEdit)
     predict = dspy.ChainOfThought(CodeEdit)
 
     if len(sys.argv) < 3:
