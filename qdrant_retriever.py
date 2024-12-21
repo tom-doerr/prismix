@@ -19,7 +19,7 @@ class QdrantRetriever:
         self.jina_model = "jina-embeddings-v3"
         self.model = None
         if not self.jina_api_key:
-            self.model = SentenceTransformer('all-MiniLM-L6-v2',  output_value="sentence_embedding", max_seq_length=self.embedding_size)
+            self.model = SentenceTransformer('all-MiniLM-L6-v2', max_seq_length=self.embedding_size)
         self._create_collection()
 
     def _create_collection(self):
