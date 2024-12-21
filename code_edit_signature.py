@@ -15,7 +15,7 @@ class CodeFile(BaseModel):
 
 
 
-class EditInstruction(dsyp.Signature):
+class EditInstruction(dspy.Signature):
     start_line = dspy.OutputField(desc="The line number where the edit should start.")
     end_line = dspy.OutputField(desc="The line number where the edit should end.")
     replacement_text = dspy.OutputField(desc="The text that should replace the lines from start_line to end_line.")
@@ -26,5 +26,5 @@ class CodeEdit(dspy.Signature):
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")
     code_files = dspy.InputField(desc="List of code files with their content.", format=list)
     context = dspy.InputField(desc="Context for the code edit.", format=Context)
-    edit_instructions = 
+    edit_instructions = dspy.OutputField(desc="A list of edit instructions.", format=list)
     search_query = dspy.OutputField(desc="A search query to use for the next iteration, if needed.")
