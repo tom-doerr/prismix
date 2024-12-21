@@ -6,8 +6,8 @@ from pydantic import BaseModel
 
 class Context(dspy.Signature):
     """Provides context for code editing."""
-    retrieved_context = dspy.InputField(desc="Context from the retriever.", format=list)
-    online_search = dspy.InputField(desc="Search results from online search.", format=list)
+    retrieved_context = dspy.InputField(desc="Context from the retriever.")
+    online_search = dspy.InputField(desc="Search results from online search.")
 
 class CodeFile(BaseModel):
     filepath: str

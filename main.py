@@ -35,7 +35,7 @@ if __name__ == "__main__":
         code_files = [CodeFile(filepath=file_path, filecontent=numbered_content)]
 
         retrieved_context = retriever.retrieve(query=instruction)
-        context = Context(retrieved_context=retrieved_context, online_search=[])
+        context = Context(retrieved_context="\n".join(retrieved_context), online_search="")
 
         try:
             response = predict(instruction=instruction, code_files=code_files, context=context)
