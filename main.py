@@ -61,7 +61,7 @@ if __name__ == "__main__":
         print("--- Output Values ---")
         print(f"Search Query: {response.search_query}")
 
-        for edit_instruction in response.edit_instructions:
+        for edit_instruction in response.edit_instructions.edit_instructions:
             file_path = edit_instruction.filepath
             start_line = int(edit_instruction.start_line)
             end_line = int(edit_instruction.end_line)
