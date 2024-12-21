@@ -67,7 +67,10 @@ if __name__ == "__main__":
             end_line = int(edit_instruction.end_line)
             replacement_text = edit_instruction.replacement_text
 
-            file_content = next(f.filecontent for f in code_files if f.filepath == file_path)
+            file_content = next((f.filecontent for f in code_files if f.filepath == file_path), None)
+            if file_content is None:
+                print(f"Error: File not found in code_files: {file_path}")
+                continue
 
             edited_content = apply_code_edit(
                 file_content=file_content,
