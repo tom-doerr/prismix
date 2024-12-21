@@ -2,12 +2,12 @@ import os
 
 import dspy
 
+# Setup the LLM
+from dspy.utils import openai_client
+
 from code_edit_signature import CodeEdit, CodeFile
 from code_edit_utils import apply_code_edit
 
-# Setup the LLM
-from dspy.teleprompt import BootstrapFewShot
-from dspy.utils import openai_client
 openai_client.api_key = os.environ.get("OPENAI_API_KEY")
 llm = dspy.OpenAI(model="gpt-4o-mini")
 dspy.settings.configure(lm=llm)
