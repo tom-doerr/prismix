@@ -38,8 +38,15 @@ class QdrantRetriever:
     def add_text(self, file_path: str, text: str):
         """Adds a text document to the Qdrant collection."""
         embedding = self.model.encode(text).tolist()
-        point = PointStruct(id=hash(file_path), vector=embedding, payload={"file_path": file_path, "text": text})
-        self.client.upsert(collection_name=self.collection_name, points=Batch(points=[point]))
+        point_id = hash(file_path)
+        self.client.upsert(
+            collection_name=self.collection_name,
+            points=Batch(
+                ids=[point_id],
+                vectors=[embedding],
+                payloads=[{"file_path": file_path, "text": text}]
+            )
+        )
 
     def retrieve(self, query: str, top_k: int = 5) -> List[str]:
         """Retrieves the top_k most relevant documents for a given query."""
