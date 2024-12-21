@@ -64,27 +64,36 @@ if __name__ == "__main__":
         print(f"Replacement Text: {response.replacement_text}")
         print(f"Search Query: {response.search_query}")
 
-        edited_content = apply_code_edit(
-            file_content=next(f.filecontent for f in code_files if f.filepath == response.filepath),
-            start_line=int(response.start_line),
-            end_line=int(response.end_line),
-            replacement_text=response.replacement_text
-        )
+        for edit_instruction in response.edit_instructions:
+            file_path = edit_instruction.filepath
+            start_line = int(edit_instruction.start_line)
+            end_line = int(edit_instruction.end_line)
+            replacement_text = edit_instruction.replacement_text
 
-        def remove_line_numbers(text: str) -> str:
-            lines = text.splitlines()
-            unumbered_lines = [line[7:] if len(line) > 7 else line for line in lines]
-            return "\n".join(unumbered_lines)
+            file_content = next(f.filecontent for f in code_files if f.filepath == file_path)
 
-        unumbered_edited_content = remove_line_numbers(edited_content)
-        print("--- Original content ---")
-        print(next(f.filecontent for f in code_files if f.filepath == response.filepath))
-        print("--- Edited content ---")
-        print(unumbered_edited_content)
+            edited_content = apply_code_edit(
+                file_content=file_content,
+                start_line=start_line,
+                end_line=end_line,
+                replacement_text=replacement_text
+            )
 
-        with open(response.filepath, 'w') as f:
-            f.write(unumbered_edited_content)
-        print(f"File {response.filepath} updated.")
+            def remove_line_numbers(text: str) -> str:
+                lines = text.splitlines()
+                unumbered_lines = [line[7:] if len(line) > 7 else line for line in lines]
+                return "\n".join(unumbered_lines)
+
+            unumbered_edited_content = remove_line_numbers(edited_content)
+            print("--- Original content ---")
+            print(file_content)
+            print("--- Edited content ---")
+            print(unumbered_edited_content)
+
+            with open(file_path, 'w') as f:
+                f.write(unumbered_edited_content)
+            print(f"File {file_path} updated.")
+
 
     except Exception as e:
         print(f"An error occurred: {e}")
