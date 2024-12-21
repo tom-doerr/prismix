@@ -14,12 +14,12 @@ class QdrantRetriever:
     def __init__(self, collection_name: str = "my_documents", embedding_size: int = 768):
         self.client = QdrantClient(":memory:")
         self.collection_name = collection_name
-        self.embedding_size = 256
+        self.embedding_size = embedding_size
         self.jina_api_key = os.environ.get("JINA_API_KEY")
         self.jina_model = "jina-embeddings-v3"
         self.model = None
         if not self.jina_api_key:
-            self.model = SentenceTransformer('all-MiniLM-L6-v2')
+            self.model = SentenceTransformer('all-MiniLM-L6-v2',  output_value="sentence_embedding", max_seq_length=self.embedding_size)
         self._create_collection()
 
     def _create_collection(self):
