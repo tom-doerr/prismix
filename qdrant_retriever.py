@@ -1,9 +1,10 @@
 import glob
+import os
 from typing import List
 
+import requests
 from qdrant_client import QdrantClient, models
 from qdrant_client.http.models import Batch
-from sentence_transformers import SentenceTransformer
 
 
 class QdrantRetriever:
@@ -12,8 +13,9 @@ class QdrantRetriever:
     def __init__(self, collection_name: str = "my_documents", embedding_size: int = 768):
         self.client = QdrantClient(":memory:")
         self.collection_name = collection_name
-        self.embedding_size = embedding_size
-        self.model = SentenceTransformer('all-MiniLM-L6-v2')
+        self.embedding_size = 256
+        self.jina_api_key = os.environ.get("JINA_API_KEY")
+        self.jina_model = "jina-embeddings-v3"
         self._create_collection()
 
     def _create_collection(self):
@@ -37,7 +39,7 @@ class QdrantRetriever:
 
     def add_text(self, file_path: str, text: str):
         """Adds a text document to the Qdrant collection."""
-        embedding = self.model.encode(text).tolist()
+        embedding = self._get_jina_embedding(text)
         point_id = hash(file_path)
         self.client.upsert(
             collection_name=self.collection_name,
@@ -57,6 +59,25 @@ class QdrantRetriever:
             limit=top_k,
         )
         return [hit.payload["text"] for hit in search_result]
+
+    def _get_jina_embedding(self, text: str) -> List[float]:
+        """Gets the Jina embedding for the given text."""
+        url = "https://api.jina.ai/v1/embeddings"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.jina_api_key}",
+        }
+        data = {
+            "input": [text],
+            "model": self.jina_model,
+            "dimensions": self.embedding_size,
+            "task": "retrieval.passage",
+            "late_chunking": True,
+        }
+        response = requests.post(url, headers=headers, json=data)
+        embeddings = response.json()["embeddings"]
+        return embeddings[0]
+
 
 if __name__ == "__main__":
     retriever = QdrantRetriever()
