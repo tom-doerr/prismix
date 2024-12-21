@@ -6,7 +6,7 @@ import dspy
 from code_edit_signature import CodeEdit, CodeFile
 from code_edit_utils import apply_code_edit
 
-llm = dspy.OpenAI(model="gpt-4o-mini", api_key=os.environ.get("OPENAI_API_KEY"))
+llm = dspy.LM(model="gpt-4o-mini", api_key=os.environ.get("OPENAI_API_KEY"))
 dspy.settings.configure(lm=llm)
 
 # Example usage
