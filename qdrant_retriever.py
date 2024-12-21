@@ -75,8 +75,12 @@ class QdrantRetriever:
             "late_chunking": True,
         }
         response = requests.post(url, headers=headers, json=data)
-        embeddings = response.json()["embeddings"]
-        return embeddings[0]
+        response_json = response.json()
+        if "data" in response_json and response_json["data"]:
+            embeddings = response_json["data"][0]["embedding"]
+            return embeddings
+        else:
+            raise KeyError(f"Unexpected response structure: {response_json}")
 
 
 if __name__ == "__main__":
