@@ -2,12 +2,17 @@ import os
 
 import dspy
 
-# Setup the LLM
-from code_edit_signature import CodeEdit, CodeFile
-from code_edit_utils import apply_code_edit
+from code_edit_signature import CodeEdit, CodeFile, Context
+from code_edit_utils import add_line_numbers, apply_code_edit
+from qdrant_retriever import QdrantRetriever
 
+# Setup the LLM
 llm = dspy.LM(model="gpt-4o-mini", api_key=os.environ.get("OPENAI_API_KEY"))
 dspy.settings.configure(lm=llm)
+
+# Initialize the retriever
+retriever = QdrantRetriever()
+retriever.add_files(include_glob="*.py", exclude_glob="*test*")
 
 # Example usage
 if __name__ == "__main__":
@@ -26,18 +31,24 @@ if __name__ == "__main__":
         with open(file_path, 'r') as f:
             file_content = f.read()
 
-        code_files = [CodeFile(filepath=file_path, filecontent=file_content)]
+        numbered_content = add_line_numbers(file_content)
+        code_files = [CodeFile(filepath=file_path, filecontent=numbered_content)]
+
+        retrieved_context = retriever.retrieve(query=instruction)
+        context = Context(retrieved_context=retrieved_context, online_search=[])
 
         try:
-            response = predict(instruction=instruction, code_files=code_files)
+            response = predict(instruction=instruction, code_files=code_files, context=context)
 
             print("--- Output Values ---")
+            print(f"Filepath: {response.filepath}")
             print(f"Start Line: {response.start_line}")
             print(f"End Line: {response.end_line}")
             print(f"Replacement Text: {response.replacement_text}")
+            print(f"Search Query: {response.search_query}")
 
             edited_content = apply_code_edit(
-                file_content=code_files[0].filecontent,
+                file_content=file_content,
                 start_line=int(response.start_line),
                 end_line=int(response.end_line),
                 replacement_text=response.replacement_text
