@@ -1,6 +1,6 @@
 import glob
 import os
-from typing import List, Optional
+from typing import List
 
 import requests
 from qdrant_client import QdrantClient, models
