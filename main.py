@@ -53,13 +53,20 @@ if __name__ == "__main__":
                 end_line=int(response.end_line),
                 replacement_text=response.replacement_text
             )
+
+            def remove_line_numbers(text: str) -> str:
+                lines = text.splitlines()
+                unumbered_lines = [line[7:] if len(line) > 7 else line for line in lines]
+                return "\n".join(unumbered_lines)
+
+            unumbered_edited_content = remove_line_numbers(edited_content)
             print("--- Original content ---")
             print(file_content)
             print("--- Edited content ---")
-            print(edited_content)
+            print(unumbered_edited_content)
 
             with open(file_path, 'w') as f:
-                f.write(edited_content)
+                f.write(unumbered_edited_content)
             print(f"File {file_path} updated.")
 
         except Exception as e:
