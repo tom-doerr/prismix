@@ -11,10 +11,9 @@ from sentence_transformers import SentenceTransformer
 class QdrantRetriever:
     """Manages Qdrant operations for storing and querying text."""
 
-    def __init__(self, collection_name: str = "my_documents", embedding_size: int = 768):
+    def __init__(self, collection_name: str = "my_documents"):
         self.client = QdrantClient(":memory:")
         self.collection_name = collection_name
-        self.embedding_size = embedding_size
         self.jina_api_key = os.environ.get("JINA_API_KEY")
         self.jina_model = "jina-embeddings-v3"
         self.model = None
@@ -24,9 +23,13 @@ class QdrantRetriever:
 
     def _create_collection(self):
         """Creates the Qdrant collection if it doesn't exist."""
+        if self.model:
+            embedding_size = self.model.get_sentence_embedding_dimension()
+        else:
+            embedding_size = 256
         self.client.recreate_collection(
             collection_name=self.collection_name,
-            vectors_config=models.VectorParams(size=self.embedding_size, distance=models.Distance.COSINE),
+            vectors_config=models.VectorParams(size=embedding_size, distance=models.Distance.COSINE),
         )
 
     def add_files(self, include_glob: str, exclude_glob: str = None):
