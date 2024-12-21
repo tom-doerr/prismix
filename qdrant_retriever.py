@@ -16,6 +16,8 @@ class QdrantRetriever:
         self.embedding_size = 256
         self.jina_api_key = os.environ.get("JINA_API_KEY")
         self.jina_model = "jina-embeddings-v3"
+        if not self.jina_api_key:
+            raise ValueError("JINA_API_KEY environment variable not set.")
         self._create_collection()
 
     def _create_collection(self):
@@ -75,6 +77,8 @@ class QdrantRetriever:
             "late_chunking": True,
         }
         response = requests.post(url, headers=headers, json=data)
+        if response.status_code != 200:
+            raise Exception(f"Jina API request failed with status code: {response.status_code}, response: {response.text}")
         response_json = response.json()
         if "data" in response_json and response_json["data"]:
             embeddings = response_json["data"][0]["embedding"]
