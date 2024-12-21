@@ -21,7 +21,9 @@ def get_all_files_to_index(directory: str) -> List[str]:
     for root, _, files in os.walk(directory):
         for file in files:
             filepath = os.path.join(root, file)
-            if not indexer.is_ignored(filepath):  # Use a public method instead of protected member
+            if not indexer.is_ignored(
+                filepath
+            ):  # Use a public method instead of protected member
                 files_to_index.append(filepath)
     return files_to_index
 

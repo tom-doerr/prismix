@@ -2,7 +2,7 @@
 This module contains basic arithmetic functions for adding, multiplying, and calculating averages.
 """
 
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 
 def add_numbers(numbers: List[float]) -> float:

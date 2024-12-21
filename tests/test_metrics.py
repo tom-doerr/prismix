@@ -4,8 +4,8 @@ Test module for metrics calculations.
 
 from prismix.core.metrics import (
     calculate_levenshtein_similarity,
-    check_indentation_consistency,
     check_formatting,
+    check_indentation_consistency,
     evaluate_edit,
 )
 

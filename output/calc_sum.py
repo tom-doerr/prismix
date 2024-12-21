@@ -18,7 +18,9 @@ if __name__ == "__main__":
         int or float: The sum of a and b.
         """
         result = a + b
-        print(f"The sum of {a} and {b} is: {result}")  # Print the result before returning
+        print(
+            f"The sum of {a} and {b} is: {result}"
+        )  # Print the result before returning
         return result
 
     if __name__ == "__main__":

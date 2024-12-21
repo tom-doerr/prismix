@@ -115,7 +115,10 @@ class TestRunTestsAndFix(unittest.TestCase):
 
         mock_run.return_value.returncode = 1
         mock_run.side_effect = subprocess.CalledProcessError(
-            1, ["ruff", "check", "./file1.py ./file2.py", "--fix"], stderr="Error output", stdout="Error output"
+            1,
+            ["ruff", "check", "./file1.py ./file2.py", "--fix"],
+            stderr="Error output",
+            stdout="Error output",
         )
         success, output = run_tests_and_fix.run_ruff_fix(files)
         self.assertFalse(success)
@@ -173,7 +176,7 @@ class TestRunTestsAndFix(unittest.TestCase):
         self.assertFalse(run_tests_and_fix.is_test_file("some/path/file.py"))
 
     def test_find_related_files(self):
-        with patch("os.path.exists", return_value=True): # type: ignore
+        with patch("os.path.exists", return_value=True):  # type: ignore
             self.assertEqual(
                 run_tests_and_fix.find_related_files("test_file_test.py"),
                 ["test_file_test.py", "test_file.py"],
@@ -187,9 +190,7 @@ class TestRunTestsAndFix(unittest.TestCase):
                 run_tests_and_fix.find_related_files("tests/test_file_test.py"),
                 ["tests/test_file_test.py"],
             )
-        self.assertEqual(
-            run_tests_and_fix.find_related_files("file.py"), ["file.py"]
-        )
+        self.assertEqual(run_tests_and_fix.find_related_files("file.py"), ["file.py"])
 
     def test_filter_files_by_output(self):
         output = "file1.py:10: Some error\nfile2.py:20: Another error"
@@ -202,9 +203,7 @@ class TestRunTestsAndFix(unittest.TestCase):
         self.assertEqual(
             run_tests_and_fix.filter_files_by_output(output, all_files), ["file1.py"]
         )
-        self.assertEqual(
-            run_tests_and_fix.filter_files_by_output("", all_files), []
-        )
+        self.assertEqual(run_tests_and_fix.filter_files_by_output("", all_files), [])
 
     @patch("subprocess.run")
     @patch("os.path.exists", return_value=True)
@@ -237,7 +236,7 @@ class TestRunTestsAndFix(unittest.TestCase):
 
         mock_run.side_effect = subprocess.CalledProcessError(  # type: ignore
             1, ["black", "file1.py"], stderr="Error output", stdout="Error output"
-       )
+        )
         run_tests_and_fix.run_black(files)
 
     @patch("run_tests_and_fix_2.run_pylint")

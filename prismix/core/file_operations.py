@@ -137,7 +137,9 @@ class FileEditor:
             if mode == "REPLACE" and 1 <= line_num <= len(lines):
                 old_text = lines[line_num - 1]
                 lines[line_num - 1] = new_text
-                changes.append(f"Replaced line {line_num}: '{old_text}' -> '{new_text}'")
+                changes.append(
+                    f"Replaced line {line_num}: '{old_text}' -> '{new_text}'"
+                )
             elif mode == "INSERT" and 1 <= line_num <= len(lines) + 1:
                 lines.insert(line_num - 1, new_text)
                 changes.append(f"Inserted at line {line_num}: '{new_text}'")
@@ -177,7 +179,9 @@ class FileEditor:
                         if line_num != -1:
                             _apply_edit(mode, line_num, new_text, lines, changes)
                     except (ValueError, IndexError) as e:
-                        changes.append(f"Failed to apply edit: Invalid line number {line_num}: {str(e)}")
+                        changes.append(
+                            f"Failed to apply edit: Invalid line number {line_num}: {str(e)}"
+                        )
                         continue
             else:
                 for edit in line_edits:
@@ -190,7 +194,9 @@ class FileEditor:
                     try:
                         _apply_edit(mode, line_num, new_text, lines, changes)
                     except (ValueError, IndexError) as e:
-                        changes.append(f"Failed to apply {mode} at line {line_num}: {str(e)}")
+                        changes.append(
+                            f"Failed to apply {mode} at line {line_num}: {str(e)}"
+                        )
                         continue
 
             return "\n".join(lines), changes

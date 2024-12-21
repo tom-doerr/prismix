@@ -194,6 +194,7 @@ def handle_command(command, args):
     else:
         execute_instruction(command)
 
+
 def main() -> NoReturn:
     """Main function to execute the Prismix application."""
     print("CodeWeaver - AI-powered iterative code generation tool")

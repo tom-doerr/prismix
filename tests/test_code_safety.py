@@ -3,6 +3,7 @@ Test module for code safety checks.
 """
 
 import pytest
+
 from prismix.core.iterative_programmer import setup_agent
 
 

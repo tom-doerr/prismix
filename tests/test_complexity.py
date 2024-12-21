@@ -3,7 +3,9 @@ Test module for code complexity using radon.
 """
 
 import subprocess
+
 import pytest
+
 
 @pytest.mark.parametrize(
     "filepath",
@@ -33,6 +35,8 @@ def test_code_complexity(filepath):
             if len(parts) > 2:
                 try:
                     complexity = int(parts[2])
-                    assert complexity <= max_complexity, f"Complexity {complexity} exceeds max {max_complexity} in {line}"
+                    assert (
+                        complexity <= max_complexity
+                    ), f"Complexity {complexity} exceeds max {max_complexity} in {line}"
                 except ValueError:
-                    pass # Ignore lines that don't have a complexity score
+                    pass  # Ignore lines that don't have a complexity score
