@@ -58,10 +58,6 @@ if __name__ == "__main__":
         response = predict(instruction=instruction, code_files=code_files, context=context)
 
         print("--- Output Values ---")
-        print(f"Filepath: {response.filepath}")
-        print(f"Start Line: {response.start_line}")
-        print(f"End Line: {response.end_line}")
-        print(f"Replacement Text: {response.replacement_text}")
         print(f"Search Query: {response.search_query}")
 
         for edit_instruction in response.edit_instructions:
