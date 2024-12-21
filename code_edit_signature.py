@@ -13,8 +13,6 @@ class CodeFile(BaseModel):
     filepath: str
     filecontent: str
 
-
-
 class EditInstruction(dspy.Signature):
     start_line = dspy.OutputField(desc="The line number where the edit should start.")
     end_line = dspy.OutputField(desc="The line number where the edit should end.")
