@@ -13,8 +13,8 @@ from sentence_transformers import SentenceTransformer
 class QdrantRetriever:
     """Manages Qdrant operations for storing and querying text."""
 
-    def __init__(self, collection_name: str = "my_documents"):
-        self.client = QdrantClient(path="./qdrant_data")
+    def __init__(self, collection_name: str = "my_documents", data_path: str = "./qdrant_data"):
+        self.client = QdrantClient(path=data_path)
         self.collection_name = collection_name
         self.jina_api_key = os.environ.get("JINA_API_KEY")
         self.jina_model = "jina-embeddings-v3"
@@ -49,7 +49,8 @@ class QdrantRetriever:
     def add_or_update_code_chunks(self, file_path: str, file_content: str):
         """Adds or updates code chunks in the Qdrant collection."""
         file_hash = self._hash_file_content(file_content)
-        if self._check_if_file_changed(file_path, file_hash, file_content):
+        # if self._check_if_file_changed(file_path, file_hash, file_content):
+        if True:
             self._delete_chunks_for_file(file_path)
             self._add_code_chunks(file_path, file_content)
         else:
@@ -105,29 +106,29 @@ class QdrantRetriever:
         """Hashes the file content."""
         return hashlib.sha256(file_content.encode()).hexdigest()
 
-    def _check_if_file_changed(self, file_path: str, current_hash: str, file_content: str) -> bool:
-        """Checks if the file content has changed."""
-        try:
-            query_embedding = self._get_jina_embedding(file_content) if self.jina_api_key else self.model.encode(file_content).tolist()
-            search_result = self.client.search(
-                collection_name=self.collection_name,
-                query_vector=query_embedding,
-                query_filter=models.Filter(
-                    must=[
-                        models.FieldCondition(
-                            key="file_path",
-                            match=models.MatchValue(value=file_path)
-                        )
-                    ]
-                ),
-                limit=1
-            )
-            if search_result:
-                stored_hash = search_result[0].payload.get("file_hash")
-                return stored_hash != current_hash
-            return False
-        except Exception:
-            return False
+    # def _check_if_file_changed(self, file_path: str, current_hash: str, file_content: str) -> bool:
+        # """Checks if the file content has changed."""
+        # try:
+            # query_embedding = self._get_jina_embedding(file_content) if self.jina_api_key else self.model.encode(file_content).tolist()
+            # search_result = self.client.search(
+                # collection_name=self.collection_name,
+                # query_vector=query_embedding,
+                # query_filter=models.Filter(
+                    # must=[
+                        # models.FieldCondition(
+                            # key="file_path",
+                            # match=models.MatchValue(value=file_path)
+                        # )
+                    # ]
+                # ),
+                # limit=1
+            # )
+            # if search_result:
+                # stored_hash = search_result[0].payload.get("file_hash")
+                # return stored_hash != current_hash
+            # return False
+        # except Exception:
+            # return False
 
     def _delete_chunks_for_file(self, file_path: str):
         """Deletes all chunks associated with a file path."""
