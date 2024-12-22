@@ -39,10 +39,6 @@ class InferenceModule(dspy.Module):
                 raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
 
 
-class Context(dspy.Signature):
-    """Provides context for code editing."""
-    retrieved_context = dspy.InputField(desc="Context from the retriever.")
-    online_search = dspy.InputField(desc="Search results from online search.")
 
 class CodeFile(BaseModel):
     filepath: str
@@ -80,6 +76,54 @@ import dspy
 dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
 
 
+
+instruction_context_pairs = [
+    {
+        "instruction": "Add a comment to the hello function that says 'This is a hello function.'",
+        "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
+    },
+    {
+        "instruction": "Change the print statement in the hello function to say 'hello world'",
+        "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
+    },
+    {
+        "instruction": "Add a new function called goodbye that prints 'goodbye'",
+        "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
+    },
+    {
+        "instruction": "Rename the hello function to greet",
+        "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
+    },
+    {
+        "instruction": "Remove the print statement from the hello function",
+        "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
+    },
+    {
+        "instruction": "Add a parameter called name to the hello function",
+         "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
+    },
+    {
+        "instruction": "Make the hello function return 'hello'",
+        "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
+    },
+    {
+        "instruction": "Add a docstring to the hello function",
+        "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
+    },
+    {
+        "instruction": "Add a type hint to the hello function",
+        "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
+    },
+    {
+        "instruction": "Add a default value to the name parameter of the hello function",
+        "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
+    }
+]
+
+
+
+
+
 def run_code_edit_example():
     # Create a predictor using the CodeEdit signature
     generate_answer = assert_transform_module(
@@ -98,48 +142,6 @@ def run_code_edit_example():
         "retrieved_context": "This is an example python file.",
         "online_search": "No relevant search results."
     }
-    instruction_context_pairs = [
-        {
-            "instruction": "Add a comment to the hello function that says 'This is a hello function.'",
-            "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
-        },
-        {
-            "instruction": "Change the print statement in the hello function to say 'hello world'",
-            "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
-        },
-        {
-            "instruction": "Add a new function called goodbye that prints 'goodbye'",
-            "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
-        },
-        {
-            "instruction": "Rename the hello function to greet",
-            "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
-        },
-        {
-            "instruction": "Remove the print statement from the hello function",
-            "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
-        },
-        {
-            "instruction": "Add a parameter called name to the hello function",
-             "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
-        },
-        {
-            "instruction": "Make the hello function return 'hello'",
-            "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
-        },
-        {
-            "instruction": "Add a docstring to the hello function",
-            "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
-        },
-        {
-            "instruction": "Add a type hint to the hello function",
-            "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
-        },
-        {
-            "instruction": "Add a default value to the name parameter of the hello function",
-            "context": {"retrieved_context": "This is an example python file.", "online_search": "No relevant search results."}
-        }
-    ]
 
     for item in instruction_context_pairs:
         # Call the predictor
