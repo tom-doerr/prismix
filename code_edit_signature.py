@@ -14,12 +14,13 @@ class InferenceModule(dspy.Module):
     def __init__(self, signature):
         super().__init__()
         self.predictor = dspy.Predict(signature)
+        self.predictor_with_assertions = assert_transform_module(self.predictor, backtrack_handler, max_backtracks=3)
 
     def forward(self, instruction, context):
         """
         Performs the code edit inference.
         """
-        return self.predictor(instruction=instruction, context=context)
+        return self.predictor_with_assertions(instruction=instruction, context=context)
 
 
 class Context(dspy.Signature):
@@ -54,24 +55,6 @@ class CodeEdit(dspy.Signature):
     edit_instructions = dspy.OutputField(desc="A list of edit instructions.", base_signature=EditInstructions)
     search_query = dspy.OutputField(desc="A search query to use for the next iteration, if needed.")
 
-    def __call__(self, **kwargs):
-        output = self.forward(**kwargs)
-        self.validate_edit_instructions(output.edit_instructions)
-        return output
-
-    def validate_edit_instructions(self, value):
-        dspy.Assert(isinstance(value, list), "edit_instructions must be a list")
-        for item in value:
-            dspy.Assert(isinstance(item, dict), "Each edit instruction must be a dictionary")
-            dspy.Assert("filepath" in item, "Each edit instruction must have a filepath")
-            if "start_line" in item:
-                dspy.Assert("end_line" in item, "LineNumberEditInstruction must have an end_line")
-                dspy.Assert("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text")
-            elif "search_text" in item:
-                dspy.Assert("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text")
-            else:
-                raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
-
 # Assuming you have a dspy.Model set up, e.g., using OpenAI
 # If not, you'll need to set it up like this:
 from typing import Union
@@ -83,7 +66,7 @@ dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
 
 def run_code_edit_example():
     # Create a predictor using the CodeEdit signature
-    generate_answer = dspy.Predict(CodeEdit)
+    generate_answer = InferenceModule(CodeEdit)
 
     # Example usage
     code_files = [
@@ -99,14 +82,7 @@ def run_code_edit_example():
     instruction = "Add a comment to the hello function that says 'This is a hello function.'"
 
     # Call the predictor
-    # prediction = generate_answer(instruction=instruction, context=context)
-    # print("prediction:", prediction)
-
-    # Activate assertions
-    generate_answer_with_assertions = assert_transform_module(generate_answer, backtrack_handler, max_backtracks=3)
-
-    # Call the predictor with assertions
-    prediction = generate_answer_with_assertions(instruction=instruction, context=context)
+    prediction = generate_answer(instruction=instruction, context=context)
     print("prediction:", prediction)
 
     # Print the generated answer
