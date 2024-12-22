@@ -56,7 +56,7 @@ from typing import Union
 
 import dspy
 
-dspy.configure(lm=dspy.OpenAI(model="gpt-4o-mini"))
+dspy.configure(lm=dspy.GPT3(model="gpt-4o-mini"))
 
 
 def run_code_edit_example():
