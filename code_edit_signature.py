@@ -50,14 +50,12 @@ class CodeEdit(dspy.Signature):
 
 # CodeEdit = create_signature_class_from_model(CodeEditPydantic)
 
+# Assuming you have a dspy.Model set up, e.g., using OpenAI
+# If not, you'll need to set it up like this:
 from typing import Union
 
 import dspy
 
-# Assuming you have a dspy.Model set up, e.g., using OpenAI
-# If not, you'll need to set it up like this:
-import os
-os.environ["OPENAI_API_KEY"] = "YOUR_API_KEY"
 dspy.configure(lm=dspy.OpenAI(model="gpt-4o-mini"))
 
 
