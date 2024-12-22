@@ -26,24 +26,24 @@ class InferenceModule(dspy.Module):
             import json
             edit_instructions = json.loads(prediction.edit_instructions)
             validated_edit_instructions = EditInstructions(edit_instructions=edit_instructions)
-            self.validate_edit_instructions(validated_edit_instructions.edit_instructions)
+            self.validate_edit_instructions(validated_edit_instructions.edit_instructions, prediction)
             prediction.edit_instructions = validated_edit_instructions.edit_instructions
         except Exception as e:
             print(f"Error parsing edit_instructions: {e}")
-            dspy.Suggest(False, f"Error parsing edit_instructions: {e}")
+            dspy.Suggest(False, f"Error parsing edit_instructions: {e}", target_module=self)
 
         return prediction
 
-    def validate_edit_instructions(self, value):
-        dspy.Suggest(isinstance(value, list), "edit_instructions must be a list")
+    def validate_edit_instructions(self, value, prediction):
+        dspy.Suggest(isinstance(value, list), "edit_instructions must be a list", target_module=self)
         for item in value:
-            dspy.Suggest(isinstance(item, dict), "Each edit instruction must be a dictionary")
-            dspy.Suggest("filepath" in item, "Each edit instruction must have a filepath")
+            dspy.Suggest(isinstance(item, dict), "Each edit instruction must be a dictionary", target_module=self)
+            dspy.Suggest("filepath" in item, "Each edit instruction must have a filepath", target_module=self)
             if "start_line" in item:
-                dspy.Suggest("end_line" in item, "LineNumberEditInstruction must have an end_line")
-                dspy.Suggest("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text")
+                dspy.Suggest("end_line" in item, "LineNumberEditInstruction must have an end_line", target_module=self)
+                dspy.Suggest("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text", target_module=self)
             elif "search_text" in item:
-                dspy.Suggest("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text")
+                dspy.Suggest("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text", target_module=self)
 
 
 
