@@ -91,7 +91,6 @@ class QdrantRetriever:
                     payloads=[{"file_path": file_path, "text": code_chunk, "start_line": start_line, "file_hash": self._hash_file_content(code_chunk)}]
                 )
             )
-            print(f"Added chunk: file_path={file_path}, text={code_chunk[:50]}..., start_line={start_line}")
 
     def _check_if_chunk_exists(self, point_id: int) -> bool:
         """Checks if a chunk with the given ID already exists in the collection."""
@@ -108,9 +107,8 @@ class QdrantRetriever:
         """Hashes the file content."""
         return hashlib.sha256(file_content.encode()).hexdigest()
 
-    def _check_if_file_changed(self, file_path: str, current_hash: str, file_content: str) -> bool:
-        """Checks if the file content has changed."""
-        return True
+    # def _check_if_file_changed(self, file_path: str, current_hash: str, file_content: str) -> bool:
+        # """Checks if the file content has changed."""
         # try:
             # query_embedding = self._get_jina_embedding(file_content) if self.jina_api_key else self.model.encode(file_content).tolist()
             # search_result = self.client.search(
@@ -162,7 +160,6 @@ class QdrantRetriever:
             query_embedding = self.model.encode(query).tolist()
         else:
             query_embedding = self._get_jina_embedding(query)
-        print(f"Query embedding: {query_embedding[:10]}...")
         search_result = self.client.search(
             collection_name=self.collection_name,
             query_vector=query_embedding,
