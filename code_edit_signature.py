@@ -20,7 +20,22 @@ class InferenceModule(dspy.Module):
         """
         Performs the code edit inference.
         """
-        return self.predictor_with_assertions(instruction=instruction, context=context)
+        prediction = self.predictor_with_assertions(instruction=instruction, context=context)
+        self.validate_edit_instructions(prediction.edit_instructions)
+        return prediction
+
+    def validate_edit_instructions(self, value):
+        dspy.Assert(isinstance(value, list), "edit_instructions must be a list")
+        for item in value:
+            dspy.Assert(isinstance(item, dict), "Each edit instruction must be a dictionary")
+            dspy.Assert("filepath" in item, "Each edit instruction must have a filepath")
+            if "start_line" in item:
+                dspy.Assert("end_line" in item, "LineNumberEditInstruction must have an end_line")
+                dspy.Assert("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text")
+            elif "search_text" in item:
+                dspy.Assert("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text")
+            else:
+                raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
 
 
 class Context(dspy.Signature):
