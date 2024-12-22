@@ -3,11 +3,13 @@ import os
 import pytest
 
 from qdrant_retriever import QdrantRetriever
+from run_tests_and_fix import downgrade_protobuf
 
 
 @pytest.fixture
 def qdrant_retriever(request):
     """Fixture to create a QdrantRetriever instance for testing."""
+    downgrade_protobuf()
     test_name = request.node.name
     retriever = QdrantRetriever(collection_name="test_collection", data_path=f"./qdrant_data_{test_name}")
     retriever.clear_collection()  # Ensure a clean collection for each test
