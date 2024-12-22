@@ -165,12 +165,11 @@ class QdrantRetriever:
             query_embedding = self.model.encode(query).tolist()
         else:
             query_embedding = self._get_jina_embedding(query)
-
-        search_result = self.client.search(
-            collection_name=self.collection_name,
-            query_vector=query_embedding,
-            limit=top_k,
-        )
+            search_result = self.client.search(
+                collection_name=self.collection_name,
+                query_vector=query_embedding,
+                limit=top_k,
+            )
         print(f"Search results: {search_result}")
         return [(hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]) for hit in search_result]
 
