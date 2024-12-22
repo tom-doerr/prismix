@@ -76,6 +76,11 @@ import dspy
 dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
 
 
+context_sample = \
+'''
+print('hello')
+'''
+
 
 instruction_context_pairs = [
     {
