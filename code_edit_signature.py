@@ -98,43 +98,63 @@ if __name__ == "__main__":
 instruction_context_pairs = [
     {
         "instruction": "Add a comment to the hello function that says 'This is a hello function.'",
-        "context": "This is an example python file. No relevant search results."
+        "context": context_sample
     },
     {
         "instruction": "Change the print statement in the hello function to say 'hello world'",
-        "context": "This is an example python file. No relevant search results."
+        "context": context_sample
     },
     {
         "instruction": "Add a new function called goodbye that prints 'goodbye'",
-        "context": "This is an example python file. No relevant search results."
+        "context": context_sample
     },
     {
         "instruction": "Rename the hello function to greet",
-        "context": "This is an example python file. No relevant search results."
+        "context": context_sample
     },
     {
         "instruction": "Remove the print statement from the hello function",
-        "context": "This is an example python file. No relevant search results."
+        "context": context_sample
     },
     {
         "instruction": "Add a parameter called name to the hello function",
-         "context": "This is an example python file. No relevant search results."
+         "context": context_sample
     },
     {
         "instruction": "Make the hello function return 'hello'",
-        "context": "This is an example python file. No relevant search results."
+        "context": context_sample
     },
     {
         "instruction": "Add a docstring to the hello function",
-        "context": "This is an example python file. No relevant search results."
+        "context": context_sample
     },
     {
         "instruction": "Add a type hint to the hello function",
-        "context": "This is an example python file. No relevant search results."
+        "context": context_sample
     },
     {
         "instruction": "Add a default value to the name parameter of the hello function",
-        "context": "This is an example python file. No relevant search results."
+        "context": context_sample
+    },
+    {
+        "instruction": "Change the print statement in the print_datetime_nyc function to print the time in UTC",
+        "context": context_sample
+    },
+    {
+        "instruction": "Remove the print_datetime_nyc function",
+        "context": context_sample
+    },
+    {
+        "instruction": "Add a new function called print_date that prints the current date",
+        "context": context_sample
+    },
+    {
+        "instruction": "Add a type hint to the print_datetime_nyc function",
+        "context": context_sample
+    },
+    {
+        "instruction": "Add a docstring to the print_datetime_nyc function",
+        "context": context_sample
     }
 ]
 
