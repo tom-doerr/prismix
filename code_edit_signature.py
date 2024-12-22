@@ -22,7 +22,17 @@ class InferenceModule(dspy.Module):
         """
         prediction = self.predictor(instruction=instruction, context=context)
         print("prediction:", prediction)
-        self.validate_edit_instructions(prediction.edit_instructions)
+        
+        try:
+            import json
+            edit_instructions = json.loads(prediction.edit_instructions)
+            validated_edit_instructions = EditInstructions(edit_instructions=edit_instructions)
+            self.validate_edit_instructions(validated_edit_instructions.edit_instructions)
+            prediction.edit_instructions = validated_edit_instructions.edit_instructions
+        except Exception as e:
+            print(f"Error parsing edit_instructions: {e}")
+            raise
+        
         return prediction
 
     def validate_edit_instructions(self, value):
