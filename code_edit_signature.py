@@ -70,11 +70,11 @@ def run_code_edit_example():
             "filecontent": "def hello():\n    print('hello')\n"
         }
     ]
-    context = {
-        "retrieved_context": "This is an example python file.",
-        "online_search": "No relevant search results."
-    }
-    instruction = "Add a comment to the hello function that says 'This is a hello function'."
+    context = Context(
+        retrieved_context="This is an example python file.",
+        online_search="No relevant search results."
+    )
+    instruction = "Add a comment to the hello function that says 'This is a hello function.'"
 
     # Call the predictor
     prediction = generate_answer(instruction=instruction, code_files=code_files, context=context)
