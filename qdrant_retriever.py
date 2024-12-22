@@ -43,12 +43,9 @@ class QdrantRetriever:
             files = [f for f in files if f not in exclude_files]
 
         for file_path in files:
-            print(f"Adding file: {file_path}")
             with open(file_path, 'r') as f:
                 file_content = f.read()
                 self.add_or_update_code_chunks(file_path, file_content)
-
-
 
     def add_or_update_code_chunks(self, file_path: str, file_content: str):
         """Adds or updates code chunks in the Qdrant collection."""
@@ -75,7 +72,6 @@ class QdrantRetriever:
             end_line = node.end_lineno if hasattr(node, 'end_lineno') else start_line
             code_chunk = '\n'.join(file_content.splitlines()[start_line - 1:end_line])
             self._add_chunk(file_path, code_chunk, start_line)
-            print(f"Added chunk file: {file_path}, start_line: {start_line}")
             for child_node in ast.iter_child_nodes(node):
                 self._extract_chunks_recursive(file_path, file_content, child_node, start_line)
         else:
@@ -95,6 +91,7 @@ class QdrantRetriever:
                     payloads=[{"file_path": file_path, "text": code_chunk, "start_line": start_line, "file_hash": self._hash_file_content(code_chunk)}]
                 )
             )
+            print(f"Added chunk: file_path={file_path}, text={code_chunk[:50]}..., start_line={start_line}")
 
     def _check_if_chunk_exists(self, point_id: int) -> bool:
         """Checks if a chunk with the given ID already exists in the collection."""
@@ -111,8 +108,9 @@ class QdrantRetriever:
         """Hashes the file content."""
         return hashlib.sha256(file_content.encode()).hexdigest()
 
-    # def _check_if_file_changed(self, file_path: str, current_hash: str, file_content: str) -> bool:
-        # """Checks if the file content has changed."""
+    def _check_if_file_changed(self, file_path: str, current_hash: str, file_content: str) -> bool:
+        """Checks if the file content has changed."""
+        return True
         # try:
             # query_embedding = self._get_jina_embedding(file_content) if self.jina_api_key else self.model.encode(file_content).tolist()
             # search_result = self.client.search(
@@ -164,7 +162,8 @@ class QdrantRetriever:
             query_embedding = self.model.encode(query).tolist()
         else:
             query_embedding = self._get_jina_embedding(query)
-            search_result = self.client.search(
+        print(f"Query embedding: {query_embedding[:10]}...")
+        search_result = self.client.search(
             collection_name=self.collection_name,
             query_vector=query_embedding,
             limit=top_k,
