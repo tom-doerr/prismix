@@ -40,13 +40,6 @@ class CodeEdit(dspy.Signature):
     edit_instructions = dspy.OutputField(desc="A list of edit instructions.", base_signature=EditInstructions, format=list)
     search_query = dspy.OutputField(desc="A search query to use for the next iteration, if needed.")
 
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.edit_instructions.format = self._validate_edit_instructions
-
-    def _validate_edit_instructions(self, value):
-        validate_edit_instructions(value)
-        return value
 
 def validate_edit_instructions(value):
     dspy.Assert(isinstance(value, list), "edit_instructions must be a list")
