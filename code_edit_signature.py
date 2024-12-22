@@ -30,22 +30,20 @@ class InferenceModule(dspy.Module):
             prediction.edit_instructions = validated_edit_instructions.edit_instructions
         except Exception as e:
             print(f"Error parsing edit_instructions: {e}")
-            dspy.Assert(False, f"Error parsing edit_instructions: {e}")
+            dspy.Suggest(False, f"Error parsing edit_instructions: {e}")
 
         return prediction
 
     def validate_edit_instructions(self, value):
-        dspy.Assert(isinstance(value, list), "edit_instructions must be a list")
+        dspy.Suggest(isinstance(value, list), "edit_instructions must be a list")
         for item in value:
-            dspy.Assert(isinstance(item, dict), "Each edit instruction must be a dictionary")
-            dspy.Assert("filepath" in item, "Each edit instruction must have a filepath")
+            dspy.Suggest(isinstance(item, dict), "Each edit instruction must be a dictionary")
+            dspy.Suggest("filepath" in item, "Each edit instruction must have a filepath")
             if "start_line" in item:
-                dspy.Assert("end_line" in item, "LineNumberEditInstruction must have an end_line")
-                dspy.Assert("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text")
+                dspy.Suggest("end_line" in item, "LineNumberEditInstruction must have an end_line")
+                dspy.Suggest("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text")
             elif "search_text" in item:
-                dspy.Assert("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text")
-            else:
-                raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
+                dspy.Suggest("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text")
 
 
 
@@ -176,7 +174,7 @@ def run_code_edit_example():
     # Create a predictor using the CodeEdit signature
     generate_answer = assert_transform_module(
         InferenceModule(CodeEdit),
-        functools.partial(backtrack_handler, max_backtracks=10),
+        functools.partial(backtrack_handler, max_backtracks=30),
     )
 
     # Example usage
@@ -202,31 +200,12 @@ def run_code_edit_example():
 
 def run_mipro_optimization():
     from dspy.datasets import Dataset
-    from dspy.primitives.assertions import DSPyAssertionError
     from dspy.teleprompt import MIPROv2
 
-    class EditDataset(Dataset):
-        def __init__(self, data):
-            super().__init__()
-            self._train = list(data)
 
-        def __len__(self):
-            return len(self._train)
-
-        def __getitem__(self, idx):
-            return self._train[idx]
-
-    def custom_assertion_handler(example, pred, trace=None):
-        try:
-            # Attempt to validate the output
-            pass
-        except DSPyAssertionError as e:
-            # Log the failure but continue optimization
-            print(f"Assertion failed: {e}")
-            return True  # Continue optimization
-        return False
-
-    trainset = EditDataset(instruction_context_pairs)
+    edit_dataset = [dspy.Example('instruction': item["instruction"], 'context': item["context"]).with_inputs('instruction', 'context') for item in instruction_context_pairs]
+    # trainset = EditDataset(instruction_context_pairs)
+    trainset = Dataset(edit_dataset)
 
     teleprompter = MIPROv2(
         metric=lambda predictions, labels: 1.0,  # Dummy metric for now
@@ -236,7 +215,7 @@ def run_mipro_optimization():
         max_bootstrapped_demos=3,
         max_labeled_demos=4,
         verbose=False,
-        assertion_handler=custom_assertion_handler,
+        num_threads=5,
     )
 
     # Create a simple module for optimization
@@ -268,5 +247,5 @@ def run_mipro_optimization():
 
 
 if __name__ == "__main__":
-    run_mipro_optimization()
     run_code_edit_example()
+    run_mipro_optimization()
