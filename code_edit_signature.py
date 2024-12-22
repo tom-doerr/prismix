@@ -84,8 +84,8 @@ def run_code_edit_example():
     instruction = "Add a comment to the hello function that says 'This is a hello function.'"
 
     # Call the predictor
-    prediction = generate_answer(instruction=instruction, context=context)
-    print("prediction:", prediction)
+    # prediction = generate_answer(instruction=instruction, context=context)
+    # print("prediction:", prediction)
 
     # Activate assertions
     generate_answer_with_assertions = assert_transform_module(generate_answer, backtrack_handler)
