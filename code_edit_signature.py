@@ -92,6 +92,7 @@ def run_code_edit_example():
 
     # Call the predictor with assertions
     prediction = generate_answer_with_assertions(instruction=instruction, context=context)
+    print("prediction:", prediction)
 
     # Print the generated answer
     print(f"Generated Answer: {prediction.edit_instructions}")
