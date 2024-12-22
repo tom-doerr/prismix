@@ -197,18 +197,31 @@ def run_code_edit_example():
         # Print the generated answer
         print(f"Generated Answer: {prediction.edit_instructions}")
 
+def custom_metric(gold, pred):
+    print("pred:", pred)
+    # try to parse the edit instructions
+    try:
+        import json
+        pred_edit_instructions = json.loads(pred.edit_instructions)
+        return 1.0
+    except Exception as e:
+        print(f"Error parsing edit_instructions: {e}")
+        return 0.0
 
 def run_mipro_optimization():
-    from dspy.datasets import Dataset
     from dspy.teleprompt import MIPROv2
 
 
     edit_dataset = [dspy.Example(instruction=item["instruction"], context=item["context"]).with_inputs('instruction', 'context') for item in instruction_context_pairs]
-    trainset = Dataset(edit_dataset)
+    # trainset = Dataset(edit_dataset)
+    trainset = edit_dataset
+
 
     teleprompter = MIPROv2(
-        metric=lambda predictions, labels: 1.0,  # Dummy metric for now
-        auto="light",
+        # metric=lambda predictions, labels: 1.0,  # Dummy metric for now
+        metric=custom_metric,
+        # auto="light",
+        auto="heavy",
         num_candidates=7,
         init_temperature=0.5,
         max_bootstrapped_demos=3,
@@ -228,7 +241,8 @@ def run_mipro_optimization():
 
     # Optimize the module
     optimized_program = teleprompter.compile(
-        SimpleEditModule(CodeEdit),
+        # SimpleEditModule(CodeEdit),
+        InferenceModule(CodeEdit),
         trainset=trainset,
         num_trials=15,
         # num_trials=5,
