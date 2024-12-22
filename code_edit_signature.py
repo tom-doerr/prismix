@@ -191,9 +191,9 @@ def run_code_edit_example():
 
 
 def run_mipro_optimization():
-    from dspy.teleprompt import MIPROv2
     from dspy.datasets import Dataset
-    
+    from dspy.teleprompt import MIPROv2
+
     class EditDataset(Dataset):
         def __init__(self, data):
             super().__init__()
@@ -224,7 +224,8 @@ def run_mipro_optimization():
     optimized_program = teleprompter.compile(
         SimpleEditModule(CodeEdit),
         trainset=trainset,
-        num_trials=15,
+        # num_trials=15,
+        num_trials=5,
         minibatch_size=25,
         minibatch_full_eval_steps=10,
         minibatch=True,
@@ -232,11 +233,11 @@ def run_mipro_optimization():
     )
 
     # Save the optimized program
-    optimized_program.save(f"mipro_optimized")
+    optimized_program.save("mipro_optimized")
 
     print("MIPRO optimization complete.")
 
 
 if __name__ == "__main__":
-    run_code_edit_example()
     run_mipro_optimization()
+    run_code_edit_example()
