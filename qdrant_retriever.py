@@ -108,9 +108,10 @@ class QdrantRetriever:
     def _check_if_file_changed(self, file_path: str, current_hash: str) -> bool:
         """Checks if the file content has changed."""
         try:
+            query_embedding = self._get_jina_embedding(file_content) if self.jina_api_key else self.model.encode(file_content).tolist()
             search_result = self.client.search(
                 collection_name=self.collection_name,
-                query_vector=self._get_jina_embedding(file_content) if self.jina_api_key else self.model.encode(file_content).tolist(),
+                query_vector=query_embedding,
                 query_filter=models.Filter(
                     must=[
                         models.FieldCondition(
