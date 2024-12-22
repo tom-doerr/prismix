@@ -78,7 +78,12 @@ dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
 
 context_sample = \
 '''
-print('hello')
+def hello():
+    print('hello')
+
+# This is a sample python file
+# It contains a hello function
+# that prints hello
 '''
 
 
