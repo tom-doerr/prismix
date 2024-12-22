@@ -199,6 +199,9 @@ def run_mipro_optimization():
             super().__init__()
             self._train = data
 
+        def __len__(self):
+            return len(self._train)
+
     trainset = EditDataset(instruction_context_pairs)
 
     teleprompter = MIPROv2(
