@@ -1,6 +1,5 @@
 import ast
 import glob
-import hashlib
 import os
 from typing import List
 
@@ -44,22 +43,18 @@ class QdrantRetriever:
         for file_path in files:
             with open(file_path, 'r') as f:
                 file_content = f.read()
-                self.add_or_update_code_chunks(file_path, file_content)
+                self.add_code_chunks(file_path, file_content)
 
-    def add_or_update_code_chunks(self, file_path: str, file_content: str):
-        """Adds or updates code chunks in the Qdrant collection."""
-        file_hash = self._hash_file_content(file_content)
-        if self._check_if_file_changed(file_path, file_hash):
-            self._delete_chunks_for_file(file_path)
-            self._add_code_chunks(file_path, file_content)
-        else:
-            self._add_code_chunks(file_path, file_content)
-
-    def _add_code_chunks(self, file_path: str, file_content: str):
+    def add_code_chunks(self, file_path: str, file_content: str):
         """Adds code chunks to the Qdrant collection."""
         try:
             tree = ast.parse(file_content)
-            self._extract_chunks_recursive(file_path, file_content, tree, 0)
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)):
+                    start_line = node.lineno
+                    end_line = node.end_lineno if hasattr(node, 'end_lineno') and node.end_lineno else start_line
+                    code_chunk = '\n'.join(file_content.splitlines()[start_line - 1:end_line])
+                    self._add_chunk(file_path, code_chunk, start_line)
         except SyntaxError:
             self._add_chunk(file_path, file_content, 1)
 
@@ -73,7 +68,7 @@ class QdrantRetriever:
                 points=Batch(
                     ids=[point_id],
                     vectors=[embedding],
-                    payloads=[{"file_path": file_path, "text": code_chunk, "start_line": start_line, "file_hash": self._hash_file_content(code_chunk)}]
+                    payloads=[{"file_path": file_path, "text": code_chunk, "start_line": start_line}]
                 )
             )
 
@@ -87,49 +82,6 @@ class QdrantRetriever:
             return True
         except Exception:
             return False
-
-    def _hash_file_content(self, file_content: str) -> str:
-        """Hashes the file content."""
-        return hashlib.sha256(file_content.encode()).hexdigest()
-
-    def _check_if_file_changed(self, file_path: str, current_hash: str) -> bool:
-        """Checks if the file content has changed."""
-        try:
-            search_result = self.client.search(
-                collection_name=self.collection_name,
-                query_vector=[0] * 256,  # Dummy vector for metadata search
-                query_filter=models.Filter(
-                    must=[
-                        models.FieldCondition(
-                            key="file_path",
-                            match=models.MatchValue(value=file_path)
-                        )
-                    ]
-                ),
-                limit=1
-            )
-            if search_result:
-                stored_hash = search_result[0].payload.get("file_hash")
-                return stored_hash != current_hash
-            return True
-        except Exception:
-            return True
-
-    def _delete_chunks_for_file(self, file_path: str):
-        """Deletes all chunks associated with a file path."""
-        self.client.delete(
-            collection_name=self.collection_name,
-            points_selector=models.FilterSelector(
-                filter=models.Filter(
-                    must=[
-                        models.FieldCondition(
-                            key="file_path",
-                            match=models.MatchValue(value=file_path)
-                        )
-                    ]
-                )
-            )
-        )
 
     def retrieve(self, query: str, top_k: int = 5) -> List[str]:
         """Retrieves the top_k most relevant documents for a given query."""
