@@ -203,8 +203,7 @@ def run_mipro_optimization():
     from dspy.teleprompt import MIPROv2
 
 
-    edit_dataset = [dspy.Example('instruction': item["instruction"], 'context': item["context"]).with_inputs('instruction', 'context') for item in instruction_context_pairs]
-    # trainset = EditDataset(instruction_context_pairs)
+    edit_dataset = [dspy.Example(instruction=item["instruction"], context=item["context"]).with_inputs('instruction', 'context') for item in instruction_context_pairs]
     trainset = Dataset(edit_dataset)
 
     teleprompter = MIPROv2(
