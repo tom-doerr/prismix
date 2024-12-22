@@ -49,7 +49,7 @@ class QdrantRetriever:
     def add_or_update_code_chunks(self, file_path: str, file_content: str):
         """Adds or updates code chunks in the Qdrant collection."""
         file_hash = self._hash_file_content(file_content)
-        if self._check_if_file_changed(file_path, file_hash):
+        if self._check_if_file_changed(file_path, file_hash, file_content):
             self._delete_chunks_for_file(file_path)
             self._add_code_chunks(file_path, file_content)
         else:
@@ -105,7 +105,7 @@ class QdrantRetriever:
         """Hashes the file content."""
         return hashlib.sha256(file_content.encode()).hexdigest()
 
-    def _check_if_file_changed(self, file_path: str, current_hash: str) -> bool:
+    def _check_if_file_changed(self, file_path: str, current_hash: str, file_content: str) -> bool:
         """Checks if the file content has changed."""
         try:
             query_embedding = self._get_jina_embedding(file_content) if self.jina_api_key else self.model.encode(file_content).tolist()
