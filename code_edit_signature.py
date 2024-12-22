@@ -50,8 +50,9 @@ class CodeEdit(dspy.Signature):
 
 # CodeEdit = create_signature_class_from_model(CodeEditPydantic)
 
+from typing import Union
+
 import dspy
-from typing import List, Union
 
 # Assuming you have a dspy.Model set up, e.g., using OpenAI
 # If not, you'll need to set it up like this:
