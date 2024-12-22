@@ -39,6 +39,20 @@ def run_ruff_fix():
     return True, local_ruff_output
 
 
+def downgrade_protobuf():
+    """Downgrades the protobuf package to 3.20.x."""
+    try:
+        subprocess.run(
+            ["pip", "install", "protobuf==3.20.*"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        print("Protobuf downgraded successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"Error downgrading protobuf: {e}\n{e.stdout}\n{e.stderr}")
+
+
 def is_test_file(file_path):
     """Check if a file is a test file."""
     return file_path.endswith("_test.py") or "tests" in file_path.split("/")
@@ -93,6 +107,7 @@ def call_aider(file_paths, combined_output_local):
 
 if __name__ == "__main__":
     all_files = glob.glob("**/*.py", recursive=True)
+    downgrade_protobuf()
     pylint_success, pylint_output = run_pylint()
     ruff_success, ruff_output = run_ruff_fix()
     combined_output = f"Pylint output:\n{pylint_output}\nRuff output:\n{ruff_output}"
