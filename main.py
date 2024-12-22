@@ -18,8 +18,8 @@ retriever.add_files(include_glob="*.py", exclude_glob="*test*")
 
 predict = dspy.ChainOfThought(CodeEdit)
 
-    parser = argparse.ArgumentParser(description="Edit code files based on instructions.")
-    parser.add_argument("instruction", type=str, help="Instruction for code modification.")
+parser = argparse.ArgumentParser(description="Edit code files based on instructions.")
+parser.add_argument("instruction", type=str, help="Instruction for code modification.")
     args = parser.parse_args()
     instruction = args.instruction
 
