@@ -49,3 +49,24 @@ class CodeEdit(dspy.Signature):
 
 
 # CodeEdit = create_signature_class_from_model(CodeEditPydantic)
+
+import dspy
+
+# Assuming you have a dspy.Model set up, e.g., using OpenAI
+# If not, you'll need to set it up like this:
+# import os
+# os.environ["OPENAI_API_KEY"] = "YOUR_API_KEY"
+# dspy.configure(lm=dspy.OpenAI(model="gpt-3.5-turbo"))
+
+# Create a predictor using the CodeEdit signature
+generate_answer = dspy.Predict(CodeEdit)
+
+# Example usage
+context = "The capital of France is Paris."
+question = "What is the capital of France?"
+
+# Call the predictor
+prediction = generate_answer(context=context, question=question)
+
+# Print the generated answer
+print(f"Generated Answer: {prediction.answer}")
