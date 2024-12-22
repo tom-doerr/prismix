@@ -63,6 +63,19 @@ class QdrantRetriever:
         except SyntaxError:
             self._add_chunk(file_path, file_content, 1)
 
+    def _extract_chunks_recursive(self, file_path: str, file_content: str, node, parent_start_line: int):
+        """Recursively extracts code chunks from the AST."""
+        if isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)):
+            start_line = node.lineno
+            end_line = node.end_lineno if hasattr(node, 'end_lineno') else start_line
+            code_chunk = '\n'.join(file_content.splitlines()[start_line - 1:end_line])
+            self._add_chunk(file_path, code_chunk, start_line)
+            for child_node in ast.iter_child_nodes(node):
+                self._extract_chunks_recursive(file_path, file_content, child_node, start_line)
+        else:
+            for child_node in ast.iter_child_nodes(node):
+                self._extract_chunks_recursive(file_path, file_content, child_node, parent_start_line)
+
     def _add_chunk(self, file_path: str, code_chunk: str, start_line: int):
         """Adds a single code chunk to the Qdrant collection."""
         embedding = self._get_jina_embedding(code_chunk)
