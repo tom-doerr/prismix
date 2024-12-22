@@ -351,6 +351,46 @@ def run_mipro_optimization():
     print("MIPRO optimization complete.")
 
 
+def run_bootstrap_fewshot_optimization():
+    from dspy.teleprompt import BootstrapFewShot
+
+    edit_dataset = [
+        dspy.Example(
+            instruction=item["instruction"], context=item["context"]
+        ).with_inputs("instruction", "context")
+        for item in instruction_context_pairs
+    ]
+    trainset = edit_dataset
+
+    teleprompter = BootstrapFewShot(
+        metric=custom_metric,
+        max_bootstrapped_demos=3,
+        max_labeled_demos=4,
+        max_rounds=10,
+    )
+
+    # Create a simple module for optimization
+    class SimpleEditModule(dspy.Module):
+        def __init__(self, signature):
+            super().__init__()
+            self.predictor = dspy.Predict(signature)
+
+        def forward(self, instruction, context):
+            return self.predictor(instruction=instruction, context=context)
+
+    # Optimize the module
+    optimized_program = teleprompter.compile(
+        SimpleEditModule(CodeEdit),
+        trainset=trainset,
+    )
+
+    # Save the optimized program
+    optimized_program.save("bootstrap_optimized.json")
+
+    print("BootstrapFewShot optimization complete.")
+
+
 if __name__ == "__main__":
     run_code_edit_example()
     run_mipro_optimization()
+    run_bootstrap_fewshot_optimization()
