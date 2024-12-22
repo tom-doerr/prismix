@@ -29,10 +29,11 @@ class QdrantRetriever:
             embedding_size = self.model.get_sentence_embedding_dimension()
         else:
             embedding_size = 256
-        self.client.recreate_collection(
-            collection_name=self.collection_name,
-            vectors_config=models.VectorParams(size=embedding_size, distance=models.Distance.COSINE),
-        )
+        if not self.client.collection_exists(self.collection_name):
+            self.client.create_collection(
+                collection_name=self.collection_name,
+                vectors_config=models.VectorParams(size=embedding_size, distance=models.Distance.COSINE),
+            )
 
     def add_files(self, include_glob: str, exclude_glob: str = None):
         """Adds files matching the include glob, excluding those matching the exclude glob."""
@@ -164,6 +165,7 @@ class QdrantRetriever:
             query_vector=query_embedding,
             limit=top_k,
         )
+        print(f"Search results: {search_result}")
         return [(hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]) for hit in search_result]
 
     def _get_jina_embedding(self, text: str) -> List[float]:
