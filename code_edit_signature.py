@@ -78,12 +78,20 @@ dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
 
 context_sample = \
 '''
+from datetime import datetime
+
 def hello():
     print('hello')
+
+def print_datetime_nyc():
+    print(datetime.now())
 
 # This is a sample python file
 # It contains a hello function
 # that prints hello
+
+if __name__ == "__main__":
+    hello()
 '''
 
 
