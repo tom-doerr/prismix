@@ -3,6 +3,7 @@
 from typing import Union
 
 import dspy
+from dspy.primitives.assertions import assert_transform_module, backtrack_handler
 from pydantic import BaseModel, Field
 
 
@@ -86,11 +87,17 @@ def run_code_edit_example():
     instruction = "Add a comment to the hello function that says 'This is a hello function.'"
 
     # Call the predictor
-    prediction = generate_answer(instruction=instruction, code_files=code_files, context=context)
+    prediction = generate_answer(instruction=instruction, context=context)
     print("prediction:", prediction)
 
     # Validate the generated answer
-    validate_edit_instructions(prediction.edit_instructions)
+    # validate_edit_instructions(prediction.edit_instructions)
+
+    # Activate assertions
+    generate_answer_with_assertions = assert_transform_module(generate_answer, backtrack_handler)
+
+    # Call the predictor with assertions
+    prediction = generate_answer_with_assertions(instruction=instruction, context=context)
 
     # Print the generated answer
     print(f"Generated Answer: {prediction.edit_instructions}")
