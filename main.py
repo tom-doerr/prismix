@@ -29,20 +29,21 @@ if __name__ == "__main__":
 
 
             code_files = []
-            for file_path in file_paths:
-                if not os.path.exists(file_path):
-                    print(f"Error: File not found at {file_path}")
-                    continue
-                with open(file_path, 'r') as f:
-                    file_content = f.read()
-                numbered_content = add_line_numbers(file_content)
-                code_files.append(CodeFile(filepath=file_path, filecontent=numbered_content))
+            # for file_path in file_paths:
+                # if not os.path.exists(file_path):
+                    # print(f"Error: File not found at {file_path}")
+                    # continue
+                # with open(file_path, 'r') as f:
+                    # file_content = f.read()
+                # numbered_content = add_line_numbers(file_content)
+                # code_files.append(CodeFile(filepath=file_path, filecontent=numbered_content))
 
             retrieved_context = retriever.retrieve(query=instruction)
             context = Context(retrieved_context="\n".join(retrieved_context), online_search="")
 
             try:
                 response = predict(instruction=instruction, code_files=code_files, context=context)
+                print("response:", response)
 
                 print("--- Output Values ---")
                 print(f"Search Query: {response.search_query}")
