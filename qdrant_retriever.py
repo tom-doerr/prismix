@@ -29,6 +29,7 @@ class QdrantRetriever:
             embedding_size = self.model.get_sentence_embedding_dimension()
         else:
             embedding_size = 256
+        print(f"Embedding size: {embedding_size}")
         if not self.client.collection_exists(self.collection_name):
             self.client.create_collection(
                 collection_name=self.collection_name,
@@ -172,6 +173,8 @@ class QdrantRetriever:
             limit=top_k,
         )
         print(f"Search results: {search_result}")
+        for hit in search_result:
+            print(f"  Hit payload: {hit.payload}")
         return [(hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]) for hit in search_result]
 
     def _get_jina_embedding(self, text: str) -> List[float]:
@@ -207,7 +210,7 @@ if __name__ == "__main__":
     retriever.add_files(include_glob="*.py", exclude_glob="*test*")
     print("Added all python files (excluding test files)")
 
-    query = "how to add line numbers to a file"
+    query = "def"
     results = retriever.retrieve(query)
     print(f"\nRetrieved results for query: '{query}':")
     for i, result in enumerate(results):
