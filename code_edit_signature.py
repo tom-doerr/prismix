@@ -19,7 +19,7 @@ class InferenceModule(dspy.Module):
         """
         Performs the code edit inference.
         """
-        prediction = self.predictor_with_assertions(instruction=instruction, context=context)
+        prediction = self.predictor(instruction=instruction, context=context)
         print("prediction:", prediction)
         self.validate_edit_instructions(prediction.edit_instructions)
         return prediction
