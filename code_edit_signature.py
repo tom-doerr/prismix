@@ -34,10 +34,10 @@ class EditInstructions(BaseModel):
 class CodeEdit(dspy.Signature):
     """Edits a code file based on an instruction."""
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")
-    code_files = dspy.InputField(desc="List of code files with their content.", format=list)
+    # code_files = dspy.InputField(desc="List of code files with their content.", format=list)
     context = dspy.InputField(desc="Context for the code edit.")
     # edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(..., desc="A list of edit instructions.")
-    edit_instructions = dspy.OutputField(desc="A list of edit instructions.", format=EditInstructions)
+    edit_instructions = dspy.OutputField(desc="A list of edit instructions.", base_signature=EditInstructions, format=list)
     search_query = dspy.OutputField(desc="A search query to use for the next iteration, if needed.")
 
 # class CodeEditPydantic(BaseModel):
@@ -56,7 +56,7 @@ from typing import Union
 
 import dspy
 
-dspy.configure(lm=dspy.GPT3(model="gpt-4o-mini"))
+dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
 
 
 def run_code_edit_example():
@@ -78,6 +78,7 @@ def run_code_edit_example():
 
     # Call the predictor
     prediction = generate_answer(instruction=instruction, code_files=code_files, context=context)
+    print("prediction:", prediction)
 
     # Print the generated answer
     print(f"Generated Answer: {prediction.edit_instructions}")
