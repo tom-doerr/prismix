@@ -1,3 +1,4 @@
+import ast
 import glob
 import os
 from typing import List
@@ -42,18 +43,31 @@ class QdrantRetriever:
         for file_path in files:
             with open(file_path, 'r') as f:
                 file_content = f.read()
-                self.add_text(file_path, file_content)
+                self.add_code_chunks(file_path, file_content)
 
-    def add_text(self, file_path: str, text: str):
-        """Adds a text document to the Qdrant collection."""
-        embedding = self._get_jina_embedding(text)
-        point_id = hash(file_path)
+    def add_code_chunks(self, file_path: str, file_content: str):
+        """Adds code chunks to the Qdrant collection."""
+        try:
+            tree = ast.parse(file_content)
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)):
+                    start_line = node.lineno
+                    end_line = node.end_lineno if hasattr(node, 'end_lineno') and node.end_lineno else start_line
+                    code_chunk = '\n'.join(file_content.splitlines()[start_line - 1:end_line])
+                    self._add_chunk(file_path, code_chunk, start_line)
+        except SyntaxError:
+            self._add_chunk(file_path, file_content, 1)
+
+    def _add_chunk(self, file_path: str, code_chunk: str, start_line: int):
+        """Adds a single code chunk to the Qdrant collection."""
+        embedding = self._get_jina_embedding(code_chunk)
+        point_id = hash(f"{file_path}-{start_line}")
         self.client.upsert(
             collection_name=self.collection_name,
             points=Batch(
                 ids=[point_id],
                 vectors=[embedding],
-                payloads=[{"file_path": file_path, "text": text}]
+                payloads=[{"file_path": file_path, "text": code_chunk, "start_line": start_line}]
             )
         )
 
@@ -68,7 +82,7 @@ class QdrantRetriever:
             query_vector=query_embedding,
             limit=top_k,
         )
-        return [(hit.payload["file_path"], hit.payload["text"]) for hit in search_result]
+        return [(hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]) for hit in search_result]
 
     def _get_jina_embedding(self, text: str) -> List[float]:
         """Gets the Jina embedding for the given text."""
