@@ -20,8 +20,8 @@ predict = dspy.ChainOfThought(CodeEdit)
 
 parser = argparse.ArgumentParser(description="Edit code files based on instructions.")
 parser.add_argument("instruction", type=str, help="Instruction for code modification.")
-    args = parser.parse_args()
-    instruction = args.instruction
+args = parser.parse_args()
+instruction = args.instruction
 
     if not instruction:
         print("Entering interactive mode. Type 'exit' to quit.")
