@@ -23,9 +23,9 @@ parser.add_argument("instruction", type=str, help="Instruction for code modifica
 args = parser.parse_args()
 instruction = args.instruction
 
-    if not instruction:
-        print("Entering interactive mode. Type 'exit' to quit.")
-        while True:
+if not instruction:
+    print("Entering interactive mode. Type 'exit' to quit.")
+    while True:
             instruction = input("Enter instruction: ")
             if instruction.lower() == "exit":
                 break
