@@ -22,7 +22,6 @@ class InferenceModule(dspy.Module):
         """
         prediction = self.predictor(instruction=instruction, context=context)
         print("prediction:", prediction)
-        
         try:
             import json
             edit_instructions = json.loads(prediction.edit_instructions)
@@ -31,8 +30,8 @@ class InferenceModule(dspy.Module):
             prediction.edit_instructions = validated_edit_instructions.edit_instructions
         except Exception as e:
             print(f"Error parsing edit_instructions: {e}")
-            raise
-        
+            dspy.Assert(False, f"Error parsing edit_instructions: {e}")
+
         return prediction
 
     def validate_edit_instructions(self, value):
@@ -246,8 +245,8 @@ def run_mipro_optimization():
         minibatch_size=25,
         minibatch_full_eval_steps=10,
         minibatch=True,
-        # requires_permission_to_run=False,
-        requires_permission_to_run=True,
+        requires_permission_to_run=False,
+        # requires_permission_to_run=True,
     )
 
     # Save the optimized program
