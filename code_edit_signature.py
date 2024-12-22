@@ -74,7 +74,7 @@ from typing import Union
 import dspy
 
 # dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
-dspy.configure(lm=dspy.LM(model="deepseek/deepseek"))
+dspy.configure(lm=dspy.LM(model="deepseek/deepseek-chat"))
 
 
 context_sample = \
