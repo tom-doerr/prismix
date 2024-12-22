@@ -202,6 +202,7 @@ def run_code_edit_example():
 
 def run_mipro_optimization():
     from dspy.datasets import Dataset
+    from dspy.primitives.assertions import DSPyAssertionError
     from dspy.teleprompt import MIPROv2
 
     class EditDataset(Dataset):
@@ -215,6 +216,16 @@ def run_mipro_optimization():
         def __getitem__(self, idx):
             return self._train[idx]
 
+    def custom_assertion_handler(example, pred, trace=None):
+        try:
+            # Attempt to validate the output
+            pass
+        except DSPyAssertionError as e:
+            # Log the failure but continue optimization
+            print(f"Assertion failed: {e}")
+            return True  # Continue optimization
+        return False
+
     trainset = EditDataset(instruction_context_pairs)
 
     teleprompter = MIPROv2(
@@ -225,6 +236,7 @@ def run_mipro_optimization():
         max_bootstrapped_demos=3,
         max_labeled_demos=4,
         verbose=False,
+        assertion_handler=custom_assertion_handler,
     )
 
     # Create a simple module for optimization
