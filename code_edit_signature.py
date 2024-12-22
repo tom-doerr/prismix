@@ -37,11 +37,13 @@ class CodeEdit(dspy.Signature):
     # code_files = dspy.InputField(desc="List of code files with their content.", format=list)
     context = dspy.InputField(desc="Context for the code edit.")
     # edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(..., desc="A list of edit instructions.")
-    edit_instructions = dspy.OutputField(desc="A list of edit instructions.", base_signature=EditInstructions, format=list)
+    edit_instructions = dspy.OutputField(desc="A list of edit instructions.", base_signature=EditInstructions)
     search_query = dspy.OutputField(desc="A search query to use for the next iteration, if needed.")
 
 
 def validate_edit_instructions(value):
+    if isinstance(value, str):
+        value = [{"instruction": value}]
     dspy.Assert(isinstance(value, list), "edit_instructions must be a list")
     for item in value:
         dspy.Assert(isinstance(item, dict), "Each edit instruction must be a dictionary")
@@ -54,12 +56,14 @@ def validate_edit_instructions(value):
         else:
             raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
 
-# class CodeEditPydantic(BaseModel):
-    # instruction: Union[LineNumberEditInstruction, SearchReplaceEditInstruction]
-    # code_files: list[CodeFile]
-    # context: Context
-    # search_query: str = Field(None, desc="A search query to use for the next iteration, if needed.")
-    # edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(None, desc="A list of edit instructions.")
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.edit_instructions.transform = self._transform_edit_instructions
+
+    def _transform_edit_instructions(self, value):
+        if isinstance(value, str):
+            return [{"instruction": value}]
+        return value
 
 
 # CodeEdit = create_signature_class_from_model(CodeEditPydantic)
