@@ -35,28 +35,27 @@ class EditInstructions(BaseModel):
 class CodeEdit(dspy.Signature):
     """Edits a code file based on an instruction."""
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")
-    # code_files = dspy.InputField(desc="List of code files with their content.", format=list)
     context = dspy.InputField(desc="Context for the code edit.")
-    # edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(..., desc="A list of edit instructions.")
     edit_instructions = dspy.OutputField(desc="A list of edit instructions.", base_signature=EditInstructions)
     search_query = dspy.OutputField(desc="A search query to use for the next iteration, if needed.")
 
+    def __call__(self, **kwargs):
+        output = self.forward(**kwargs)
+        self.validate_edit_instructions(output.edit_instructions)
+        return output
 
-def validate_edit_instructions(value):
-    dspy.Assert(isinstance(value, list), "edit_instructions must be a list")
-    for item in value:
-        dspy.Assert(isinstance(item, dict), "Each edit instruction must be a dictionary")
-        dspy.Assert("filepath" in item, "Each edit instruction must have a filepath")
-        if "start_line" in item:
-            dspy.Assert("end_line" in item, "LineNumberEditInstruction must have an end_line")
-            dspy.Assert("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text")
-        elif "search_text" in item:
-            dspy.Assert("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text")
-        else:
-            raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
-
-
-# CodeEdit = create_signature_class_from_model(CodeEditPydantic)
+    def validate_edit_instructions(self, value):
+        dspy.Assert(isinstance(value, list), "edit_instructions must be a list")
+        for item in value:
+            dspy.Assert(isinstance(item, dict), "Each edit instruction must be a dictionary")
+            dspy.Assert("filepath" in item, "Each edit instruction must have a filepath")
+            if "start_line" in item:
+                dspy.Assert("end_line" in item, "LineNumberEditInstruction must have an end_line")
+                dspy.Assert("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text")
+            elif "search_text" in item:
+                dspy.Assert("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text")
+            else:
+                raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
 
 # Assuming you have a dspy.Model set up, e.g., using OpenAI
 # If not, you'll need to set it up like this:
@@ -87,9 +86,6 @@ def run_code_edit_example():
     # Call the predictor
     prediction = generate_answer(instruction=instruction, context=context)
     print("prediction:", prediction)
-
-    # Validate the generated answer
-    # validate_edit_instructions(prediction.edit_instructions)
 
     # Activate assertions
     generate_answer_with_assertions = assert_transform_module(generate_answer, backtrack_handler)
