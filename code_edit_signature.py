@@ -43,8 +43,6 @@ class CodeEdit(dspy.Signature):
 
 
 def validate_edit_instructions(value):
-    if isinstance(value, str):
-        value = [{"instruction": value}]
     dspy.Assert(isinstance(value, list), "edit_instructions must be a list")
     for item in value:
         dspy.Assert(isinstance(item, dict), "Each edit instruction must be a dictionary")
