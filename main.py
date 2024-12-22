@@ -46,21 +46,34 @@ if __name__ == "__main__":
 
         for edit_instruction in response.edit_instructions.edit_instructions:
             file_path = edit_instruction.filepath
-            start_line = int(edit_instruction.start_line)
-            end_line = int(edit_instruction.end_line)
-            replacement_text = edit_instruction.replacement_text
-
             file_content = next((f.filecontent for f in code_files if f.filepath == file_path), None)
             if file_content is None:
                 print(f"Error: File not found in code_files: {file_path}")
                 continue
 
-            edited_content = apply_code_edit(
-                file_content=file_content,
-                start_line=start_line,
-                end_line=end_line,
-                replacement_text=replacement_text
-            )
+            if hasattr(edit_instruction, 'start_line') and hasattr(edit_instruction, 'end_line') and hasattr(edit_instruction, 'replacement_text'):
+                start_line = int(edit_instruction.start_line)
+                end_line = int(edit_instruction.end_line)
+                replacement_text = edit_instruction.replacement_text
+
+                edited_content = apply_code_edit(
+                    file_content=file_content,
+                    start_line=start_line,
+                    end_line=end_line,
+                    replacement_text=replacement_text
+                )
+            elif hasattr(edit_instruction, 'search_text') and hasattr(edit_instruction, 'replacement_text'):
+                search_text = edit_instruction.search_text
+                replacement_text = edit_instruction.replacement_text
+                
+                def replace_text(text: str, search_text: str, replacement_text: str) -> str:
+                    return text.replace(search_text, replacement_text)
+                
+                edited_content = replace_text(file_content, search_text, replacement_text)
+            else:
+                print(f"Error: Invalid edit instruction: {edit_instruction}")
+                continue
+
 
             def remove_line_numbers(text: str) -> str:
                 lines = text.splitlines()
