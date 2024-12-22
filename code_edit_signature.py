@@ -40,6 +40,24 @@ class CodeEdit(dspy.Signature):
     edit_instructions = dspy.OutputField(desc="A list of edit instructions.", base_signature=EditInstructions, format=list)
     search_query = dspy.OutputField(desc="A search query to use for the next iteration, if needed.")
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.edit_instructions.format = self._validate_edit_instructions
+
+    def _validate_edit_instructions(self, value):
+        assert isinstance(value, list), "edit_instructions must be a list"
+        for item in value:
+            assert isinstance(item, dict), "Each edit instruction must be a dictionary"
+            assert "filepath" in item, "Each edit instruction must have a filepath"
+            if "start_line" in item:
+                assert "end_line" in item, "LineNumberEditInstruction must have an end_line"
+                assert "replacement_text" in item, "LineNumberEditInstruction must have a replacement_text"
+            elif "search_text" in item:
+                assert "replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text"
+            else:
+                raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
+        return value
+
 # class CodeEditPydantic(BaseModel):
     # instruction: Union[LineNumberEditInstruction, SearchReplaceEditInstruction]
     # code_files: list[CodeFile]
