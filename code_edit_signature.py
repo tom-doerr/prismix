@@ -241,7 +241,7 @@ def run_mipro_optimization():
     )
 
     # Save the optimized program
-    optimized_program.save("mipro_optimized")
+    optimized_program.save("mipro_optimized.json")
 
     print("MIPRO optimization complete.")
 
