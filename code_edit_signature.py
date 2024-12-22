@@ -14,14 +14,28 @@ class InferenceModule(dspy.Module):
     def __init__(self, signature):
         super().__init__()
         self.predictor = dspy.Predict(signature)
-        self.forward = assert_transform_module(self.forward, backtrack_handler, max_backtracks=3)
 
     def forward(self, instruction, context):
         """
         Performs the code edit inference.
         """
-        prediction = self.predictor(instruction=instruction, context=context)
-        return prediction.edit_instructions
+        prediction = self.predictor_with_assertions(instruction=instruction, context=context)
+        print("prediction:", prediction)
+        self.validate_edit_instructions(prediction.edit_instructions)
+        return prediction
+
+    def validate_edit_instructions(self, value):
+        dspy.Assert(isinstance(value, list), "edit_instructions must be a list")
+        for item in value:
+            dspy.Assert(isinstance(item, dict), "Each edit instruction must be a dictionary")
+            dspy.Assert("filepath" in item, "Each edit instruction must have a filepath")
+            if "start_line" in item:
+                dspy.Assert("end_line" in item, "LineNumberEditInstruction must have an end_line")
+                dspy.Assert("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text")
+            elif "search_text" in item:
+                dspy.Assert("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text")
+            else:
+                raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
 
 
 class Context(dspy.Signature):
@@ -53,7 +67,7 @@ class CodeEdit(dspy.Signature):
     """Edits a code file based on an instruction."""
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")
     context = dspy.InputField(desc="Context for the code edit.")
-    edit_instructions = dspy.OutputField(desc="A list of edit instructions.")
+    edit_instructions = dspy.OutputField(desc="A list of edit instructions.", base_signature=EditInstructions)
     search_query = dspy.OutputField(desc="A search query to use for the next iteration, if needed.")
 
 # Assuming you have a dspy.Model set up, e.g., using OpenAI
@@ -67,7 +81,11 @@ dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
 
 def run_code_edit_example():
     # Create a predictor using the CodeEdit signature
-    generate_answer = InferenceModule(CodeEdit)
+    backtracking_handler = backtrack_handler()
+    generate_answer = assert_transform_module(
+        InferenceModule(),
+        backtracking_handler
+    )
 
     # Example usage
     code_files = [
@@ -83,10 +101,11 @@ def run_code_edit_example():
     instruction = "Add a comment to the hello function that says 'This is a hello function.'"
 
     # Call the predictor
-    edit_instructions = generate_answer(instruction=instruction, context=context)
+    prediction = generate_answer(instruction=instruction, context=context)
+    print("prediction:", prediction)
 
     # Print the generated answer
-    print(f"Generated Answer: {edit_instructions}")
+    print(f"Generated Answer: {prediction.edit_instructions}")
 
 
 if __name__ == "__main__":
