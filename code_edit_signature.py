@@ -83,7 +83,7 @@ def run_code_edit_example():
     # Create a predictor using the CodeEdit signature
     generate_answer = assert_transform_module(
         InferenceModule(CodeEdit),
-        backtrack_handler,
+        backtrack_handler(max_backtracks=10),
     )
 
     # Example usage
