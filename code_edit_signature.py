@@ -1,5 +1,7 @@
 
 
+from typing import Union
+
 import dspy
 from pydantic import BaseModel, Field
 
@@ -19,7 +21,6 @@ class LineNumberEditInstruction(BaseModel):
     replacement_text: str = Field(..., desc="The text that should replace the lines from start_line to end_line.")
     filepath: str = Field(..., desc="The path to the file that should be edited.")
 
-from typing import Union
 
 
 class SearchReplaceEditInstruction(BaseModel):
@@ -27,13 +28,21 @@ class SearchReplaceEditInstruction(BaseModel):
     search_text: str = Field(..., desc="The text to search for.")
     replacement_text: str = Field(..., desc="The text to replace the found text with.")
 
-class EditInstructions(BaseModel):
-    edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(..., desc="A list of edit instructions.")
+# class EditInstructions(BaseModel):
+    # edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(..., desc="A list of edit instructions.")
 
-class CodeEdit(dspy.Signature):
-    """Edits a code file based on an instruction."""
-    instruction = dspy.InputField(desc="Instruction on how to modify the code.")
-    code_files = dspy.InputField(desc="List of code files with their content.", format=list)
-    context = dspy.InputField(desc="Context for the code edit.", format=Context)
-    edit_instructions = dspy.OutputField(desc="A list of edit instructions.", format=EditInstructions)
-    search_query = dspy.OutputField(desc="A search query to use for the next iteration, if needed.")
+# class CodeEdit(dspy.Signature):
+    # """Edits a code file based on an instruction."""
+    # instruction = dspy.InputField(desc="Instruction on how to modify the code.")
+    # code_files = dspy.InputField(desc="List of code files with their content.", format=list)
+    # context = dspy.InputField(desc="Context for the code edit.", format=Context)
+    # # edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(..., desc="A list of edit instructions.")
+    # edit_instructions = dspy.OutputField(desc="A list of edit instructions."
+    # search_query = dspy.OutputField(desc="A search query to use for the next iteration, if needed.")
+
+class CodeEdit(BaseModel):
+    instruction: Union[LineNumberEditInstruction, SearchReplaceEditInstruction]
+    code_files: list[CodeFile]
+    context: Context
+    search_query: str = Field(None, desc="A search query to use for the next iteration, if needed.")
+    edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(None, desc="A list of edit instructions.")
