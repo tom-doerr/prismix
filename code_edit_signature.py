@@ -197,10 +197,13 @@ def run_mipro_optimization():
     class EditDataset(Dataset):
         def __init__(self, data):
             super().__init__()
-            self._train = data
+            self._train = list(data)
 
         def __len__(self):
             return len(self._train)
+
+        def __getitem__(self, idx):
+            return self._train[idx]
 
     trainset = EditDataset(instruction_context_pairs)
 
