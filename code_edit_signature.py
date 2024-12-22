@@ -36,8 +36,8 @@ class CodeEdit(dspy.Signature):
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")
     code_files = dspy.InputField(desc="List of code files with their content.", format=list)
     context = dspy.InputField(desc="Context for the code edit.", format=Context)
-    edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(..., desc="A list of edit instructions.")
-    edit_instructions = dspy.OutputField(desc="A list of edit instructions.", format=list)
+    # edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(..., desc="A list of edit instructions.")
+    edit_instructions = dspy.OutputField(desc="A list of edit instructions.", format=EditInstructions)
     search_query = dspy.OutputField(desc="A search query to use for the next iteration, if needed.")
 
 # class CodeEditPydantic(BaseModel):
