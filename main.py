@@ -16,7 +16,7 @@ dspy.settings.configure(lm=llm)
 retriever = QdrantRetriever()
 retriever.add_files(include_glob="*.py", exclude_glob="*test*")
 
-    predict = dspy.ChainOfThought(CodeEdit)
+predict = dspy.ChainOfThought(CodeEdit)
 
     parser = argparse.ArgumentParser(description="Edit code files based on instructions.")
     parser.add_argument("instruction", type=str, help="Instruction for code modification.")
