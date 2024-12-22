@@ -81,10 +81,9 @@ dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
 
 def run_code_edit_example():
     # Create a predictor using the CodeEdit signature
-    backtracking_handler = backtrack_handler
     generate_answer = assert_transform_module(
         InferenceModule(),
-        backtracking_handler
+        backtrack_handler,
     )
 
     # Example usage
