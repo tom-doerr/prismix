@@ -25,8 +25,8 @@ if __name__ == "__main__":
             if instruction.lower() == "exit":
                 break
             file_paths = []
-            for file_path in retriever.get_all_file_paths():
-                file_paths.append(file_path)
+            for file_path in retriever.collection.list_points().points:
+                file_paths.append(file_path.id)
 
 
             code_files = []
