@@ -276,7 +276,7 @@ def custom_metric(reasoning, edit_instructions, search_query=""):
     print("edit_instructions:", edit_instructions)
     # try to parse the edit instructions
     score = 0.0
-    edit_instructions_format = EditInstructions.model_json_schema()
+    edit_instructions_format = str(EditInstructions.model_json_schema())
     print("edit_instructions_format:", edit_instructions_format)
     edit_rater_score = edit_rater(
         edit_instructions=str(edit_instructions),
