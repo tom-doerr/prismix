@@ -78,7 +78,7 @@ class QdrantRetriever:
 
     def _add_chunk(self, file_path: str, code_chunk: str, start_line: int):
         """Adds a single code chunk to the Qdrant collection."""
-        embedding = self._get_jina_embedding(code_chunk) if self.jina_api_key else self.model.encode(code_chunk).tolist()
+        embedding = self._get_jina_embedding(code_chunk)
         point_id = hash(f"{file_path}-{start_line}")
         if not self._check_if_chunk_exists(point_id):
             self.client.upsert(
@@ -110,7 +110,7 @@ class QdrantRetriever:
         try:
             search_result = self.client.search(
                 collection_name=self.collection_name,
-                query_vector=self._get_jina_embedding(file_content) if self.jina_api_key else self.model.encode(file_content).tolist(),
+                query_vector=self._get_jina_embedding(file_path) if self.jina_api_key else self.model.encode(file_path).tolist(),
                 query_filter=models.Filter(
                     must=[
                         models.FieldCondition(
