@@ -59,11 +59,26 @@ def validate_edit_instructions(value):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.edit_instructions.transform = self._transform_edit_instructions
+        self.edit_instructions.assert_transform = self._assert_transform_edit_instructions
 
     def _transform_edit_instructions(self, value):
         if isinstance(value, str):
             return [{"instruction": value}]
         return value
+
+    def _assert_transform_edit_instructions(self, value):
+        dspy.Assert(isinstance(value, list), "edit_instructions must be a list")
+        for item in value:
+            dspy.Assert(isinstance(item, dict), "Each edit instruction must be a dictionary")
+            dspy.Assert("instruction" in item or "filepath" in item, "Each edit instruction must have an instruction or a filepath")
+            if "filepath" in item:
+                if "start_line" in item:
+                    dspy.Assert("end_line" in item, "LineNumberEditInstruction must have an end_line")
+                    dspy.Assert("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text")
+                elif "search_text" in item:
+                    dspy.Assert("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text")
+                else:
+                    raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
 
 
 # CodeEdit = create_signature_class_from_model(CodeEditPydantic)
