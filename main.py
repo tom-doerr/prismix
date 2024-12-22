@@ -27,8 +27,8 @@ if __name__ == "__main__":
             file_paths = []
             for file_path in retriever.get_all_file_paths():
                 file_paths.append(file_path)
-            
-            
+
+
             code_files = []
             for file_path in file_paths:
                 if not os.path.exists(file_path):
