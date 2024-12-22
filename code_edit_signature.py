@@ -88,7 +88,7 @@ def run_code_edit_example():
     # print("prediction:", prediction)
 
     # Activate assertions
-    generate_answer_with_assertions = assert_transform_module(generate_answer, backtrack_handler)
+    generate_answer_with_assertions = assert_transform_module(generate_answer, backtrack_handler, max_backtracks=3)
 
     # Call the predictor with assertions
     prediction = generate_answer_with_assertions(instruction=instruction, context=context)
