@@ -7,6 +7,21 @@ from dspy.primitives.assertions import assert_transform_module, backtrack_handle
 from pydantic import BaseModel, Field
 
 
+class InferenceModule(dspy.Module):
+    """
+    A base class for inference modules.
+    """
+    def __init__(self, signature):
+        super().__init__()
+        self.predictor = dspy.Predict(signature)
+
+    def forward(self, instruction, context):
+        """
+        Performs the code edit inference.
+        """
+        return self.predictor(instruction=instruction, context=context)
+
+
 class Context(dspy.Signature):
     """Provides context for code editing."""
     retrieved_context = dspy.InputField(desc="Context from the retriever.")
