@@ -13,14 +13,22 @@ class CodeFile(BaseModel):
     filepath: str
     filecontent: str
 
-class EditInstruction(BaseModel):
+class LineNumberEditInstruction(BaseModel):
     start_line: int = Field(..., desc="The line number where the edit should start.")
     end_line: int = Field(..., desc="The line number where the edit should end.")
     replacement_text: str = Field(..., desc="The text that should replace the lines from start_line to end_line.")
     filepath: str = Field(..., desc="The path to the file that should be edited.")
 
+from typing import Union
+
+
+class SearchReplaceEditInstruction(BaseModel):
+    filepath: str = Field(..., desc="The path to the file that should be edited.")
+    search_text: str = Field(..., desc="The text to search for.")
+    replacement_text: str = Field(..., desc="The text to replace the found text with.")
+
 class EditInstructions(BaseModel):
-    edit_instructions: list[EditInstruction] = Field(..., desc="A list of edit instructions.")
+    edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(..., desc="A list of edit instructions.")
 
 class CodeEdit(dspy.Signature):
     """Edits a code file based on an instruction."""
