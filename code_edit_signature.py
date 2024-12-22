@@ -73,7 +73,8 @@ from typing import Union
 
 import dspy
 
-dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
+# dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
+dspy.configure(lm=dspy.LM(model="deepseek/deepseek"))
 
 
 context_sample = \
@@ -230,12 +231,13 @@ def run_mipro_optimization():
     optimized_program = teleprompter.compile(
         SimpleEditModule(CodeEdit),
         trainset=trainset,
-        # num_trials=15,
-        num_trials=5,
+        num_trials=15,
+        # num_trials=5,
         minibatch_size=25,
         minibatch_full_eval_steps=10,
         minibatch=True,
-        requires_permission_to_run=False,
+        # requires_permission_to_run=False,
+        requires_permission_to_run=True,
     )
 
     # Save the optimized program
