@@ -14,36 +14,38 @@ class InferenceModule(dspy.Module):
     """
     def __init__(self, signature):
         super().__init__()
-        self.predictor = dspy.Predict(signature)
+        # self.predictor = dspy.Predict(signature)
+        self.predictor = dspy.ChainOfThought(signature)
 
     def forward(self, instruction, context):
         """
         Performs the code edit inference.
         """
         prediction = self.predictor(instruction=instruction, context=context)
-        print("prediction:", prediction)
-        try:
-            import json
-            edit_instructions = json.loads(prediction.edit_instructions)
-            validated_edit_instructions = EditInstructions(edit_instructions=edit_instructions)
-            self.validate_edit_instructions(validated_edit_instructions.edit_instructions, prediction)
-            prediction.edit_instructions = validated_edit_instructions.edit_instructions
-        except Exception as e:
-            print(f"Error parsing edit_instructions: {e}")
-            dspy.Suggest(False, f"Error parsing edit_instructions: {e}", target_module=self)
+        if False:
+            print("prediction:", prediction)
+            try:
+                import json
+                edit_instructions = json.loads(prediction.edit_instructions)
+                validated_edit_instructions = EditInstructions(edit_instructions=edit_instructions)
+                self.validate_edit_instructions(validated_edit_instructions.edit_instructions, prediction, target_module=self)
+                prediction.edit_instructions = validated_edit_instructions.edit_instructions
+            except Exception as e:
+                print(f"Error parsing edit_instructions: {e}")
+                dspy.Suggest(False, f"Error parsing edit_instructions: {e}", target_module=self)
 
         return prediction
 
-    def validate_edit_instructions(self, value, prediction):
-        dspy.Suggest(isinstance(value, list), "edit_instructions must be a list", target_module=self)
-        for item in value:
-            dspy.Suggest(isinstance(item, dict), "Each edit instruction must be a dictionary", target_module=self)
-            dspy.Suggest("filepath" in item, "Each edit instruction must have a filepath", target_module=self)
-            if "start_line" in item:
-                dspy.Suggest("end_line" in item, "LineNumberEditInstruction must have an end_line", target_module=self)
-                dspy.Suggest("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text", target_module=self)
-            elif "search_text" in item:
-                dspy.Suggest("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text", target_module=self)
+def validate_edit_instructions(value, prediction, target_module):
+    dspy.Suggest(isinstance(value, list), "edit_instructions must be a list", target_module=target_module)
+    for item in value:
+        dspy.Suggest(isinstance(item, dict), "Each edit instruction must be a dictionary", target_module=target_module)
+        dspy.Suggest("filepath" in item, "Each edit instruction must have a filepath", target_module=target_module)
+        if "start_line" in item:
+            dspy.Suggest("end_line" in item, "LineNumberEditInstruction must have an end_line", target_module=target_module)
+            dspy.Suggest("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text", target_module=target_module)
+        elif "search_text" in item:
+            dspy.Suggest("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text", target_module=target_module)
 
 
 
@@ -68,7 +70,7 @@ class EditInstructions(BaseModel):
     edit_instructions: list[Union[LineNumberEditInstruction, SearchReplaceEditInstruction]] = Field(..., desc="A list of edit instructions.")
 
 class CodeEdit(dspy.Signature):
-    """Edits a code file based on an instruction."""
+    """Edits a code file based on an instruction. """
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")
     context = dspy.InputField(desc="Context for the code edit.", type=str)
     edit_instructions = dspy.OutputField(desc="A list of edit instructions.", base_signature=EditInstructions)
@@ -81,7 +83,7 @@ from typing import Union
 import dspy
 
 # dspy.configure(lm=dspy.LM(model="openai/gpt-4o-mini"))
-dspy.configure(lm=dspy.LM(model="deepseek/deepseek-chat"))
+dspy.configure(lm=dspy.LM(model="deepseek/deepseek-chat", max_tokens=500, cache=False))
 
 
 context_sample = \
@@ -197,16 +199,48 @@ def run_code_edit_example():
         # Print the generated answer
         print(f"Generated Answer: {prediction.edit_instructions}")
 
-def custom_metric(gold, pred):
-    print("pred:", pred)
+
+class Scorer(BaseModel):
+    score: float = Field(..., ge=0, le=10, desc="The score of the edit, value between 0 and 10.")
+
+
+# new signature for rating the output
+class CodeEditRating(dspy.Signature):
+    """Rates how close the edit_instruction conforms to the edit_format."""
+    edit_instructions = dspy.InputField(desc="A list of edit instructions.", base_signature=EditInstructions)
+    search_query = dspy.InputField(desc="A search query to use for the next iteration, if needed.")
+    edit_format = dspy.InputField(desc="The format of the edit instructions.", type=str)
+    # rating = dspy.OutputField(desc="A rating of the code edit on a scale from 1 to 10. Reply with just the int and nothing else.", type=int)
+    rating = dspy.OutputField(base_signature=Scorer, type=float, desc="A rating of the code edit on a scale from 1 to 10.")
+
+
+# edit_rater = dspy.ChainOfThought(CodeEditRating)
+edit_rater = dspy.TypedChainOfThought(CodeEditRating)
+
+
+# def custom_metric(gold, pred, trace=None):
+def custom_metric(reasoning, edit_instructions, search_query=''):
+    print('custom_metric called')
+    print("edit_instructions:", edit_instructions)
     # try to parse the edit instructions
+    score = 0.0
+    edit_instructions_format = EditInstructions.model_json_schema()
+    print("edit_instructions_format:", edit_instructions_format)
+    edit_rater_score = edit_rater(edit_instructions=str(edit_instructions), search_query=str(search_query), edit_format=edit_instructions_format)
+    print("edit_rater_score:", edit_rater_score)
+    score += float(edit_rater_score.rating)
     try:
         import json
-        pred_edit_instructions = json.loads(pred.edit_instructions)
-        return 1.0
+        pred_edit_instructions = json.loads(edit_instructions.edit_instructions)
+        score += 1.0
+        return score
     except Exception as e:
         print(f"Error parsing edit_instructions: {e}")
-        return 0.0
+        return score
+
+
+
+
 
 def run_mipro_optimization():
     from dspy.teleprompt import MIPROv2
@@ -246,9 +280,8 @@ def run_mipro_optimization():
         generate_answer,
         trainset=trainset,
         num_trials=15,
-        # num_trials=5,
         minibatch_size=25,
-        minibatch_full_eval_steps=10,
+        minibatch_full_eval_steps=100,
         minibatch=True,
         requires_permission_to_run=False,
         # requires_permission_to_run=True,
