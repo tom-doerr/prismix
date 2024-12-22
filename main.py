@@ -1,5 +1,6 @@
 import os
 import sys
+import argparse
 
 import dspy
 
@@ -15,28 +16,32 @@ dspy.settings.configure(lm=llm)
 retriever = QdrantRetriever()
 retriever.add_files(include_glob="*.py", exclude_glob="*test*")
 
-if __name__ == "__main__":
     predict = dspy.ChainOfThought(CodeEdit)
 
-    if len(sys.argv) < 2:
+    parser = argparse.ArgumentParser(description="Edit code files based on instructions.")
+    parser.add_argument("instruction", type=str, help="Instruction for code modification.")
+    args = parser.parse_args()
+    instruction = args.instruction
+
+    if not instruction:
         print("Entering interactive mode. Type 'exit' to quit.")
         while True:
             instruction = input("Enter instruction: ")
             if instruction.lower() == "exit":
                 break
+
             file_paths = retriever.collection.list_points().points
             file_paths = [point.id for point in file_paths]
 
-
             code_files = []
-            # for file_path in file_paths:
-                # if not os.path.exists(file_path):
-                    # print(f"Error: File not found at {file_path}")
-                    # continue
-                # with open(file_path, 'r') as f:
-                    # file_content = f.read()
-                # numbered_content = add_line_numbers(file_content)
-                # code_files.append(CodeFile(filepath=file_path, filecontent=numbered_content))
+            for file_path in file_paths:
+                if not os.path.exists(file_path):
+                    print(f"Error: File not found at {file_path}")
+                    continue
+                with open(file_path, 'r') as f:
+                    file_content = f.read()
+                numbered_content = add_line_numbers(file_content)
+                code_files.append(CodeFile(filepath=file_path, filecontent=numbered_content))
 
             retrieved_context = retriever.retrieve(query=instruction)
             context = Context(retrieved_context="\n".join(retrieved_context), online_search="")
@@ -99,14 +104,15 @@ if __name__ == "__main__":
                 print(f"An error occurred: {e}")
         sys.exit(0)
 
-    instruction = sys.argv[1]
-    file_paths = sys.argv[2:]
+
+    file_paths = retriever.collection.list_points().points
+    file_paths = [point.id for point in file_paths]
 
     code_files = []
     for file_path in file_paths:
         if not os.path.exists(file_path):
             print(f"Error: File not found at {file_path}")
-            sys.exit(1)
+            continue
         with open(file_path, 'r') as f:
             file_content = f.read()
         numbered_content = add_line_numbers(file_content)
