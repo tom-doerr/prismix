@@ -6,19 +6,17 @@ from qdrant_retriever import QdrantRetriever
 
 
 @pytest.fixture
-def qdrant_retriever(request):
+def qdrant_retriever():
     """Fixture to create a QdrantRetriever instance for testing."""
-    test_name = request.node.name
-    retriever = QdrantRetriever(collection_name="test_collection", data_path=f"./qdrant_data_{test_name}")
+    retriever = QdrantRetriever(collection_name="test_collection")
     retriever.clear_collection()  # Ensure a clean collection for each test
     return retriever
 
 
 def test_add_and_retrieve_code_chunks(qdrant_retriever):
     """Tests adding and retrieving code chunks."""
-    try:
-        test_file_path = "test_file.py"
-        test_file_content = """
+    test_file_path = "test_file.py"
+    test_file_content = """
 def hello():
     print("hello")
 
@@ -26,13 +24,11 @@ class MyClass:
     def __init__(self):
         pass
 """
-        qdrant_retriever.add_or_update_code_chunks(test_file_path, test_file_content)
-        results = qdrant_retriever.retrieve("hello")
-        assert len(results) > 0
-        assert "hello" in results[0][1]
-        assert test_file_path == results[0][0]
-    except TypeError as e:
-        pytest.skip(f"Test skipped due to TypeError: {e}")
+    qdrant_retriever.add_or_update_code_chunks(test_file_path, test_file_content)
+    results = qdrant_retriever.retrieve("hello")
+    assert len(results) > 0
+    assert "hello" in results[0][1]
+    assert test_file_path == results[0][0]
 
 def test_add_and_retrieve_code_chunks_with_jina(qdrant_retriever):
     """Tests adding and retrieving code chunks with Jina embeddings."""
