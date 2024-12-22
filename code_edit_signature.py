@@ -169,13 +169,13 @@ instruction_context_pairs = [
 
 
 
+generate_answer = assert_transform_module(
+    InferenceModule(CodeEdit),
+    functools.partial(backtrack_handler, max_backtracks=30),
+)
 
 def run_code_edit_example():
     # Create a predictor using the CodeEdit signature
-    generate_answer = assert_transform_module(
-        InferenceModule(CodeEdit),
-        functools.partial(backtrack_handler, max_backtracks=30),
-    )
 
     # Example usage
     code_files = [
@@ -242,7 +242,8 @@ def run_mipro_optimization():
     # Optimize the module
     optimized_program = teleprompter.compile(
         # SimpleEditModule(CodeEdit),
-        InferenceModule(CodeEdit),
+        # InferenceModule(CodeEdit),
+        generate_answer,
         trainset=trainset,
         num_trials=15,
         # num_trials=5,
