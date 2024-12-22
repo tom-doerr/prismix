@@ -56,9 +56,9 @@ import dspy
 
 # Assuming you have a dspy.Model set up, e.g., using OpenAI
 # If not, you'll need to set it up like this:
-# import os
-# os.environ["OPENAI_API_KEY"] = "YOUR_API_KEY"
-# dspy.configure(lm=dspy.OpenAI(model="gpt-3.5-turbo"))
+import os
+os.environ["OPENAI_API_KEY"] = "YOUR_API_KEY"
+dspy.configure(lm=dspy.OpenAI(model="gpt-4o-mini"))
 
 
 def run_code_edit_example():
