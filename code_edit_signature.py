@@ -1,5 +1,6 @@
 
 
+import functools
 from typing import Union
 
 import dspy
@@ -83,7 +84,7 @@ def run_code_edit_example():
     # Create a predictor using the CodeEdit signature
     generate_answer = assert_transform_module(
         InferenceModule(CodeEdit),
-        backtrack_handler(max_backtracks=10),
+        functools.partial(backtrack_handler, max_backtracks=10),
     )
 
     # Example usage
