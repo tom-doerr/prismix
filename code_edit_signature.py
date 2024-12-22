@@ -94,6 +94,9 @@ def run_code_edit_example():
     prediction = generate_answer(instruction=instruction, code_files=code_files, context=context)
     print("prediction:", prediction)
 
+    # Validate the generated answer
+    validate_edit_instructions(prediction.edit_instructions)
+
     # Print the generated answer
     print(f"Generated Answer: {prediction.edit_instructions}")
 
