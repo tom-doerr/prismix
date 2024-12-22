@@ -108,10 +108,9 @@ class QdrantRetriever:
     def _check_if_file_changed(self, file_path: str, current_hash: str) -> bool:
         """Checks if the file content has changed."""
         try:
-            query_embedding = self._get_jina_embedding(file_path) if self.jina_api_key else self.model.encode(file_path).tolist()
             search_result = self.client.search(
                 collection_name=self.collection_name,
-                query_vector=query_embedding,
+                query_vector=[0] * 256,  # Dummy vector for metadata search
                 query_filter=models.Filter(
                     must=[
                         models.FieldCondition(
@@ -125,9 +124,9 @@ class QdrantRetriever:
             if search_result:
                 stored_hash = search_result[0].payload.get("file_hash")
                 return stored_hash != current_hash
-            return False
+            return True
         except Exception:
-            return False
+            return True
 
     def _delete_chunks_for_file(self, file_path: str):
         """Deletes all chunks associated with a file path."""
