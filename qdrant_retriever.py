@@ -62,14 +62,26 @@ class QdrantRetriever:
         """Adds a single code chunk to the Qdrant collection."""
         embedding = self._get_jina_embedding(code_chunk)
         point_id = hash(f"{file_path}-{start_line}")
-        self.client.upsert(
-            collection_name=self.collection_name,
-            points=Batch(
-                ids=[point_id],
-                vectors=[embedding],
-                payloads=[{"file_path": file_path, "text": code_chunk, "start_line": start_line}]
+        if not self._check_if_chunk_exists(point_id):
+            self.client.upsert(
+                collection_name=self.collection_name,
+                points=Batch(
+                    ids=[point_id],
+                    vectors=[embedding],
+                    payloads=[{"file_path": file_path, "text": code_chunk, "start_line": start_line}]
+                )
             )
-        )
+
+    def _check_if_chunk_exists(self, point_id: int) -> bool:
+        """Checks if a chunk with the given ID already exists in the collection."""
+        try:
+            self.client.retrieve(
+                collection_name=self.collection_name,
+                ids=[point_id],
+            )
+            return True
+        except Exception:
+            return False
 
     def retrieve(self, query: str, top_k: int = 5) -> List[str]:
         """Retrieves the top_k most relevant documents for a given query."""
