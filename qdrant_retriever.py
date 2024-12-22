@@ -68,7 +68,7 @@ class QdrantRetriever:
             query_vector=query_embedding,
             limit=top_k,
         )
-        return [hit.payload["text"] for hit in search_result]
+        return [(hit.payload["file_path"], hit.payload["text"]) for hit in search_result]
 
     def _get_jina_embedding(self, text: str) -> List[float]:
         """Gets the Jina embedding for the given text."""
