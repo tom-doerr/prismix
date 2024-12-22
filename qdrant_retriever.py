@@ -131,13 +131,6 @@ class QdrantRetriever:
             )
         )
 
-    def clear_collection(self):
-        """Clears all data from the Qdrant collection."""
-        self.client.delete(
-            collection_name=self.collection_name,
-            points_selector=models.SelectorType.ALL,
-        )
-
     def retrieve(self, query: str, top_k: int = 5) -> List[str]:
         """Retrieves the top_k most relevant documents for a given query."""
         if self.model:
