@@ -65,10 +65,10 @@ if __name__ == "__main__":
             elif hasattr(edit_instruction, 'search_text') and hasattr(edit_instruction, 'replacement_text'):
                 search_text = edit_instruction.search_text
                 replacement_text = edit_instruction.replacement_text
-                
+
                 def replace_text(text: str, search_text: str, replacement_text: str) -> str:
                     return text.replace(search_text, replacement_text)
-                
+
                 edited_content = replace_text(file_content, search_text, replacement_text)
             else:
                 print(f"Error: Invalid edit instruction: {edit_instruction}")
