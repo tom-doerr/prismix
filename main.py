@@ -24,9 +24,8 @@ if __name__ == "__main__":
             instruction = input("Enter instruction: ")
             if instruction.lower() == "exit":
                 break
-            file_paths = []
-            for file_path in retriever.collection.list_points().points:
-                file_paths.append(file_path.id)
+            file_paths = retriever.collection.list_points().points
+            file_paths = [point.id for point in file_paths]
 
 
             code_files = []
