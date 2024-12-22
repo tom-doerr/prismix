@@ -1,5 +1,4 @@
 import os
-from importlib.util import find_spec
 
 import pytest
 
@@ -10,8 +9,6 @@ from run_tests_and_fix import downgrade_protobuf
 @pytest.fixture
 def qdrant_retriever(request):
     """Fixture to create a QdrantRetriever instance for testing."""
-    if not find_spec("tensorboard"):
-        pytest.skip("tensorboard not installed, skipping test")
     downgrade_protobuf()
     test_name = request.node.name
     retriever = QdrantRetriever(collection_name="test_collection", data_path=f"./qdrant_data_{test_name}")
