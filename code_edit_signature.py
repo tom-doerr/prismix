@@ -51,6 +51,7 @@ class CodeEdit(dspy.Signature):
 # CodeEdit = create_signature_class_from_model(CodeEditPydantic)
 
 import dspy
+from typing import List, Union
 
 # Assuming you have a dspy.Model set up, e.g., using OpenAI
 # If not, you'll need to set it up like this:
@@ -58,15 +59,30 @@ import dspy
 # os.environ["OPENAI_API_KEY"] = "YOUR_API_KEY"
 # dspy.configure(lm=dspy.OpenAI(model="gpt-3.5-turbo"))
 
-# Create a predictor using the CodeEdit signature
-generate_answer = dspy.Predict(CodeEdit)
 
-# Example usage
-context = "The capital of France is Paris."
-question = "What is the capital of France?"
+def run_code_edit_example():
+    # Create a predictor using the CodeEdit signature
+    generate_answer = dspy.Predict(CodeEdit)
 
-# Call the predictor
-prediction = generate_answer(context=context, question=question)
+    # Example usage
+    code_files = [
+        {
+            "filepath": "example.py",
+            "filecontent": "def hello():\n    print('hello')\n"
+        }
+    ]
+    context = {
+        "retrieved_context": "This is an example python file.",
+        "online_search": "No relevant search results."
+    }
+    instruction = "Add a comment to the hello function that says 'This is a hello function'."
 
-# Print the generated answer
-print(f"Generated Answer: {prediction.answer}")
+    # Call the predictor
+    prediction = generate_answer(instruction=instruction, code_files=code_files, context=context)
+
+    # Print the generated answer
+    print(f"Generated Answer: {prediction.edit_instructions}")
+
+
+if __name__ == "__main__":
+    run_code_edit_example()
