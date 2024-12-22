@@ -190,5 +190,53 @@ def run_code_edit_example():
         print(f"Generated Answer: {prediction.edit_instructions}")
 
 
+def run_mipro_optimization():
+    from dspy.teleprompt import MIPROv2
+    from dspy.datasets import Dataset
+    
+    class EditDataset(Dataset):
+        def __init__(self, data):
+            super().__init__()
+            self._train = data
+
+    trainset = EditDataset(instruction_context_pairs)
+
+    teleprompter = MIPROv2(
+        metric=lambda predictions, labels: 1.0,  # Dummy metric for now
+        auto="light",
+        num_candidates=7,
+        init_temperature=0.5,
+        max_bootstrapped_demos=3,
+        max_labeled_demos=4,
+        verbose=False,
+    )
+
+    # Create a simple module for optimization
+    class SimpleEditModule(dspy.Module):
+        def __init__(self, signature):
+            super().__init__()
+            self.predictor = dspy.Predict(signature)
+
+        def forward(self, instruction, context):
+            return self.predictor(instruction=instruction, context=context)
+
+    # Optimize the module
+    optimized_program = teleprompter.compile(
+        SimpleEditModule(CodeEdit),
+        trainset=trainset,
+        num_trials=15,
+        minibatch_size=25,
+        minibatch_full_eval_steps=10,
+        minibatch=True,
+        requires_permission_to_run=False,
+    )
+
+    # Save the optimized program
+    optimized_program.save(f"mipro_optimized")
+
+    print("MIPRO optimization complete.")
+
+
 if __name__ == "__main__":
     run_code_edit_example()
+    run_mipro_optimization()
