@@ -45,18 +45,21 @@ class CodeEdit(dspy.Signature):
         self.edit_instructions.format = self._validate_edit_instructions
 
     def _validate_edit_instructions(self, value):
-        assert isinstance(value, list), "edit_instructions must be a list"
-        for item in value:
-            assert isinstance(item, dict), "Each edit instruction must be a dictionary"
-            assert "filepath" in item, "Each edit instruction must have a filepath"
-            if "start_line" in item:
-                assert "end_line" in item, "LineNumberEditInstruction must have an end_line"
-                assert "replacement_text" in item, "LineNumberEditInstruction must have a replacement_text"
-            elif "search_text" in item:
-                assert "replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text"
-            else:
-                raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
+        validate_edit_instructions(value)
         return value
+
+def validate_edit_instructions(value):
+    dspy.Assert(isinstance(value, list), "edit_instructions must be a list")
+    for item in value:
+        dspy.Assert(isinstance(item, dict), "Each edit instruction must be a dictionary")
+        dspy.Assert("filepath" in item, "Each edit instruction must have a filepath")
+        if "start_line" in item:
+            dspy.Assert("end_line" in item, "LineNumberEditInstruction must have an end_line")
+            dspy.Assert("replacement_text" in item, "LineNumberEditInstruction must have a replacement_text")
+        elif "search_text" in item:
+            dspy.Assert("replacement_text" in item, "SearchReplaceEditInstruction must have a replacement_text")
+        else:
+            raise AssertionError("Each edit instruction must be either a LineNumberEditInstruction or a SearchReplaceEditInstruction")
 
 # class CodeEditPydantic(BaseModel):
     # instruction: Union[LineNumberEditInstruction, SearchReplaceEditInstruction]
