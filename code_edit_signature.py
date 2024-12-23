@@ -446,15 +446,15 @@ def load_optimized_program(filename: str):
     # Create an instance of InferenceModule with the loaded signature
     # signature = CodeEdit(**program_json["signature"])
     # module = InferenceModule(signature)
-    
+
     # Load the module
     module = dspy.Module.from_json(program_json)
-    
+
     signature = module.signature
-    
+
     # Load the state of the module
     module.load_state(program_json)
-    
+
     return module
 
     # Load the state of the module
