@@ -302,7 +302,9 @@ def custom_metric(reasoning, edit_instructions, search_query=""):
 
 
 def generate_answer_with_assertions(instruction, context):
-    prediction = generate_answer(instruction=instruction, context=context)
+    
+    module = InferenceModule(CodeEdit)
+    prediction = module.forward(instruction=instruction, context=context)
     edit_instructions_format = str(EditInstructions.model_json_schema())
     try:
 
@@ -311,12 +313,12 @@ def generate_answer_with_assertions(instruction, context):
         edit_instructions = json.loads(prediction.edit_instructions)
         validated_edit_instructions = EditInstructions(edit_instructions=edit_instructions)
         validate_edit_instructions(
-            validated_edit_instructions.edit_instructions, prediction, target_module=self.forward
+            validated_edit_instructions.edit_instructions, prediction, target_module=module.forward
         )
         prediction.edit_instructions = validated_edit_instructions.edit_instructions
     except Exception as e:
         dspy.Assert(False,
-        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}", target_module=self.forward)
+        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}", target_module=module.forward)
 
 
 def run_mipro_optimization():
