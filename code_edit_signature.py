@@ -30,7 +30,7 @@ class InferenceModule(dspy.Module):
 
                 edit_instructions = json.loads(prediction.edit_instructions)
                 validated_edit_instructions = EditInstructions(
-                    edit_instructions=edit_instructions
+                    edit_instructions=prediction.edit_instructions
                 )
                 self.validate_edit_instructions(
                     validated_edit_instructions.edit_instructions,
@@ -52,35 +52,35 @@ class InferenceModule(dspy.Module):
 
 
 def validate_edit_instructions(value, prediction, target_module):
-    dspy.Suggest(
+    dspy.Assert(
         isinstance(value, list),
         "edit_instructions must be a list",
         target_module=target_module,
     )
     for item in value:
-        dspy.Suggest(
+        dspy.Assert(
             isinstance(item, dict),
             "Each edit instruction must be a dictionary",
             target_module=target_module,
         )
-        dspy.Suggest(
+        dspy.Assert(
             "filepath" in item,
             "Each edit instruction must have a filepath",
             target_module=target_module,
         )
         if "start_line" in item:
-            dspy.Suggest(
+            dspy.Assert(
                 "end_line" in item,
                 "LineNumberEditInstruction must have an end_line",
                 target_module=target_module,
             )
-            dspy.Suggest(
+            dspy.Assert(
                 "replacement_text" in item,
                 "LineNumberEditInstruction must have a replacement_text",
                 target_module=target_module,
             )
         elif "search_text" in item:
-            dspy.Suggest(
+            dspy.Assert(
                 "replacement_text" in item,
                 "SearchReplaceEditInstruction must have a replacement_text",
                 target_module=target_module,
@@ -119,7 +119,7 @@ class CodeEdit(dspy.Signature):
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")
     context = dspy.InputField(desc="Context for the code edit.", type=str)
     edit_instructions = dspy.OutputField(
-        desc="A list of edit instructions.", base_signature=EditInstructions
+        desc="A list of edit instructions."
     )
     search_query = dspy.OutputField(
         desc="A search query to use for the next iteration, if needed."
@@ -305,17 +305,18 @@ def generate_answer_with_assertions(instruction, context):
     edit_instructions_format = str(EditInstructions.model_json_schema())
     try:
 
-        import json
+        # import json
 
-        edit_instructions = json.loads(prediction.edit_instructions)
-        validated_edit_instructions = EditInstructions(edit_instructions=edit_instructions)
+        # edit_instructions = json.loads(prediction.edit_instructions)
+        validated_edit_instructions = EditInstructions(edit_instructions=prediction.edit_instructions)
         validate_edit_instructions(
-            validated_edit_instructions.edit_instructions, prediction, target_module=self.forward
+            validated_edit_instructions.edit_instructions, prediction, target_module=generate_answer
         )
         prediction.edit_instructions = validated_edit_instructions.edit_instructions
     except Exception as e:
         dspy.Assert(False,
-        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}")
+        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}", target_module=generate_answer)
+    return prediction
 
 
 def run_mipro_optimization():
