@@ -65,7 +65,11 @@ class InferenceModule(dspy.Module):
                         False, f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}")
 
         print("trace:", dspy.settings.trace)
-        return prediction._replace(search_query="")
+        return dspy.Prediction(
+            reasoning=prediction.reasoning,
+            edit_instructions=prediction.edit_instructions,
+            search_query=""
+        )
 
 # def validate_edit_instructions(value, prediction, target_module):
 def validate_edit_instructions(edit_instructions, target_module):
