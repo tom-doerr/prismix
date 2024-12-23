@@ -43,6 +43,7 @@ class InferenceModule(dspy.Module):
                 try:
                     parsed_edit_instructions = json.loads(prediction.edit_instructions)
                 except json.JSONDecodeError as e:
+                    edit_instructions_format = str(EditInstructions.model_json_schema())
                     dspy.Assert(
                         False,
                         f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}",
