@@ -287,7 +287,7 @@ def custom_metric(reasoning, edit_instructions, search_query=""):
         edit_instructions_str = json.dumps(edit_instructions)
         edit_rater_score = edit_rater(
             edit_instructions=edit_instructions_str,
-            search_query=str(search_query),
+            search_query=str(search_query) if search_query else "",
             edit_format=edit_instructions_format,
         )
         print("edit_rater_score:", edit_rater_score)
@@ -358,7 +358,7 @@ def run_mipro_optimization():
     optimized_program = teleprompter.compile(
         # SimpleEditModule(CodeEdit),
         # InferenceModule(CodeEdit),
-        generate_answer,
+        generate_answer_with_assertions,
         trainset=trainset,
         num_trials=15,
         minibatch_size=25,
