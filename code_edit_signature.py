@@ -473,5 +473,5 @@ def run_code_edit_example():
 
 if __name__ == "__main__":
     run_code_edit_example()
-    run_bootstrap_fewshot_optimization()
-    run_mipro_optimization()
+    # run_bootstrap_fewshot_optimization()
+    # run_mipro_optimization()
