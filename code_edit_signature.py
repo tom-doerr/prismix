@@ -284,7 +284,10 @@ def custom_metric(reasoning, edit_instructions, search_query=""):
     print("edit_instructions_format:", edit_instructions_format)
     try:
         import json
-        edit_instructions_str = json.dumps(edit_instructions)
+        if isinstance(edit_instructions, str):
+            edit_instructions_str = edit_instructions
+        else:
+            edit_instructions_str = json.dumps(edit_instructions)
         edit_rater_score = edit_rater(
             edit_instructions=edit_instructions_str,
             search_query=str(search_query) if search_query else "",
@@ -362,7 +365,7 @@ def run_mipro_optimization():
         trainset=trainset,
         num_trials=15,
         minibatch_size=25,
-        minibatch_full_eval_steps=100,
+        minibatch_full_eval_steps=10,
         minibatch=True,
         requires_permission_to_run=False,
         # requires_permission_to_run=True,
