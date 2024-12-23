@@ -30,7 +30,7 @@ class InferenceModule(dspy.Module):
 
                 edit_instructions = json.loads(prediction.edit_instructions)
                 validated_edit_instructions = EditInstructions(
-                    edit_instructions=prediction.edit_instructions
+                    edit_instructions=edit_instructions
                 )
                 self.validate_edit_instructions(
                     validated_edit_instructions.edit_instructions,
@@ -282,17 +282,18 @@ def custom_metric(reasoning, edit_instructions, search_query=""):
     score = 0.0
     edit_instructions_format = str(EditInstructions.model_json_schema())
     print("edit_instructions_format:", edit_instructions_format)
-    edit_rater_score = edit_rater(
-        edit_instructions=str(edit_instructions),
-        search_query=str(search_query),
-        edit_format=edit_instructions_format,
-    )
-    print("edit_rater_score:", edit_rater_score)
-    score += float(edit_rater_score.rating)
     try:
         import json
+        edit_instructions_str = json.dumps(edit_instructions)
+        edit_rater_score = edit_rater(
+            edit_instructions=edit_instructions_str,
+            search_query=str(search_query),
+            edit_format=edit_instructions_format,
+        )
+        print("edit_rater_score:", edit_rater_score)
+        score += float(edit_rater_score.rating)
 
-        pred_edit_instructions = json.loads(edit_instructions.edit_instructions)
+        pred_edit_instructions = json.loads(edit_instructions_str)
         score += 20.0
         return score
     except Exception as e:
@@ -304,11 +305,10 @@ def generate_answer_with_assertions(instruction, context):
     prediction = generate_answer(instruction=instruction, context=context)
     edit_instructions_format = str(EditInstructions.model_json_schema())
     try:
+        import json
 
-        # import json
-
-        # edit_instructions = json.loads(prediction.edit_instructions)
-        validated_edit_instructions = EditInstructions(edit_instructions=prediction.edit_instructions)
+        edit_instructions = json.loads(prediction.edit_instructions)
+        validated_edit_instructions = EditInstructions(edit_instructions=edit_instructions)
         validate_edit_instructions(
             validated_edit_instructions.edit_instructions, prediction, target_module=generate_answer_with_assertions
         )
