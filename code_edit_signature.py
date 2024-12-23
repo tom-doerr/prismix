@@ -51,7 +51,6 @@ class InferenceModule(dspy.Module):
         print("trace:", dspy.settings.trace)
         return prediction
 
-
 def validate_edit_instructions(value, prediction, target_module):
     dspy.Suggest(
         isinstance(value, list),
@@ -211,14 +210,13 @@ instruction_context_pairs = [
 ]
 
 
-generate_answer = assert_transform_module(
-    InferenceModule(CodeEdit),
-    functools.partial(backtrack_handler, max_backtracks=30),
-)
-
-
 def run_code_edit_example():
     # Create a predictor using the CodeEdit signature
+    module = InferenceModule(CodeEdit)
+    generate_answer = assert_transform_module(
+        module,
+        functools.partial(backtrack_handler, max_backtracks=30),
+    )
 
     # Example usage
     code_files = [
@@ -231,8 +229,7 @@ def run_code_edit_example():
 
     for item in instruction_context_pairs:
         # Call the predictor
-        module = InferenceModule(CodeEdit)
-        prediction = module.forward(
+        prediction = generate_answer(
             instruction=item["instruction"], context=item["context"]
         )
         print("prediction:", prediction)
@@ -358,10 +355,12 @@ def run_mipro_optimization():
             return self.predictor(instruction=instruction, context=context)
 
     # Optimize the module
+    module = InferenceModule(CodeEdit)
     optimized_program = teleprompter.compile(
-        # SimpleEditModule(CodeEdit),
-        # InferenceModule(CodeEdit),
-        generate_answer,
+        assert_transform_module(
+            module,
+            functools.partial(backtrack_handler, max_backtracks=30),
+        ),
         trainset=trainset,
         num_trials=15,
         minibatch_size=25,
@@ -407,7 +406,10 @@ def run_bootstrap_fewshot_optimization():
     # Optimize the module
     module = InferenceModule(CodeEdit)
     optimized_program = teleprompter.compile(
-        module.forward,
+        assert_transform_module(
+            module,
+            functools.partial(backtrack_handler, max_backtracks=30),
+        ),
         trainset=trainset,
     )
 
