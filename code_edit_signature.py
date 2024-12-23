@@ -141,6 +141,7 @@ context_sample = """
 from datetime import datetime
 
 def hello():
+    # This is a hello function.
     print('hello')
 
 def print_datetime_nyc():
