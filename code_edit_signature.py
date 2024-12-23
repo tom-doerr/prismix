@@ -1,4 +1,5 @@
 import functools
+import json
 from typing import Union
 
 import dspy
@@ -26,21 +27,32 @@ class InferenceModule(dspy.Module):
         if True:
             print("prediction:", prediction)
             try:
-                import json
+                # import json
+                # try:
+                    # edit_instructions = json.loads(prediction.edit_instructions)
+                # except json.JSONDecodeError:
+                    # edit_instructions = prediction.edit_instructions
+                # validated_edit_instructions = EditInstructions(
+                    # edit_instructions=edit_instructions
+                # )
+                # validate_edit_instructions(
+                    # validated_edit_instructions.edit_instructions,
+                    # prediction,
+                    # target_module=self.forward,
+                # )
                 try:
-                    edit_instructions = json.loads(prediction.edit_instructions)
-                except json.JSONDecodeError:
-                    edit_instructions = prediction.edit_instructions
-                validated_edit_instructions = EditInstructions(
-                    edit_instructions=edit_instructions
-                )
-                self.validate_edit_instructions(
-                    validated_edit_instructions.edit_instructions,
-                    prediction,
+                    parsed_edit_instructions = json.loads(prediction.edit_instructions)
+                except json.JSONDecodeError as e:
+                    dspy.Assert(
+                        False,
+                        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}",
+                    )
+                validate_edit_instructions(
+                    parsed_edit_instructions,
                     target_module=self.forward,
                 )
                 prediction.edit_instructions = (
-                    validated_edit_instructions.edit_instructions
+                    prediction.edit_instructions
                 )
             except Exception as e:
                 print(f"Error parsing edit_instructions: {e}")
@@ -53,13 +65,14 @@ class InferenceModule(dspy.Module):
         print("trace:", dspy.settings.trace)
         return prediction
 
-def validate_edit_instructions(value, prediction, target_module):
+# def validate_edit_instructions(value, prediction, target_module):
+def validate_edit_instructions(edit_instructions, target_module):
     dspy.Suggest(
-        isinstance(value, list),
+        isinstance(edit_instructions, list),
         "edit_instructions must be a list",
         target_module=target_module,
     )
-    for item in value:
+    for item in edit_instructions:
         dspy.Suggest(
             isinstance(item, dict),
             "Each edit instruction must be a dictionary",
@@ -422,6 +435,6 @@ def run_bootstrap_fewshot_optimization():
 
 
 if __name__ == "__main__":
-    run_code_edit_example()
-    # run_bootstrap_fewshot_optimization()
+    # run_code_edit_example()
+    run_bootstrap_fewshot_optimization()
     # run_mipro_optimization()
