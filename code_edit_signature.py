@@ -140,7 +140,6 @@ dspy.configure(lm=lm)
 context_sample = """
 from datetime import datetime
 
-def hello():
     # This is a hello function.
     print('hello')
 
