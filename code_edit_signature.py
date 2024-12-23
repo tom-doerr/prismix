@@ -27,8 +27,10 @@ class InferenceModule(dspy.Module):
             print("prediction:", prediction)
             try:
                 import json
-
-                edit_instructions = json.loads(prediction.edit_instructions)
+                try:
+                    edit_instructions = json.loads(prediction.edit_instructions)
+                except json.JSONDecodeError:
+                    edit_instructions = prediction.edit_instructions
                 validated_edit_instructions = EditInstructions(
                     edit_instructions=edit_instructions
                 )
@@ -46,7 +48,7 @@ class InferenceModule(dspy.Module):
                 edit_instructions_format = str(EditInstructions.model_json_schema())
 
                 dspy.Assert(
-                        False, f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}", target_module=self.forward)
+                        False, f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}")
 
         print("trace:", dspy.settings.trace)
         return prediction
@@ -316,7 +318,7 @@ def generate_answer_with_assertions(instruction, context):
         prediction.edit_instructions = validated_edit_instructions.edit_instructions
     except Exception as e:
         dspy.Assert(False,
-        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}", target_module=module.forward)
+        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}")
 
 
 def run_mipro_optimization():
