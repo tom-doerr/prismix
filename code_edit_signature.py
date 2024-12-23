@@ -442,7 +442,15 @@ def load_optimized_program(filename: str):
     import dspy
     with open(filename, "r") as f:
         program_json = json.load(f)
-    return dspy.Module.from_json(program_json)
+    
+    # Create an instance of InferenceModule with the loaded signature
+    signature = dspy.Signature.from_json(program_json["signature"])
+    module = InferenceModule(signature)
+    
+    # Load the state of the module
+    module.load_state(program_json)
+    
+    return module
 
 
 def run_inference(program, instruction: str, context: str):
