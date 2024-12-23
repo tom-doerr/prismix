@@ -387,8 +387,9 @@ def run_mipro_optimization():
     )
 
     # Save the optimized program to a single JSON file
-    with open("mipro_optimized.json", "w") as f:
-        json.dump(optimized_program.to_json(), f)
+    # with open("mipro_optimized.json", "w") as f:
+        # json.dump(optimized_program.to_json(), f)
+    optimized_program.save("mipro_optimized.json", save_program=False)
 
     print("MIPRO optimization complete.")
 
@@ -406,7 +407,8 @@ def run_bootstrap_fewshot_optimization():
 
     teleprompter = BootstrapFewShot(
         metric=custom_metric,
-        max_bootstrapped_demos=3,
+        # max_bootstrapped_demos=3,
+        max_bootstrapped_demos=1,
         max_labeled_demos=4,
         max_rounds=10,
     )
@@ -431,25 +433,27 @@ def run_bootstrap_fewshot_optimization():
     )
 
     # Save the optimized program to a single JSON file
-    with open("bootstrap_optimized.json", "w") as f:
-        json.dump(optimized_program.to_json(), f)
+    # with open("bootstrap_optimized", "w") as f:
+        # json.dump(optimized_program.to_json(), f)
+    optimized_program.save("bootstrap_optimized.json", save_program=False)
 
     print("BootstrapFewShot optimization complete.")
 
 
 def load_optimized_program(filename: str):
     """Loads an optimized program from a JSON file."""
-    import dspy
-    with open(filename, "r") as f:
-        program_json = json.load(f)
-    
+    # import dspy
+    # with open(filename, "r") as f:
+        # program_json = json.load(f)
+
     # Create an instance of InferenceModule with the loaded signature
-    signature = dspy.Signature.from_json(program_json["signature"])
-    module = InferenceModule(signature)
-    
-    # Load the state of the module
-    module.load_state(program_json)
-    
+    # signature = dspy.Signature.from_json(program_json["signature"])
+    # module = InferenceModule(signature)
+
+    # # Load the state of the module
+    # module.load_state(program_json)
+    module = dspy.load(filename)
+
     return module
 
 
@@ -461,7 +465,8 @@ def run_inference(program, instruction: str, context: str):
 
 def run_code_edit_example():
     # Load the optimized program
-    optimized_program = load_optimized_program("bootstrap_optimized.json")
+    # optimized_program = load_optimized_program("bootstrap_optimized")
+    optimized_program = load_optimized_program("mipro_optimized.json")
 
     # Example usage
     code_files = [
@@ -484,6 +489,6 @@ def run_code_edit_example():
 
 
 if __name__ == "__main__":
-    run_code_edit_example()
     # run_bootstrap_fewshot_optimization()
+    run_code_edit_example()
     # run_mipro_optimization()
