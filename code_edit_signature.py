@@ -434,7 +434,43 @@ def run_bootstrap_fewshot_optimization():
     print("BootstrapFewShot optimization complete.")
 
 
+def load_optimized_program(filename: str):
+    """Loads an optimized program from a JSON file."""
+    import dspy
+    return dspy.load(filename)
+
+
+def run_inference(program, instruction: str, context: str):
+    """Runs inference using the loaded program."""
+    prediction = program(instruction=instruction, context=context)
+    return prediction
+
+
+def run_code_edit_example():
+    # Load the optimized program
+    optimized_program = load_optimized_program("bootstrap_optimized.json")
+
+    # Example usage
+    code_files = [
+        {"filepath": "example.py", "filecontent": "def hello():\n    print('hello')\n"}
+    ]
+    context = {
+        "retrieved_context": "This is an example python file.",
+        "online_search": "No relevant search results.",
+    }
+
+    for item in instruction_context_pairs:
+        # Call the predictor
+        prediction = run_inference(
+            optimized_program, instruction=item["instruction"], context=item["context"]
+        )
+        print("prediction:", prediction)
+
+        # Print the generated answer
+        print(f"Generated Answer: {prediction.edit_instructions}")
+
+
 if __name__ == "__main__":
-    # run_code_edit_example()
-    run_bootstrap_fewshot_optimization()
+    run_code_edit_example()
+    # run_bootstrap_fewshot_optimization()
     # run_mipro_optimization()
