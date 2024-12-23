@@ -386,8 +386,9 @@ def run_mipro_optimization():
         # requires_permission_to_run=True,
     )
 
-    # Save the optimized program
-    optimized_program.save("mipro_optimized.json")
+    # Save the optimized program to a single JSON file
+    with open("mipro_optimized.json", "w") as f:
+        json.dump(optimized_program.to_json(), f)
 
     print("MIPRO optimization complete.")
 
@@ -429,8 +430,9 @@ def run_bootstrap_fewshot_optimization():
         trainset=trainset,
     )
 
-    # Save the optimized program
-    optimized_program.save("bootstrap_optimized.json")
+    # Save the optimized program to a single JSON file
+    with open("bootstrap_optimized.json", "w") as f:
+        json.dump(optimized_program.to_json(), f)
 
     print("BootstrapFewShot optimization complete.")
 
@@ -438,7 +440,9 @@ def run_bootstrap_fewshot_optimization():
 def load_optimized_program(filename: str):
     """Loads an optimized program from a JSON file."""
     import dspy
-    return dspy.load(filename)
+    with open(filename, "r") as f:
+        program_json = json.load(f)
+    return dspy.Module.from_json(program_json)
 
 
 def run_inference(program, instruction: str, context: str):
