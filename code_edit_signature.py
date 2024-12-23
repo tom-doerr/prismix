@@ -302,7 +302,7 @@ def custom_metric(reasoning, edit_instructions, search_query=""):
 
 
 def generate_answer_with_assertions(instruction, context):
-    
+
     module = InferenceModule(CodeEdit)
     prediction = module.forward(instruction=instruction, context=context)
     edit_instructions_format = str(EditInstructions.model_json_schema())
