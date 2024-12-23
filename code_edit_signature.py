@@ -35,7 +35,7 @@ class InferenceModule(dspy.Module):
                 self.validate_edit_instructions(
                     validated_edit_instructions.edit_instructions,
                     prediction,
-                    target_module=self,
+                    target_module=self.forward,
                 )
                 prediction.edit_instructions = (
                     validated_edit_instructions.edit_instructions
@@ -55,35 +55,35 @@ def validate_edit_instructions(value, prediction, target_module):
     dspy.Assert(
         isinstance(value, list),
         "edit_instructions must be a list",
-        target_module=target_module,
+        target_module=validate_edit_instructions,
     )
     for item in value:
         dspy.Assert(
             isinstance(item, dict),
             "Each edit instruction must be a dictionary",
-            target_module=target_module,
+            target_module=validate_edit_instructions,
         )
         dspy.Assert(
             "filepath" in item,
             "Each edit instruction must have a filepath",
-            target_module=target_module,
+            target_module=validate_edit_instructions,
         )
         if "start_line" in item:
             dspy.Assert(
                 "end_line" in item,
                 "LineNumberEditInstruction must have an end_line",
-                target_module=target_module,
+                target_module=validate_edit_instructions,
             )
             dspy.Assert(
                 "replacement_text" in item,
                 "LineNumberEditInstruction must have a replacement_text",
-                target_module=target_module,
+                target_module=validate_edit_instructions,
             )
         elif "search_text" in item:
             dspy.Assert(
                 "replacement_text" in item,
                 "SearchReplaceEditInstruction must have a replacement_text",
-                target_module=target_module,
+                target_module=validate_edit_instructions,
             )
 
 
@@ -310,12 +310,12 @@ def generate_answer_with_assertions(instruction, context):
         # edit_instructions = json.loads(prediction.edit_instructions)
         validated_edit_instructions = EditInstructions(edit_instructions=prediction.edit_instructions)
         validate_edit_instructions(
-            validated_edit_instructions.edit_instructions, prediction, target_module=generate_answer
+            validated_edit_instructions.edit_instructions, prediction, target_module=generate_answer_with_assertions
         )
         prediction.edit_instructions = validated_edit_instructions.edit_instructions
     except Exception as e:
         dspy.Assert(False,
-        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}", target_module=generate_answer)
+        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}", target_module=generate_answer_with_assertions)
     return prediction
 
 
