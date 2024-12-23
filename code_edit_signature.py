@@ -15,13 +15,15 @@ class InferenceModule(dspy.Module):
         super().__init__()
         # self.predictor = dspy.Predict(signature)
         self.predictor = dspy.ChainOfThought(signature)
+        self.signature = signature
 
     def forward(self, instruction, context):
         """
         Performs the code edit inference.
         """
         prediction = self.predictor(instruction=instruction, context=context)
-        if False:
+        # if False:
+        if True:
             print("prediction:", prediction)
             try:
                 import json
@@ -40,9 +42,11 @@ class InferenceModule(dspy.Module):
                 )
             except Exception as e:
                 print(f"Error parsing edit_instructions: {e}")
-                dspy.Suggest(
-                    False, f"Error parsing edit_instructions: {e}", target_module=self
-                )
+                # dspy.Suggest(
+                edit_instructions_format = str(EditInstructions.model_json_schema())
+
+                dspy.Assert(
+                        False, f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}", target_module=self.forward)
 
         return prediction
 
@@ -266,8 +270,8 @@ class CodeEditRating(dspy.Signature):
     )
 
 
-# edit_rater = dspy.ChainOfThought(CodeEditRating)
-edit_rater = dspy.TypedChainOfThought(CodeEditRating)
+edit_rater = dspy.ChainOfThought(CodeEditRating)
+# edit_rater = dspy.TypedChainOfThought(CodeEditRating)
 
 
 # def custom_metric(gold, pred, trace=None):
@@ -294,6 +298,24 @@ def custom_metric(reasoning, edit_instructions, search_query=""):
     except Exception as e:
         print(f"Error parsing edit_instructions: {e}")
         return score
+
+
+def generate_answer_with_assertions(instruction, context):
+    prediction = generate_answer(instruction=instruction, context=context)
+    edit_instructions_format = str(EditInstructions.model_json_schema())
+    try:
+
+        import json
+
+        edit_instructions = json.loads(prediction.edit_instructions)
+        validated_edit_instructions = EditInstructions(edit_instructions=edit_instructions)
+        validate_edit_instructions(
+            validated_edit_instructions.edit_instructions, prediction, target_module=self.forward
+        )
+        prediction.edit_instructions = validated_edit_instructions.edit_instructions
+    except Exception as e:
+        dspy.Assert(False,
+        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}")
 
 
 def run_mipro_optimization():
@@ -380,7 +402,7 @@ def run_bootstrap_fewshot_optimization():
 
     # Optimize the module
     optimized_program = teleprompter.compile(
-        SimpleEditModule(CodeEdit),
+        generate_answer_with_assertions,
         trainset=trainset,
     )
 
@@ -392,5 +414,5 @@ def run_bootstrap_fewshot_optimization():
 
 if __name__ == "__main__":
     run_code_edit_example()
-    run_mipro_optimization()
-    run_bootstrap_fewshot_optimization()
+    # run_bootstrap_fewshot_optimization()
+    # run_mipro_optimization()
