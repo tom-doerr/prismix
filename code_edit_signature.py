@@ -27,8 +27,10 @@ class InferenceModule(dspy.Module):
             print("prediction:", prediction)
             try:
                 import json
-
-                edit_instructions = json.loads(prediction.edit_instructions)
+                if isinstance(prediction.edit_instructions, str):
+                    edit_instructions = json.loads(prediction.edit_instructions)
+                else:
+                    edit_instructions = prediction.edit_instructions
                 validated_edit_instructions = EditInstructions(
                     edit_instructions=edit_instructions
                 )
