@@ -4,6 +4,7 @@ from typing import Union
 
 import dspy
 from dspy.primitives.assertions import assert_transform_module, backtrack_handler
+from dspy.teleprompt import BootstrapFewShot
 from pydantic import BaseModel, Field
 
 
@@ -375,7 +376,7 @@ def run_mipro_optimization():
     optimized_program = teleprompter.compile(
         assert_transform_module(
             module,
-            functools.partial(backtrack_handler, max_backtracks=30),
+            functools.partial(backtrack_handler, max_backtracks=3),
         ),
         trainset=trainset,
         num_trials=15,
@@ -395,7 +396,6 @@ def run_mipro_optimization():
 
 
 def run_bootstrap_fewshot_optimization():
-    from dspy.teleprompt import BootstrapFewShotWithRandomSearch
 
     edit_dataset = [
         dspy.Example(
@@ -406,21 +406,20 @@ def run_bootstrap_fewshot_optimization():
     trainset = edit_dataset
 
 
-    # teleprompter = BootstrapFewShot(
-        # metric=custom_metric,
-        # # max_bootstrapped_demos=3,
-        # max_bootstrapped_demos=1,
-        # max_labeled_demos=4,
-        # max_rounds=10,
-    # )
-    teleprompter = BootstrapFewShotWithRandomSearch(
+    teleprompter = BootstrapFewShot(
         metric=custom_metric,
         max_bootstrapped_demos=8,
-        max_labeled_demos=8,
+        max_labeled_demos=4,
         max_rounds=10,
-        num_candidate_programs=10,
-        num_threads=10
     )
+    # teleprompter = BootstrapFewShotWithRandomSearch(
+        # metric=custom_metric,
+        # max_bootstrapped_demos=8,
+        # max_labeled_demos=8,
+        # max_rounds=10,
+        # num_candidate_programs=10,
+        # num_threads=10
+    # )
 
     # Create a simple module for optimization
     class SimpleEditModule(dspy.Module):
@@ -436,7 +435,7 @@ def run_bootstrap_fewshot_optimization():
     optimized_program = teleprompter.compile(
         assert_transform_module(
             module,
-            functools.partial(backtrack_handler, max_backtracks=30),
+            functools.partial(backtrack_handler, max_backtracks=3),
         ),
         trainset=trainset,
     )
