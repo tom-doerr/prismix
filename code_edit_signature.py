@@ -35,7 +35,7 @@ class InferenceModule(dspy.Module):
                 self.validate_edit_instructions(
                     validated_edit_instructions.edit_instructions,
                     prediction,
-                    target_module=self,
+                    target_module=self.forward,
                 )
                 prediction.edit_instructions = (
                     validated_edit_instructions.edit_instructions
@@ -48,6 +48,7 @@ class InferenceModule(dspy.Module):
                 dspy.Assert(
                         False, f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}", target_module=self.forward)
 
+        print("trace:", dspy.settings.trace)
         return prediction
 
 
@@ -315,7 +316,7 @@ def generate_answer_with_assertions(instruction, context):
         prediction.edit_instructions = validated_edit_instructions.edit_instructions
     except Exception as e:
         dspy.Assert(False,
-        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}")
+        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}", target_module=self.forward)
 
 
 def run_mipro_optimization():
