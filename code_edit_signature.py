@@ -231,7 +231,8 @@ def run_code_edit_example():
 
     for item in instruction_context_pairs:
         # Call the predictor
-        prediction = generate_answer(
+        module = InferenceModule(CodeEdit)
+        prediction = module.forward(
             instruction=item["instruction"], context=item["context"]
         )
         print("prediction:", prediction)
@@ -404,8 +405,9 @@ def run_bootstrap_fewshot_optimization():
             return self.predictor(instruction=instruction, context=context)
 
     # Optimize the module
+    module = InferenceModule(CodeEdit)
     optimized_program = teleprompter.compile(
-        generate_answer_with_assertions,
+        module.forward,
         trainset=trainset,
     )
 
