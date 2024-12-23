@@ -27,20 +27,15 @@ class InferenceModule(dspy.Module):
             print("prediction:", prediction)
             try:
                 import json
-                if isinstance(prediction.edit_instructions, str):
-                    if prediction.edit_instructions == "":
-                        edit_instructions = []
-                    else:
-                        edit_instructions = json.loads(prediction.edit_instructions)
-                else:
-                    edit_instructions = prediction.edit_instructions
+
+                edit_instructions = json.loads(prediction.edit_instructions)
                 validated_edit_instructions = EditInstructions(
                     edit_instructions=edit_instructions
                 )
                 self.validate_edit_instructions(
                     validated_edit_instructions.edit_instructions,
                     prediction,
-                    target_module=self.forward,
+                    target_module=self,
                 )
                 prediction.edit_instructions = (
                     validated_edit_instructions.edit_instructions
@@ -57,38 +52,38 @@ class InferenceModule(dspy.Module):
 
 
 def validate_edit_instructions(value, prediction, target_module):
-    dspy.Assert(
+    dspy.Suggest(
         isinstance(value, list),
         "edit_instructions must be a list",
-        target_module=validate_edit_instructions,
+        target_module=target_module,
     )
     for item in value:
-        dspy.Assert(
+        dspy.Suggest(
             isinstance(item, dict),
             "Each edit instruction must be a dictionary",
-            target_module=validate_edit_instructions,
+            target_module=target_module,
         )
-        dspy.Assert(
+        dspy.Suggest(
             "filepath" in item,
             "Each edit instruction must have a filepath",
-            target_module=validate_edit_instructions,
+            target_module=target_module,
         )
         if "start_line" in item:
-            dspy.Assert(
+            dspy.Suggest(
                 "end_line" in item,
                 "LineNumberEditInstruction must have an end_line",
-                target_module=validate_edit_instructions,
+                target_module=target_module,
             )
-            dspy.Assert(
+            dspy.Suggest(
                 "replacement_text" in item,
                 "LineNumberEditInstruction must have a replacement_text",
-                target_module=validate_edit_instructions,
+                target_module=target_module,
             )
         elif "search_text" in item:
-            dspy.Assert(
+            dspy.Suggest(
                 "replacement_text" in item,
                 "SearchReplaceEditInstruction must have a replacement_text",
-                target_module=validate_edit_instructions,
+                target_module=target_module,
             )
 
 
@@ -124,7 +119,7 @@ class CodeEdit(dspy.Signature):
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")
     context = dspy.InputField(desc="Context for the code edit.", type=str)
     edit_instructions = dspy.OutputField(
-        desc="A list of edit instructions."
+        desc="A list of edit instructions.", base_signature=EditInstructions
     )
     search_query = dspy.OutputField(
         desc="A search query to use for the next iteration, if needed."
@@ -145,7 +140,7 @@ dspy.configure(lm=lm)
 context_sample = """
 from datetime import datetime
 
-    # This is a hello function.
+def hello():
     print('hello')
 
 def print_datetime_nyc():
@@ -287,21 +282,17 @@ def custom_metric(reasoning, edit_instructions, search_query=""):
     score = 0.0
     edit_instructions_format = str(EditInstructions.model_json_schema())
     print("edit_instructions_format:", edit_instructions_format)
+    edit_rater_score = edit_rater(
+        edit_instructions=str(edit_instructions),
+        search_query=str(search_query),
+        edit_format=edit_instructions_format,
+    )
+    print("edit_rater_score:", edit_rater_score)
+    score += float(edit_rater_score.rating)
     try:
         import json
-        if isinstance(edit_instructions, str):
-            edit_instructions_str = edit_instructions
-        else:
-            edit_instructions_str = json.dumps(edit_instructions)
-        edit_rater_score = edit_rater(
-            edit_instructions=edit_instructions_str,
-            search_query=str(search_query) if search_query else "",
-            edit_format=edit_instructions_format,
-        )
-        print("edit_rater_score:", edit_rater_score)
-        score += float(edit_rater_score.rating)
 
-        pred_edit_instructions = json.loads(edit_instructions_str)
+        pred_edit_instructions = json.loads(edit_instructions.edit_instructions)
         score += 20.0
         return score
     except Exception as e:
@@ -313,18 +304,18 @@ def generate_answer_with_assertions(instruction, context):
     prediction = generate_answer(instruction=instruction, context=context)
     edit_instructions_format = str(EditInstructions.model_json_schema())
     try:
+
         import json
 
         edit_instructions = json.loads(prediction.edit_instructions)
         validated_edit_instructions = EditInstructions(edit_instructions=edit_instructions)
         validate_edit_instructions(
-            validated_edit_instructions.edit_instructions, prediction, target_module=generate_answer_with_assertions
+            validated_edit_instructions.edit_instructions, prediction, target_module=self.forward
         )
         prediction.edit_instructions = validated_edit_instructions.edit_instructions
     except Exception as e:
         dspy.Assert(False,
-        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}", target_module=generate_answer_with_assertions)
-    return prediction
+        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}")
 
 
 def run_mipro_optimization():
@@ -366,11 +357,11 @@ def run_mipro_optimization():
     optimized_program = teleprompter.compile(
         # SimpleEditModule(CodeEdit),
         # InferenceModule(CodeEdit),
-        generate_answer_with_assertions,
+        generate_answer,
         trainset=trainset,
         num_trials=15,
         minibatch_size=25,
-        minibatch_full_eval_steps=10,
+        minibatch_full_eval_steps=100,
         minibatch=True,
         requires_permission_to_run=False,
         # requires_permission_to_run=True,
