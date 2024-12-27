@@ -285,7 +285,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--iterations",
         type=int,
-        default=1000,
+        default=100,
         help="Number of iterations to run the tests and fixes.",
     )
     args = parser.parse_args()
