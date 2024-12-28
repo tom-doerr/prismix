@@ -45,6 +45,7 @@ class InferenceModule(dspy.Module):
                     parsed_edit_instructions = json.loads(prediction.edit_instructions)
                 except json.JSONDecodeError as e:
                     edit_instructions_format = str(EditInstructions.model_json_schema())
+                    print("JSONDecodeError edit_instructions_format:", edit_instructions_format)
                     dspy.Assert(
                         False,
                         f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}",
@@ -511,5 +512,5 @@ def run_code_edit_example():
 
 if __name__ == "__main__":
     # run_bootstrap_fewshot_optimization()
-    run_code_edit_example()
-    # run_mipro_optimization()
+    # run_code_edit_example()
+    run_mipro_optimization()
