@@ -112,7 +112,8 @@ class CodeEditor:
                 raise FileNotFoundError("No valid code files found to edit")
 
             # Get context and predict edits
-            retrieved_context = "\n".join(self.retriever.retrieve(query=instruction, top_k=3))
+            retrieved_results = self.retriever.retrieve(query=instruction, top_k=3)
+            retrieved_context = "\n".join(f"File: {result[0]}\nCode:\n{result[1]}" for result in retrieved_results)
             context = Context(
                 retrieved_context=retrieved_context,
                 online_search=""
