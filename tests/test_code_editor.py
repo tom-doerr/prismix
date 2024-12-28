@@ -13,7 +13,9 @@ def setup_code_editor(tmp_path):
     
     # Use temporary directory for Qdrant data
     qdrant_path = tmp_path / "qdrant_data"
-    retriever = QdrantRetriever(collection_name="test_collection")
+    # Use temporary directory for Qdrant data
+    qdrant_path = tmp_path / "qdrant_data"
+    retriever = QdrantRetriever(collection_name="test_collection", path=str(qdrant_path))
     predictor = dspy.ChainOfThought("instruction, context -> edit_instructions")
     editor = CodeEditor(retriever, predictor)
     
@@ -44,7 +46,8 @@ def test_remove_line_numbers():
     editor = CodeEditor(MagicMock(), MagicMock())
     numbered_content = "   1 line1\n   2 line2\n   3 line3"
     expected = "line1\nline2\nline3"
-    assert editor.remove_line_numbers(numbered_content) == expected
+    result = editor.remove_line_numbers(numbered_content)
+    assert result == expected, f"Expected '{expected}' but got '{result}'"
 
 def test_load_code_files(tmp_path):
     editor = CodeEditor(MagicMock(), MagicMock())
@@ -107,8 +110,9 @@ def test_process_edit_instruction(setup_code_editor, tmp_path):
     
     # Mock predictor response
     class MockPrediction:
-        edit_instructions = '{"edit_instructions": [{"filepath": "' + str(test_file) + '", "search_text": "hello", "replacement_text": "goodbye"}]}'
-        search_query = ""
+        def __init__(self):
+            self.edit_instructions = '{"edit_instructions": [{"filepath": "' + str(test_file) + '", "search_text": "hello", "replacement_text": "goodbye"}]}'
+            self.search_query = ""
     
     editor.predictor = MagicMock(return_value=MockPrediction())
     

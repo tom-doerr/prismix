@@ -12,8 +12,8 @@ from sentence_transformers import SentenceTransformer
 class QdrantRetriever:
     """Manages Qdrant operations for storing and querying text."""
 
-    def __init__(self, collection_name: str = "my_documents"):
-        self.client = QdrantClient(path="./qdrant_data")
+    def __init__(self, collection_name: str = "my_documents", path: str = "./qdrant_data"):
+        self.client = QdrantClient(path=path)
         self.collection_name = collection_name
         self.jina_api_key = os.environ.get("JINA_API_KEY")
         self.jina_model = "jina-embeddings-v3"
