@@ -42,7 +42,10 @@ def main() -> None:
 
         # Initialize the retriever and predictor
         retriever = QdrantRetriever()
-        retriever.add_files(include_glob="*.py", exclude_glob="*test*")
+        retriever.add_files(
+            include_glob="*.py", 
+            exclude_glob="**/{__pycache__,build,dist,.cache,.mypy_cache,.pytest_cache,venv,env,node_modules}/*"
+        )
         predictor = dspy.ChainOfThought(CodeEdit)
 
         # Create code editor
