@@ -49,6 +49,29 @@ class CodeEditor:
             print(f"Error: Invalid edit instruction: {instruction}")
             return None
             
+        # Find the indentation of the search text line
+        lines = file_content.splitlines()
+        for i, line in enumerate(lines):
+            if instruction.search_text in line:
+                # Get the indentation (whitespace before first non-whitespace char)
+                indentation = line[:len(line) - len(line.lstrip())]
+                break
+        else:
+            # If search text not found, just do a simple replace
+            return file_content.replace(
+                instruction.search_text,
+                instruction.replacement_text
+            )
+            
+        # Split replacement text into lines and apply indentation
+        replacement_lines = instruction.replacement_text.splitlines()
+        if len(replacement_lines) > 1:
+            # Apply indentation to all lines except first
+            replacement_lines = [replacement_lines[0]] + [
+                indentation + line for line in replacement_lines[1:]
+            ]
+            instruction.replacement_text = '\n'.join(replacement_lines)
+            
         return file_content.replace(
             instruction.search_text,
             instruction.replacement_text
