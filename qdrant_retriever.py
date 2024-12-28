@@ -187,13 +187,13 @@ class QdrantRetriever:
                 collection_name=self.collection_name,
                 limit=1000
             )[0]
-        
-        # Extract specific search text from instruction
-        search_text = query
-        if " to " in query:
-            search_text = query.split(" to ")[0].strip()
-            if "change " in search_text:
-                search_text = search_text.replace("change ", "").strip()
+            
+            # Extract specific search text from instruction
+            search_text = query
+            if " to " in query:
+                search_text = query.split(" to ")[0].strip()
+                if "change " in search_text:
+                    search_text = search_text.replace("change ", "").strip()
         
         # Check for exact matches
         exact_matches = []
