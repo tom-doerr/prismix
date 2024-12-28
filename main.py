@@ -42,8 +42,8 @@ def main() -> None:
     try:
         # Configure Deepseek with optimal settings
         llm = dspy.LM(
-            model="deep8eek/deepseek-chat",
-            max_tokens=400,  # Increased for better responses
+            model="deepseek/deepseek-chat",
+            max_tokens=800,  # Increased for better responses
             cache=False,
             temperature=0.7,  # Lower for more deterministic output
             top_p=0.9,
