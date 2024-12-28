@@ -130,7 +130,7 @@ class CodeEditor:
         except Exception as e:
             raise FileWriteError(f"Error writing file {file_path}: {e}")
 
-    def process_edit(self, instruction: str, dry_run: bool = False) -> bool:
+    def process_edit_instruction(self, instruction: str, dry_run: bool = False) -> bool:
         """Process an edit instruction.
         
         Args:
