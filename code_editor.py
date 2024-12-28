@@ -85,15 +85,25 @@ class CodeEditor:
             
         Returns:
             bool: True if edits were successfully applied, False otherwise
+            
+        Raises:
+            ValueError: If the instruction is empty or invalid
+            FileNotFoundError: If no valid code files are found
+            RuntimeError: If the predictor fails to generate valid edit instructions
         """
+        if not instruction or not instruction.strip():
+            raise ValueError("Instruction cannot be empty")
+            
         try:
             # Load code files
             file_paths = [f for f in self.retriever.collection.list_points().points if f.endswith('.py')]
+            if not file_paths:
+                raise FileNotFoundError("No Python files found in the codebase")
+                
             code_files = self.load_code_files(file_paths)
             
             if not code_files:
-                print("No valid code files found to edit")
-                return False
+                raise FileNotFoundError("No valid code files found to edit")
 
             # Get context and predict edits
             retrieved_context = "\n".join(self.retriever.retrieve(query=instruction, top_k=3))
@@ -105,26 +115,27 @@ class CodeEditor:
             response = self.predictor(instruction=instruction, context=context)
             
             if not response.edit_instructions or not response.edit_instructions.edit_instructions:
-                print("No valid edit instructions generated")
-                return False
+                raise RuntimeError("No valid edit instructions generated")
 
             print("--- Output Values ---")
             print(f"Search Query: {response.search_query}")
 
             # Track success of edits
             success_count = 0
+            failed_files = []
             
             # Apply edits
             for edit_instruction in response.edit_instructions.edit_instructions:
                 file_path = edit_instruction.filepath
                 file_content = next((f.filecontent for f in code_files if f.filepath == file_path), None)
                 if file_content is None:
-                    print(f"Error: File not found in code_files: {file_path}")
+                    failed_files.append(file_path)
                     continue
 
                 # Apply edit and remove line numbers
                 edited_content = self.apply_edit_instruction(file_content, edit_instruction)
                 if edited_content is None:
+                    failed_files.append(file_path)
                     continue
                     
                 unumbered_edited_content = self.remove_line_numbers(edited_content)
@@ -140,8 +151,11 @@ class CodeEditor:
                     if self.backup_and_write_file(file_path, file_content, unumbered_edited_content):
                         success_count += 1
 
+            if failed_files:
+                print(f"Failed to process {len(failed_files)} files: {', '.join(failed_files)}")
+
             return success_count > 0
             
         except Exception as e:
             print(f"Error processing edit instruction: {e}")
-            return False
+            raise

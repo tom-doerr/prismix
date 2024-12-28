@@ -72,8 +72,14 @@ def main() -> None:
                     logging.info(f"Successfully processed edit #{edit_count}")
                 else:
                     logging.warning("Failed to process edit instruction")
+            except ValueError as e:
+                logging.error(f"Invalid instruction: {e}")
+            except FileNotFoundError as e:
+                logging.error(f"File error: {e}")
+            except RuntimeError as e:
+                logging.error(f"Edit generation failed: {e}")
             except Exception as e:
-                logging.error(f"Error processing edit instruction: {e}")
+                logging.error(f"Unexpected error processing edit instruction: {e}", exc_info=True)
 
             if args.instruction:
                 break
