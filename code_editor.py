@@ -20,7 +20,7 @@ class CodeEditor:
     def remove_line_numbers(self, text: str) -> str:
         """Remove line numbers from code content."""
         lines = text.splitlines()
-        return "\n".join(line[7:] if len(line) > 7 else line for line in lines)
+        return "\n".join(line[5:] if len(line) > 5 else line for line in lines)
 
     def load_code_files(self, file_paths: List[str]) -> List[CodeFile]:
         """Load and number code files."""
@@ -122,9 +122,9 @@ class CodeEditor:
             # Use assertions to validate the response
             response = self.predictor(instruction=instruction, context=context)
             
-            # Ensure response is a Prediction object
-            if not isinstance(response, dspy.Prediction):
-                raise RuntimeError("Invalid response format from predictor")
+            # Ensure response has required attributes
+            if not hasattr(response, 'edit_instructions') or not hasattr(response, 'search_query'):
+                raise RuntimeError("Invalid response format from predictor - missing required fields")
                 
             # Parse edit instructions
             try:

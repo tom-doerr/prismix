@@ -109,10 +109,12 @@ def test_process_edit_instruction(setup_code_editor, tmp_path):
     instruction = "Change 'hello' to 'goodbye' in the print statement"
     
     # Mock predictor response
-    class MockPrediction:
+    class MockPrediction(dspy.Prediction):
         def __init__(self):
+            super().__init__()
             self.edit_instructions = '{"edit_instructions": [{"filepath": "' + str(test_file) + '", "search_text": "hello", "replacement_text": "goodbye"}]}'
             self.search_query = ""
+            self.reasoning = "Mock reasoning"
     
     editor.predictor = MagicMock(return_value=MockPrediction())
     
@@ -148,7 +150,9 @@ def test_process_edit_instruction_missing_files(setup_code_editor, tmp_path):
     
     editor.predictor = MagicMock(return_value=MockPrediction())
     
-    assert editor.process_edit_instruction(instruction) is False
+    # Should raise FileNotFoundError when no valid files are found
+    with pytest.raises(FileNotFoundError):
+        editor.process_edit_instruction(instruction)
 
 def test_process_edit_instruction_empty_instruction(setup_code_editor):
     editor, _ = setup_code_editor
