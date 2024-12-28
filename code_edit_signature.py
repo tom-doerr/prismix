@@ -76,35 +76,6 @@ class InferenceModule(dspy.Module):
 
 
 
-class Context(BaseModel):
-    retrieved_context: str = Field(..., desc="Context retrieved from the codebase.")
-    online_search: str = Field(..., desc="Context from online search results.")
-
-class CodeFile(BaseModel):
-    filepath: str
-    filecontent: str
-
-
-class SearchReplaceEditInstruction(BaseModel):
-    filepath: str = Field(..., desc="The path to the file that should be edited.")
-    search_text: str = Field(..., desc="The text to search for.")
-    replacement_text: str = Field(..., desc="The text to replace the found text with.")
-
-
-class EditInstructions(BaseModel):
-    edit_instructions: list[SearchReplaceEditInstruction] = Field(
-        ..., desc="A list of search/replace edit instructions."
-    )
-
-
-class CodeEdit(dspy.Signature):
-    """Edits a code file based on an instruction using search/replace."""
-
-    instruction = dspy.InputField(desc="Instruction on how to modify the code.")
-    context = dspy.InputField(desc="Context for the code edit.", type=str)
-    edit_instructions = dspy.OutputField(
-        desc="A list of search/replace edit instructions.", 
-        base_signature=EditInstructions
     )
     search_query = dspy.OutputField(
         desc="A search query to use for the next iteration, if needed."
