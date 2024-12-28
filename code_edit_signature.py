@@ -1,11 +1,17 @@
 import functools
 import json
-from typing import Union
+from typing import Union, List
 
 import dspy
 from dspy.primitives.assertions import assert_transform_module, backtrack_handler
 from dspy.teleprompt import BootstrapFewShot
-from pydantic import BaseModel, Field
+from prismix.core.models import (
+    Context,
+    CodeFile,
+    SearchReplaceEditInstruction,
+    EditInstructions,
+    Scorer
+)
 
 
 class InferenceModule(dspy.Module):
