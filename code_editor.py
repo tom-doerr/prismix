@@ -106,7 +106,14 @@ class CodeEditor:
             
         Raises:
             FileWriteError: If file operations fail
+            ValueError: If inputs are invalid
         """
+        # Validate inputs
+        if not isinstance(file_path, str) or not file_path.strip():
+            raise ValueError("File path must be a non-empty string")
+            
+        if not isinstance(original, str) or not isinstance(new, str):
+            raise ValueError("Content must be strings")
         backup_path = f"{file_path}.bak"
         try:
             # Create numbered backup if one already exists
@@ -144,7 +151,15 @@ class CodeEditor:
             ValueError: If instruction is invalid
             FileNotFoundError: If no relevant files found
             RuntimeError: If predictor fails to generate valid edits
+            EditApplicationError: If edits cannot be applied
+            FileWriteError: If file operations fail
         """
+        # Validate input
+        if not isinstance(instruction, str) or not instruction.strip():
+            raise ValueError("Instruction must be a non-empty string")
+            
+        if not isinstance(dry_run, bool):
+            raise ValueError("dry_run must be a boolean")
         if not instruction or not instruction.strip():
             raise ValueError("Instruction cannot be empty")
             

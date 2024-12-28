@@ -34,14 +34,31 @@ class InferenceModule(dspy.Module):
             
         Raises:
             ValueError: If instructions are invalid
+            ValidationError: If instructions don't match schema
         """
+        if not isinstance(instructions, str):
+            raise ValueError("Instructions must be a JSON string")
+            
         try:
             parsed = json.loads(instructions)
-            return EditInstructions(edit_instructions=[
+            if not isinstance(parsed, list):
+                raise ValueError("Instructions must be a JSON array")
+                
+            validated = EditInstructions(edit_instructions=[
                 SearchReplaceEditInstruction(**instr) 
                 for instr in parsed
             ])
-        except (json.JSONDecodeError, ValidationError) as e:
+            
+            # Additional validation
+            for instr in validated.edit_instructions:
+                if not instr.filepath or not instr.search_text:
+                    raise ValueError("Filepath and search_text are required")
+                    
+            return validated
+            
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Invalid JSON: {e}")
+        except ValidationError as e:
             raise ValueError(
                 f"Invalid edit instructions: {e}. Must match format: {EditInstructions.model_json_schema()}"
             )

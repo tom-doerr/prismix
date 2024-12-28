@@ -169,12 +169,24 @@ class QdrantRetriever:
 
 
     def retrieve(self, query: str, top_k: int = 5) -> List[str]:
-        """Retrieves the top_k most relevant documents for a given query."""
-        # First try exact string match across all files
-        all_files = self.client.scroll(
-            collection_name=self.collection_name,
-            limit=1000
-        )[0]
+        """Retrieves the top_k most relevant documents for a given query.
+        
+        Args:
+            query: The search query
+            top_k: Number of results to return
+            
+        Returns:
+            List of tuples containing (file_path, text, start_line)
+            
+        Raises:
+            RuntimeError: If retrieval fails
+        """
+        try:
+            # First try exact string match across all files
+            all_files = self.client.scroll(
+                collection_name=self.collection_name,
+                limit=1000
+            )[0]
         
         # Extract specific search text from instruction
         search_text = query
