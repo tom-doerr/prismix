@@ -167,86 +167,21 @@ class CodeEditor:
                 import re
                 from prismix.core.models import EditInstructions
                 
-                # Clean and parse the response
-                edit_text = response.edit_instructions.strip()
+                # Simplify to handle list of search/replace instructions directly
+                edit_instructions = []
+                for instr in response.edit_instructions:
+                    if not isinstance(instr, dict):
+                        continue
+                    if not all(k in instr for k in ['filepath', 'search_text', 'replacement_text']):
+                        continue
+                    edit_instructions.append(SearchReplaceEditInstruction(
+                        filepath=instr['filepath'],
+                        search_text=instr['search_text'],
+                        replacement_text=instr['replacement_text']
+                    ))
                 
-                # Remove markdown code block markers if present
-                if edit_text.startswith("```json") and edit_text.endswith("```"):
-                    edit_text = edit_text[7:-3].strip()
-                elif edit_text.startswith("```") and edit_text.endswith("```"):
-                    edit_text = edit_text[3:-3].strip()
-                
-                # Ensure complete JSON by checking for closing brackets
-                if not edit_text.strip().endswith('}'):
-                    # Try to complete the JSON
-                    if 'edit_instructions' in edit_text and not edit_text.strip().endswith(']}'):
-                        edit_text = edit_text.rstrip() + ']}'
-                    elif not edit_text.strip().endswith('}'):
-                        edit_text = edit_text.rstrip() + '}'
-                
-                # Validate JSON format with detailed feedback
-                try:
-                    import json
-                    parsed = json.loads(edit_text)
-                    
-                    # Check basic structure
-                    dspy.Assert(
-                        isinstance(parsed, dict),
-                        "Top level must be a JSON object with 'edit_instructions' array"
-                    )
-                    dspy.Assert(
-                        'edit_instructions' in parsed,
-                        "Missing 'edit_instructions' array in JSON"
-                    )
-                    dspy.Assert(
-                        isinstance(parsed['edit_instructions'], list),
-                        "'edit_instructions' must be an array of edit objects"
-                    )
-                    
-                    # Validate each edit instruction
-                    for i, instr in enumerate(parsed['edit_instructions']):
-                        dspy.Assert(
-                            isinstance(instr, dict),
-                            f"Edit instruction {i+1} must be a JSON object"
-                        )
-                        dspy.Assert(
-                            'filepath' in instr,
-                            f"Edit instruction {i+1} missing 'filepath' field"
-                        )
-                        dspy.Assert(
-                            'search_text' in instr,
-                            f"Edit instruction {i+1} missing 'search_text' field"
-                        )
-                        dspy.Assert(
-                            'replacement_text' in instr,
-                            f"Edit instruction {i+1} missing 'replacement_text' field"
-                        )
-                        
-                except json.JSONDecodeError as e:
-                    from prismix.core.models import EditInstructions
-                    edit_instructions_format = str(EditInstructions.model_json_schema())
-                    error_msg = f"Error parsing edit_instructions: {str(e)}.\n"
-                    error_msg += "edit_instructions must be of the following format:\n"
-                    error_msg += edit_instructions_format + "\n"
-                    # Write the full received text to a file for debugging
-                    with open("debug_received_text.txt", "w") as f:
-                        f.write(edit_text)
-                    dspy.Assert(False, error_msg)
-                
-                # Parse the validated JSON
-                edit_data = json.loads(edit_text)
-                
-                # Log the complete JSON for debugging
-                print("Complete JSON received:")
-                full_json = json.dumps(edit_data, indent=2)
-                print(full_json)
-                # Write full JSON to a file for debugging
-                with open("debug_edit_instructions.json", "w") as f:
-                    f.write(full_json)
-                
-                # Validate using Pydantic model
-                try:
-                    edit_instructions = EditInstructions(**edit_data)
+                if not edit_instructions:
+                    raise ValueError("No valid edit instructions found in response")
                 except Exception as e:
                     raise dspy.DSPyAssertionError(
                         id="invalid_edit_schema",
