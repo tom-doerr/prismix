@@ -16,54 +16,62 @@ from pydantic import BaseModel, Field
 
 
 class InferenceModule(dspy.Module):
-    """
-    A base class for inference modules.
-    """
-
+    """Handles code edit inference using search/replace instructions."""
+    
     def __init__(self, signature):
         super().__init__()
-        # self.predictor = dspy.Predict(signature)
         self.predictor = dspy.ChainOfThought(signature)
         self.signature = signature
 
-    def forward(self, instruction, context):
+    def _validate_edit_instructions(self, instructions: str) -> EditInstructions:
+        """Validate and parse edit instructions.
+        
+        Args:
+            instructions: JSON string of edit instructions
+            
+        Returns:
+            EditInstructions: Validated edit instructions
+            
+        Raises:
+            ValueError: If instructions are invalid
         """
-        Performs the code edit inference.
+        try:
+            parsed = json.loads(instructions)
+            return EditInstructions(edit_instructions=[
+                SearchReplaceEditInstruction(**instr) 
+                for instr in parsed
+            ])
+        except (json.JSONDecodeError, ValidationError) as e:
+            raise ValueError(
+                f"Invalid edit instructions: {e}. Must match format: {EditInstructions.model_json_schema()}"
+            )
+
+    def forward(self, instruction: str, context: str) -> dspy.Prediction:
+        """Generate and validate code edit instructions.
+        
+        Args:
+            instruction: The edit instruction to process
+            context: Context for the code edit
+            
+        Returns:
+            dspy.Prediction: Contains reasoning and validated edit instructions
+            
+        Raises:
+            dspy.DSPyAssertionError: If instructions fail validation
         """
         prediction = self.predictor(instruction=instruction, context=context)
-        # if False:
-        if True:
-            print("prediction:", prediction)
-            try:
-                try:
-                    parsed_edit_instructions = json.loads(prediction.edit_instructions)
-                except json.JSONDecodeError as e:
-                    edit_instructions_format = str(EditInstructions.model_json_schema())
-                    print("JSONDecodeError edit_instructions_format:", edit_instructions_format)
-                    dspy.Assert(
-                        False,
-                        f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}",
-                    )
-                prediction.edit_instructions = (
-                    prediction.edit_instructions
-                )
-            except Exception as e:
-                print(f"Error parsing edit_instructions: {e}")
-                edit_instructions_format = str(EditInstructions.model_json_schema())
-                dspy.Suggest(
-                    False, 
-                    f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}"
-                )
-
-        print("trace:", dspy.settings.trace)
         
-        # Create prediction dict with required fields
-        prediction_dict = {
-            'reasoning': prediction.reasoning,
-            'edit_instructions': prediction.edit_instructions
-        }
-        
-        return dspy.Prediction(**prediction_dict)
+        try:
+            validated_instructions = self._validate_edit_instructions(prediction.edit_instructions)
+            return dspy.Prediction(
+                reasoning=prediction.reasoning,
+                edit_instructions=validated_instructions.json()
+            )
+        except ValueError as e:
+            dspy.Assert(
+                False,
+                f"Error parsing edit_instructions: {e}"
+            )
 
 class SearchReplaceEditInstruction2(BaseModel):
     filepath: str = Field(..., desc="The path to the file that should be edited.")
@@ -225,29 +233,36 @@ edit_rater = dspy.ChainOfThought(CodeEditRating)
 
 
 # def custom_metric(gold, pred, trace=None):
-def custom_metric(reasoning, edit_instructions, search_query=""):
-    print("custom_metric called")
-    print("edit_instructions:", edit_instructions)
-    # try to parse the edit instructions
-    score = 0.0
-    edit_instructions_format = str(EditInstructions.model_json_schema())
-    print("edit_instructions_format:", edit_instructions_format)
-    edit_rater_score = edit_rater(
-        edit_instructions=str(edit_instructions),
-        search_query=str(search_query),
-        edit_format=edit_instructions_format,
-    )
-    print("edit_rater_score:", edit_rater_score)
-    score += float(edit_rater_score.rating)
+def custom_metric(reasoning: str, edit_instructions: str, search_query: str = "") -> float:
+    """Evaluate the quality of generated edit instructions.
+    
+    Args:
+        reasoning: The reasoning behind the edits
+        edit_instructions: The generated edit instructions
+        search_query: Optional search query for context
+        
+    Returns:
+        float: Score between 0 and 10
+        
+    Raises:
+        ValueError: If instructions cannot be parsed
+    """
     try:
-        import json
-
-        pred_edit_instructions = json.loads(edit_instructions.edit_instructions)
-        score += 20.0
-        return score
-    except Exception as e:
-        print(f"Error parsing edit_instructions: {e}")
-        return score
+        # Validate instructions first
+        instructions = json.loads(edit_instructions)
+        EditInstructions(edit_instructions=instructions)
+        
+        # Get rating from LLM
+        rating = edit_rater(
+            edit_instructions=edit_instructions,
+            search_query=search_query,
+            edit_format=str(EditInstructions.model_json_schema())
+        ).rating
+        
+        # Add bonus for valid JSON
+        return float(rating) + 2.0
+    except (json.JSONDecodeError, ValidationError) as e:
+        raise ValueError(f"Invalid edit instructions: {e}")
 
 
 def generate_answer_with_assertions(instruction, context):
@@ -327,57 +342,44 @@ def run_mipro_optimization():
 
 
 
-def run_bootstrap_fewshot_optimization():
-
-    edit_dataset = [
+def run_bootstrap_fewshot_optimization() -> dspy.Module:
+    """Optimize the code edit module using BootstrapFewShot.
+    
+    Returns:
+        dspy.Module: Optimized program
+    """
+    # Create training dataset
+    trainset = [
         dspy.Example(
-            instruction=item["instruction"], context=item["context"]
+            instruction=item["instruction"], 
+            context=item["context"]
         ).with_inputs("instruction", "context")
         for item in instruction_context_pairs
     ]
-    trainset = edit_dataset
 
-
+    # Configure optimizer
     teleprompter = BootstrapFewShot(
         metric=custom_metric,
         max_bootstrapped_demos=8,
         max_labeled_demos=4,
         max_rounds=10,
+        num_threads=10
     )
-    # teleprompter = BootstrapFewShotWithRandomSearch(
-        # metric=custom_metric,
-        # max_bootstrapped_demos=8,
-        # max_labeled_demos=8,
-        # max_rounds=10,
-        # num_candidate_programs=10,
-        # num_threads=10
-    # )
 
-    # Create a simple module for optimization
-    class SimpleEditModule(dspy.Module):
-        def __init__(self, signature):
-            super().__init__()
-            self.predictor = dspy.Predict(signature)
-
-        def forward(self, instruction, context):
-            return self.predictor(instruction=instruction, context=context)
-
-    # Optimize the module
+    # Create and optimize module
     module = InferenceModule(CodeEdit)
     optimized_program = teleprompter.compile(
         assert_transform_module(
             module,
-            functools.partial(backtrack_handler, max_backtracks=10),  # Increased from 3 to 10
+            functools.partial(backtrack_handler, max_backtracks=10)
         ),
         trainset=trainset,
     )
 
-    # Save the optimized program to a single JSON file
-    # with open("bootstrap_optimized.json", "w") as f:
-        # json.dump(optimized_program.to_json(), f)
+    # Save optimized program
     optimized_program.save("bootstrap_optimized.json")
-
     print("BootstrapFewShot optimization complete.")
+    return optimized_program
 
 
 def load_optimized_program(filename: str):
