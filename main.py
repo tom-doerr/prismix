@@ -43,6 +43,47 @@ def load_code_files(file_paths: List[str]) -> List[CodeFile]:
             print(f"Error reading file {file_path}: {e}")
     return code_files
 
+def apply_edit_instruction(file_content: str, instruction: Any) -> Optional[str]:
+    """Apply edit instruction to file content"""
+    if not validate_edit_instruction(instruction):
+        print(f"Error: Invalid edit instruction: {instruction}")
+        return None
+        
+    if hasattr(instruction, 'start_line'):
+        return apply_code_edit(
+            file_content=file_content,
+            start_line=int(instruction.start_line),
+            end_line=int(instruction.end_line),
+            replacement_text=instruction.replacement_text
+        )
+    else:
+        return file_content.replace(
+            instruction.search_text,
+            instruction.replacement_text
+        )
+
+def backup_and_write_file(file_path: str, original_content: str, new_content: str) -> bool:
+    """Create backup and write new content to file"""
+    backup_path = f"{file_path}.bak"
+    try:
+        # Create backup
+        with open(backup_path, 'w') as backup:
+            backup.write(original_content)
+        
+        # Validate line count
+        if len(new_content.splitlines()) != len(original_content.splitlines()):
+            print("Warning: Line count mismatch. Changes not applied.")
+            return False
+            
+        # Write new content
+        with open(file_path, 'w') as f:
+            f.write(new_content)
+        print(f"File {file_path} updated. Backup saved to {backup_path}")
+        return True
+    except Exception as e:
+        print(f"Error writing file {file_path}: {e}")
+        return False
+
 # Setup the LLM
 llm = dspy.LM(model="gpt-4o-mini", api_key=os.environ.get("OPENAI_API_KEY"))
 dspy.settings.configure(lm=llm)
