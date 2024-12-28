@@ -155,6 +155,7 @@ class CodeEditor:
             # Parse and validate edit instructions
             try:
                 import json
+                import re
                 from prismix.core.models import EditInstructions
                 
                 # Clean and parse the response
