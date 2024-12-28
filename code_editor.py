@@ -176,6 +176,14 @@ class CodeEditor:
                 elif edit_text.startswith("```") and edit_text.endswith("```"):
                     edit_text = edit_text[3:-3].strip()
                 
+                # Ensure complete JSON by checking for closing brackets
+                if not edit_text.strip().endswith('}'):
+                    # Try to complete the JSON
+                    if 'edit_instructions' in edit_text and not edit_text.strip().endswith(']}'):
+                        edit_text = edit_text.rstrip() + ']}'
+                    elif not edit_text.strip().endswith('}'):
+                        edit_text = edit_text.rstrip() + '}'
+                
                 # Validate JSON format with detailed feedback
                 try:
                     import json
@@ -226,6 +234,10 @@ class CodeEditor:
                 
                 # Parse the validated JSON
                 edit_data = json.loads(edit_text)
+                
+                # Log the complete JSON for debugging
+                print("Complete JSON received:")
+                print(json.dumps(edit_data, indent=2))
                 
                 # Validate using Pydantic model
                 try:
