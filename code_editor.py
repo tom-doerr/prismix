@@ -229,7 +229,10 @@ class CodeEditor:
                     error_msg += "- Unclosed quotes or brackets\n"
                     error_msg += "- Using single quotes instead of double quotes\n"
                     error_msg += "- Truncated JSON\n"
-                    error_msg += f"Received: {edit_text[:200]}..." if len(edit_text) > 200 else f"Received: {edit_text}"
+                    error_msg += f"Received: {edit_text}"
+                    # Write the full received text to a file for debugging
+                    with open("debug_received_text.txt", "w") as f:
+                        f.write(edit_text)
                     dspy.Assert(False, error_msg)
                 
                 # Parse the validated JSON
@@ -237,7 +240,11 @@ class CodeEditor:
                 
                 # Log the complete JSON for debugging
                 print("Complete JSON received:")
-                print(json.dumps(edit_data, indent=2))
+                full_json = json.dumps(edit_data, indent=2)
+                print(full_json)
+                # Write full JSON to a file for debugging
+                with open("debug_edit_instructions.json", "w") as f:
+                    f.write(full_json)
                 
                 # Validate using Pydantic model
                 try:
