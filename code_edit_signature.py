@@ -72,34 +72,6 @@ class InferenceModule(dspy.Module):
             search_query=""
         )
 
-# def validate_edit_instructions(value, prediction, target_module):
-def validate_edit_instructions(edit_instructions, target_module):
-    dspy.Suggest(
-        isinstance(edit_instructions, list),
-        "edit_instructions must be a list",
-        target_module=target_module,
-    )
-    for item in edit_instructions:
-        dspy.Suggest(
-            isinstance(item, dict),
-            "Each edit instruction must be a dictionary",
-            target_module=target_module,
-        )
-        dspy.Suggest(
-            "filepath" in item,
-            "Each edit instruction must have a filepath",
-            target_module=target_module,
-        )
-        dspy.Suggest(
-            "search_text" in item,
-            "SearchReplaceEditInstruction must have a search_text",
-            target_module=target_module,
-        )
-        dspy.Suggest(
-            "replacement_text" in item,
-            "SearchReplaceEditInstruction must have a replacement_text",
-            target_module=target_module,
-        )
 
 
 class CodeFile(BaseModel):
