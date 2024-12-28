@@ -70,6 +70,10 @@ class InferenceModule(dspy.Module):
 
 
 
+class Context(BaseModel):
+    retrieved_context: str = Field(..., desc="Context retrieved from the codebase.")
+    online_search: str = Field(..., desc="Context from online search results.")
+
 class CodeFile(BaseModel):
     filepath: str
     filecontent: str

@@ -5,7 +5,7 @@ from typing import List, Optional, Dict, Any
 
 import dspy
 
-from code_edit_signature import CodeEdit, Context, CodeFile
+from code_edit_signature import CodeEdit, CodeFile, Context
 from qdrant_retriever import QdrantRetriever
 
 def add_line_numbers(content: str) -> str:
@@ -99,12 +99,13 @@ def process_edit_instruction(instruction: str, retriever: QdrantRetriever, predi
         return False
 
     # Get context and predict edits
+    retrieved_context = "\n".join(retriever.retrieve(query=instruction, top_k=3))
     context = Context(
-        retrieved_context=str(retriever.retrieve(query=instruction)),
+        retrieved_context=retrieved_context,
         online_search=""
     )
     
-    response = predictor(instruction=instruction, code_files=code_files, context=context)
+    response = predictor(instruction=instruction, context=context)
     
     if not response.edit_instructions or not response.edit_instructions.edit_instructions:
         print("No valid edit instructions generated")
