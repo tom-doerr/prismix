@@ -56,18 +56,11 @@ class InferenceModule(dspy.Module):
 
         print("trace:", dspy.settings.trace)
         
-        # Handle missing search_query
-        search_query = getattr(prediction, 'search_query', "")
-        
         # Create prediction dict with required fields
         prediction_dict = {
             'reasoning': prediction.reasoning,
-            'edit_instructions': prediction.edit_instructions,
-            'search_query': search_query
+            'edit_instructions': prediction.edit_instructions
         }
-        
-        # Filter out None values
-        prediction_dict = {k: v for k, v in prediction_dict.items() if v is not None}
         
         return dspy.Prediction(**prediction_dict)
 
@@ -95,10 +88,6 @@ class CodeEdit(dspy.Signature):
     edit_instructions = dspy.OutputField(
         desc="A JSON string containing a list of search/replace edit instructions. MUST be valid JSON in the specified format.",
         base_signature=EditInstructions
-    )
-    search_query = dspy.OutputField(
-        desc="A search query to use for the next iteration, if needed.",
-        optional=True
     )
 
 

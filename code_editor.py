@@ -149,8 +149,8 @@ class CodeEditor:
             response = self.predictor(instruction=instruction, context=context)
             
             # Ensure response has required attributes
-            if not hasattr(response, 'edit_instructions') or not hasattr(response, 'search_query'):
-                raise RuntimeError("Invalid response format from predictor - missing required fields")
+            if not hasattr(response, 'edit_instructions'):
+                raise RuntimeError("Invalid response format from predictor - missing edit_instructions")
                 
             # Parse and validate edit instructions
             try:
