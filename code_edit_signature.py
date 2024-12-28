@@ -93,11 +93,21 @@ class CodeEditInference(dspy.Module):
                 edit_instructions=validated_instructions.json()
             )
         except ValueError as e:
-            dspy.Assert(
-                False,
+            # Create variable with all debug info
+            debug_info = (
                 f"Error parsing edit_instructions: {e}\n"
                 f"Received: {prediction.edit_instructions}\n"
-                f"Expected format: {EditInstructions.model_json_schema()}"
+                f"Expected format: {EditInstructions.model_json_schema()}\n"
+                f"Full prediction: {prediction}"
+            )
+            
+            # Print debug info
+            print("DEBUG INFO:\n", debug_info)
+            
+            # Send in assert
+            dspy.Assert(
+                False,
+                debug_info
             )
 
 class SearchReplaceEditInstruction2(BaseModel):
