@@ -85,12 +85,20 @@ class QdrantRetriever:
             limit=1000
         )[0]
         
+        # Extract specific search text from instruction
+        search_text = None
+        if " to " in query:
+            search_text = query.split(" to ")[0].strip()
+            if "change " in search_text:
+                search_text = search_text.replace("change ", "").strip()
+        
         # Check for exact matches
-        exact_matches = [
-            (hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"])
-            for hit in all_files
-            if query.lower() in hit.payload["text"].lower()
-        ]
+        exact_matches = []
+        for hit in all_files:
+            if search_text and search_text.lower() in hit.payload["text"].lower():
+                exact_matches.append((hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]))
+            elif query.lower() in hit.payload["text"].lower():
+                exact_matches.append((hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]))
         
         if exact_matches:
             return exact_matches[:top_k]

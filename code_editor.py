@@ -91,9 +91,16 @@ class CodeEditor:
             raise ValueError("Instruction cannot be empty")
             
         try:
-            # Search for relevant files based on instruction
-            print(f"Searching for files matching: {instruction}")
-            search_results = self.retriever.retrieve(query=instruction, top_k=3)
+            # Extract specific search text from instruction
+            search_query = instruction
+            if " to " in instruction:
+                search_query = instruction.split(" to ")[0].strip()
+                if "change " in search_query:
+                    search_query = search_query.replace("change ", "").strip()
+            
+            # Search for relevant files based on extracted search text
+            print(f"Searching for files containing: '{search_query}'")
+            search_results = self.retriever.retrieve(query=search_query, top_k=3)
             file_paths = list(set(result[0] for result in search_results))
             
             if not file_paths:
