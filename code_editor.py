@@ -223,15 +223,8 @@ class CodeEditor:
                         )
                         
                 except json.JSONDecodeError as e:
-                    edit_instructions_format = """{
-    "edit_instructions": [
-        {
-            "filepath": "path/to/file.py",
-            "search_text": "text to search for",
-            "replacement_text": "text to replace with"
-        }
-    ]
-}"""
+                    from prismix.core.models import EditInstructions
+                    edit_instructions_format = str(EditInstructions.model_json_schema())
                     error_msg = f"Error parsing edit_instructions: {str(e)}.\n"
                     error_msg += "edit_instructions must be of the following format:\n"
                     error_msg += edit_instructions_format + "\n\n"
