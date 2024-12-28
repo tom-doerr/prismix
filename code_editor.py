@@ -77,55 +77,71 @@ class CodeEditor:
             return False
 
     def process_edit_instruction(self, instruction: str, dry_run: bool = False) -> bool:
-        """Process a single edit instruction."""
-        # Load code files
-        file_paths = [f for f in self.retriever.collection.list_points().points if f.endswith('.py')]
-        code_files = self.load_code_files(file_paths)
+        """Process a single edit instruction.
         
-        if not code_files:
-            print("No valid code files found to edit")
-            return False
-
-        # Get context and predict edits
-        retrieved_context = "\n".join(self.retriever.retrieve(query=instruction, top_k=3))
-        context = Context(
-            retrieved_context=retrieved_context,
-            online_search=""
-        )
-        
-        response = self.predictor(instruction=instruction, context=context)
-        
-        if not response.edit_instructions or not response.edit_instructions.edit_instructions:
-            print("No valid edit instructions generated")
-            return False
-
-        print("--- Output Values ---")
-        print(f"Search Query: {response.search_query}")
-
-        # Apply edits
-        for edit_instruction in response.edit_instructions.edit_instructions:
-            file_path = edit_instruction.filepath
-            file_content = next((f.filecontent for f in code_files if f.filepath == file_path), None)
-            if file_content is None:
-                print(f"Error: File not found in code_files: {file_path}")
-                continue
-
-            # Apply edit and remove line numbers
-            edited_content = self.apply_edit_instruction(file_content, edit_instruction)
-            if edited_content is None:
-                continue
-                
-            unumbered_edited_content = self.remove_line_numbers(edited_content)
+        Args:
+            instruction: The edit instruction to process
+            dry_run: If True, only preview changes without saving
             
-            # Show changes
-            print("--- Original content ---")
-            print(file_content)
-            print("--- Edited content ---")
-            print(unumbered_edited_content)
+        Returns:
+            bool: True if edits were successfully applied, False otherwise
+        """
+        try:
+            # Load code files
+            file_paths = [f for f in self.retriever.collection.list_points().points if f.endswith('.py')]
+            code_files = self.load_code_files(file_paths)
+            
+            if not code_files:
+                print("No valid code files found to edit")
+                return False
 
-            # Apply changes if not in dry-run mode
-            if not dry_run:
-                if not self.backup_and_write_file(file_path, file_content, unumbered_edited_content):
+            # Get context and predict edits
+            retrieved_context = "\n".join(self.retriever.retrieve(query=instruction, top_k=3))
+            context = Context(
+                retrieved_context=retrieved_context,
+                online_search=""
+            )
+            
+            response = self.predictor(instruction=instruction, context=context)
+            
+            if not response.edit_instructions or not response.edit_instructions.edit_instructions:
+                print("No valid edit instructions generated")
+                return False
+
+            print("--- Output Values ---")
+            print(f"Search Query: {response.search_query}")
+
+            # Track success of edits
+            success_count = 0
+            
+            # Apply edits
+            for edit_instruction in response.edit_instructions.edit_instructions:
+                file_path = edit_instruction.filepath
+                file_content = next((f.filecontent for f in code_files if f.filepath == file_path), None)
+                if file_content is None:
+                    print(f"Error: File not found in code_files: {file_path}")
                     continue
 
-        return True
+                # Apply edit and remove line numbers
+                edited_content = self.apply_edit_instruction(file_content, edit_instruction)
+                if edited_content is None:
+                    continue
+                    
+                unumbered_edited_content = self.remove_line_numbers(edited_content)
+                
+                # Show changes
+                print("--- Original content ---")
+                print(file_content)
+                print("--- Edited content ---")
+                print(unumbered_edited_content)
+
+                # Apply changes if not in dry-run mode
+                if not dry_run:
+                    if self.backup_and_write_file(file_path, file_content, unumbered_edited_content):
+                        success_count += 1
+
+            return success_count > 0
+            
+        except Exception as e:
+            print(f"Error processing edit instruction: {e}")
+            return False
