@@ -6,6 +6,14 @@ from prismix.core.models import SearchReplaceEditInstruction, Context
 from qdrant_retriever import QdrantRetriever
 import dspy
 
+class EditApplicationError(Exception):
+    """Raised when an edit cannot be applied to content."""
+    pass
+
+class FileWriteError(Exception):
+    """Raised when file operations fail."""
+    pass
+
 class CodeEditor:
     """Handles code editing operations using search/replace instructions."""
     
@@ -42,49 +50,85 @@ class CodeEditor:
         return all(key in instruction for key in ['filepath', 'search_text', 'replacement_text'])
 
     def _apply_edit(self, content: str, instruction: Dict[str, str]) -> str:
-        """Apply a single edit instruction to content."""
+        """Apply a single edit instruction to content.
+        
+        Args:
+            content: The original file content
+            instruction: Dictionary containing filepath, search_text, and replacement_text
+            
+        Returns:
+            str: The modified content
+            
+        Raises:
+            ValueError: If instruction is invalid
+            EditApplicationError: If edit cannot be applied
+        """
         if not self._validate_edit(instruction):
             raise ValueError(f"Invalid edit instruction: {instruction}")
             
-        # Find indentation of search text line
-        lines = content.splitlines()
-        for line in lines:
-            if instruction['search_text'] in line:
-                indentation = line[:len(line) - len(line.lstrip())]
-                break
-        else:
-            # Simple replace if search text not found
-            return content.replace(
-                instruction['search_text'],
-                instruction['replacement_text']
-            )
+        search_text = instruction['search_text']
+        replacement = instruction['replacement_text']
+        
+        # Handle multi-line replacements
+        if '\n' in replacement:
+            # Find indentation of first matching line
+            lines = content.splitlines()
+            indentation = ''
+            for line in lines:
+                if search_text in line:
+                    indentation = line[:len(line) - len(line.lstrip())]
+                    break
             
-        # Apply indentation to multi-line replacements
-        replacement_lines = instruction['replacement_text'].splitlines()
-        if len(replacement_lines) > 1:
-            replacement_lines = [replacement_lines[0]] + [
-                indentation + line for line in replacement_lines[1:]
-            ]
-            instruction['replacement_text'] = '\n'.join(replacement_lines)
+            # Apply indentation to all but first line
+            replacement_lines = replacement.splitlines()
+            if indentation:
+                replacement_lines = [replacement_lines[0]] + [
+                    indentation + line for line in replacement_lines[1:]
+                ]
+            replacement = '\n'.join(replacement_lines)
             
-        return content.replace(
-            instruction['search_text'],
-            instruction['replacement_text']
-        )
+        # Replace all occurrences
+        if search_text not in content:
+            raise EditApplicationError(f"Search text not found in content: {search_text}")
+            
+        return content.replace(search_text, replacement)
 
     def _backup_and_write(self, file_path: str, original: str, new: str) -> bool:
-        """Create backup and write new content to file."""
+        """Create backup and write new content to file.
+        
+        Args:
+            file_path: Path to the file being edited
+            original: Original content for backup
+            new: New content to write
+            
+        Returns:
+            bool: True if successful, False otherwise
+            
+        Raises:
+            FileWriteError: If file operations fail
+        """
         backup_path = f"{file_path}.bak"
         try:
+            # Create numbered backup if one already exists
+            if Path(backup_path).exists():
+                counter = 1
+                while Path(f"{backup_path}.{counter}").exists():
+                    counter += 1
+                backup_path = f"{backup_path}.{counter}"
+                
+            # Write backup first
             with open(backup_path, 'w') as backup:
                 backup.write(original)
+                
+            # Write new content
             with open(file_path, 'w') as f:
                 f.write(new)
+                
             print(f"File {file_path} updated. Backup saved to {backup_path}")
             return True
+            
         except Exception as e:
-            print(f"Error writing file {file_path}: {e}")
-            return False
+            raise FileWriteError(f"Error writing file {file_path}: {e}")
 
     def process_edit(self, instruction: str, dry_run: bool = False) -> bool:
         """Process an edit instruction.
