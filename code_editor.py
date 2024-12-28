@@ -126,46 +126,41 @@ class CodeEditor:
             if not hasattr(response, 'edit_instructions') or not hasattr(response, 'search_query'):
                 raise RuntimeError("Invalid response format from predictor - missing required fields")
                 
-            # Parse edit instructions
-            # First try to parse as JSON
+            # Parse and validate edit instructions
             try:
                 import json
-                edit_instructions = json.loads(response.edit_instructions)
-            except json.JSONDecodeError:
-                # If direct JSON parsing fails, try to extract JSON from markdown code block
+                from prismix.core.models import EditInstructions
+                
+                # First try to parse as JSON
                 try:
-                    import re
-                    json_match = re.search(r'```json\n(.*?)\n```', response.edit_instructions, re.DOTALL)
-                    if json_match:
-                        edit_instructions = json.loads(json_match.group(1))
-                    else:
-                        # Try to find JSON in the response text
-                        json_match = re.search(r'\{.*\}', response.edit_instructions, re.DOTALL)
+                    edit_data = json.loads(response.edit_instructions)
+                except json.JSONDecodeError:
+                    # If direct JSON parsing fails, try to extract JSON from markdown code block
+                    try:
+                        import re
+                        json_match = re.search(r'```json\n(.*?)\n```', response.edit_instructions, re.DOTALL)
                         if json_match:
-                            edit_instructions = json.loads(json_match.group())
+                            edit_data = json.loads(json_match.group(1))
                         else:
-                            raise ValueError("Could not find valid JSON in response")
-                except Exception as e:
-                    raise dspy.DSPyAssertionError(
-                        id="invalid_json_format",
-                        msg=f"Invalid edit instructions format: {e}. Must be valid JSON matching EditInstructions schema."
-                    )
-            
-            # Validate the structure
-            if not isinstance(edit_instructions, dict):
+                            # Try to find JSON in the response text
+                            json_match = re.search(r'\{.*\}', response.edit_instructions, re.DOTALL)
+                            if json_match:
+                                edit_data = json.loads(json_match.group())
+                            else:
+                                raise ValueError("Could not find valid JSON in response")
+                    except Exception as e:
+                        raise dspy.DSPyAssertionError(
+                            id="invalid_json_format",
+                            msg=f"Invalid edit instructions format: {e}. Must be valid JSON matching EditInstructions schema."
+                        )
+                
+                # Validate using Pydantic model
+                edit_instructions = EditInstructions(**edit_data)
+                
+            except Exception as e:
                 raise dspy.DSPyAssertionError(
-                    id="invalid_json_structure",
-                    msg="Edit instructions must be a JSON object"
-                )
-            if 'edit_instructions' not in edit_instructions:
-                raise dspy.DSPyAssertionError(
-                    id="missing_key",
-                    msg="Missing 'edit_instructions' key in JSON"
-                )
-            if not isinstance(edit_instructions['edit_instructions'], list):
-                raise dspy.DSPyAssertionError(
-                    id="invalid_type",
-                    msg="'edit_instructions' must be a list"
+                    id="invalid_edit_instructions",
+                    msg=f"Invalid edit instructions: {e}. Must match EditInstructions schema."
                 )
 
             print("--- Output Values ---")
@@ -176,7 +171,7 @@ class CodeEditor:
             failed_files = []
             
             # Apply edits
-            for edit_instruction in response.edit_instructions.edit_instructions:
+            for edit_instruction in edit_instructions.edit_instructions:
                 file_path = edit_instruction.filepath
                 file_content = next((f.filecontent for f in code_files if f.filepath == file_path), None)
                 if file_content is None:
