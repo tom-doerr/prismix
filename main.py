@@ -18,14 +18,6 @@ def remove_line_numbers(text: str) -> str:
     lines = text.splitlines()
     return "\n".join(line[7:] if len(line) > 7 else line for line in lines)
 
-def validate_edit_instruction(instruction: Any) -> bool:
-    """Validate that edit instruction has required fields"""
-    return (hasattr(instruction, 'start_line') and 
-            hasattr(instruction, 'end_line') and 
-            hasattr(instruction, 'replacement_text')) or \
-           (hasattr(instruction, 'search_text') and 
-            hasattr(instruction, 'replacement_text'))
-
 def load_code_files(file_paths: List[str]) -> List[CodeFile]:
     """Load and number code files"""
     code_files = []
