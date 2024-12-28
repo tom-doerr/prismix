@@ -27,11 +27,8 @@ class CodeEditor:
             predictor: DSPy predictor for generating edit instructions
         """
         self.retriever = retriever
-        # Wrap the predictor with assertion transformation and backtracking
-        self.predictor = assert_transform_module(
-            predictor,
-            functools.partial(backtrack_handler, max_backtracks=10)
-        )
+        # Use the predictor directly since it's already transformed
+        self.predictor = predictor
         self.max_retries = 3
 
     def _add_line_numbers(self, content: str) -> str:

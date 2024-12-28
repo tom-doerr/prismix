@@ -48,15 +48,15 @@ def main() -> None:
             include_glob="*.py", 
             exclude_glob="**/{__pycache__,build,dist,.cache,.mypy_cache,.pytest_cache,venv,env,node_modules}/*"
         )
-        # Create predictor with backtracking
-        base_predictor = dspy.ChainOfThought(CodeEdit)
-        predictor = assert_transform_module(
-            base_predictor,
+        # Create and transform the predictor
+        predictor = dspy.ChainOfThought(CodeEdit)
+        transformed_predictor = assert_transform_module(
+            predictor,
             functools.partial(backtrack_handler, max_backtracks=10)
         )
 
         # Create code editor
-        editor = CodeEditor(retriever, predictor)
+        editor = CodeEditor(retriever, transformed_predictor)
 
         # Parse command line arguments
         parser = argparse.ArgumentParser(description="Edit code files based on instructions.")
