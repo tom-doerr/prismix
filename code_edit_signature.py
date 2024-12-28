@@ -59,11 +59,17 @@ class InferenceModule(dspy.Module):
         # Handle missing search_query
         search_query = getattr(prediction, 'search_query', "")
         
-        return dspy.Prediction(
-            reasoning=prediction.reasoning,
-            edit_instructions=prediction.edit_instructions,
-            search_query=search_query
-        )
+        # Create prediction dict with required fields
+        prediction_dict = {
+            'reasoning': prediction.reasoning,
+            'edit_instructions': prediction.edit_instructions,
+            'search_query': search_query
+        }
+        
+        # Filter out None values
+        prediction_dict = {k: v for k, v in prediction_dict.items() if v is not None}
+        
+        return dspy.Prediction(**prediction_dict)
 
 
 
