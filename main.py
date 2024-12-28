@@ -37,7 +37,7 @@ def main() -> None:
     
     try:
         # Setup the LLM
-        llm = dspy.LM(model="deepseek/deepseek-chat", max_tokens=200, cache=False)
+        llm = dspy.LM(model="deepseek/deepseek-chat", max_tokens=200, cache=False, temperature=1.0)
         dspy.settings.configure(lm=llm)
 
         # Initialize the retriever and predictor
