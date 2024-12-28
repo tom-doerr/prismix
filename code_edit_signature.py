@@ -34,19 +34,6 @@ class InferenceModule(dspy.Module):
         if True:
             print("prediction:", prediction)
             try:
-                # import json
-                # try:
-                    # edit_instructions = json.loads(prediction.edit_instructions)
-                # except json.JSONDecodeError:
-                    # edit_instructions = prediction.edit_instructions
-                # validated_edit_instructions = EditInstructions(
-                    # edit_instructions=edit_instructions
-                # )
-                # validate_edit_instructions(
-                    # validated_edit_instructions.edit_instructions,
-                    # prediction,
-                    # target_module=self.forward,
-                # )
                 try:
                     parsed_edit_instructions = json.loads(prediction.edit_instructions)
                 except json.JSONDecodeError as e:
@@ -61,17 +48,21 @@ class InferenceModule(dspy.Module):
                 )
             except Exception as e:
                 print(f"Error parsing edit_instructions: {e}")
-                # dspy.Suggest(
                 edit_instructions_format = str(EditInstructions.model_json_schema())
-
                 dspy.Suggest(
-                        False, f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}")
+                    False, 
+                    f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}"
+                )
 
         print("trace:", dspy.settings.trace)
+        
+        # Handle missing search_query
+        search_query = getattr(prediction, 'search_query', "")
+        
         return dspy.Prediction(
             reasoning=prediction.reasoning,
             edit_instructions=prediction.edit_instructions,
-            search_query=""
+            search_query=search_query
         )
 
 
@@ -100,7 +91,8 @@ class CodeEdit(dspy.Signature):
         base_signature=EditInstructions
     )
     search_query = dspy.OutputField(
-        desc="A search query to use for the next iteration, if needed."
+        desc="A search query to use for the next iteration, if needed.",
+        optional=True
     )
 
 
