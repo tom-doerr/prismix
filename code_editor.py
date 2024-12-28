@@ -151,10 +151,12 @@ class CodeEditor:
                         raise ValueError("Could not find valid JSON in response")
                 except Exception as e2:
                     raise dspy.DSPyAssertionError(
+                        id="invalid_json_format",
                         msg=f"Invalid edit instructions format: {e2}. Must be valid JSON matching EditInstructions schema."
                     )
             except ValueError as e:
                 raise dspy.DSPyAssertionError(
+                    id="invalid_json_structure", 
                     msg=f"Invalid edit instructions structure: {e}. Must be valid JSON matching EditInstructions schema."
                 )
 
