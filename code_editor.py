@@ -122,16 +122,19 @@ class CodeEditor:
             # Use assertions to validate the response
             response = self.predictor(instruction=instruction, context=context)
             
-            if not response.edit_instructions or not response.edit_instructions.edit_instructions:
-                raise RuntimeError("No valid edit instructions generated")
-
-            # Validate edit instructions format
+            # Ensure response is a Prediction object
+            if not isinstance(response, dspy.Prediction):
+                raise RuntimeError("Invalid response format from predictor")
+                
+            # Parse edit instructions
             try:
                 import json
-                json.loads(str(response.edit_instructions))
-            except json.JSONDecodeError as e:
+                edit_instructions = json.loads(response.edit_instructions)
+                if not isinstance(edit_instructions, dict) or 'edit_instructions' not in edit_instructions:
+                    raise ValueError("Invalid edit instructions format")
+            except (json.JSONDecodeError, ValueError) as e:
                 raise dspy.AssertionError(
-                    f"Invalid edit instructions format: {e}. Must be valid JSON."
+                    f"Invalid edit instructions format: {e}. Must be valid JSON matching EditInstructions schema."
                 )
 
             print("--- Output Values ---")
