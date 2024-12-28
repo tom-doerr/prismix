@@ -42,24 +42,21 @@ def load_code_files(file_paths: List[str]) -> List[CodeFile]:
             print(f"Error reading file {file_path}: {e}")
     return code_files
 
+def validate_edit_instruction(instruction: Any) -> bool:
+    """Validate that edit instruction has required fields"""
+    return (hasattr(instruction, 'search_text') and 
+            hasattr(instruction, 'replacement_text'))
+
 def apply_edit_instruction(file_content: str, instruction: Any) -> Optional[str]:
-    """Apply edit instruction to file content"""
+    """Apply edit instruction to file content using search/replace"""
     if not validate_edit_instruction(instruction):
         print(f"Error: Invalid edit instruction: {instruction}")
         return None
         
-    if hasattr(instruction, 'start_line'):
-        return apply_code_edit(
-            file_content=file_content,
-            start_line=int(instruction.start_line),
-            end_line=int(instruction.end_line),
-            replacement_text=instruction.replacement_text
-        )
-    else:
-        return file_content.replace(
-            instruction.search_text,
-            instruction.replacement_text
-        )
+    return file_content.replace(
+        instruction.search_text,
+        instruction.replacement_text
+    )
 
 def backup_and_write_file(file_path: str, original_content: str, new_content: str) -> bool:
     """Create backup and write new content to file"""
