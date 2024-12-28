@@ -324,7 +324,7 @@ def run_mipro_optimization():
     optimized_program = teleprompter.compile(
         assert_transform_module(
             module,
-            functools.partial(backtrack_handler, max_backtracks=3),
+            functools.partial(backtrack_handler, max_backtracks=10),  # Increased from 3 to 10
         ),
         trainset=trainset,
         num_trials=15,
