@@ -133,7 +133,7 @@ class CodeEditor:
                 if not isinstance(edit_instructions, dict) or 'edit_instructions' not in edit_instructions:
                     raise ValueError("Invalid edit instructions format")
             except (json.JSONDecodeError, ValueError) as e:
-                raise dspy.AssertionError(
+                raise dspy.DSPyAssertionError(
                     f"Invalid edit instructions format: {e}. Must be valid JSON matching EditInstructions schema."
                 )
 
