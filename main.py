@@ -6,6 +6,7 @@ import dspy
 from qdrant_retriever import QdrantRetriever
 from code_edit_signature import CodeEdit
 from code_editor import CodeEditor
+from prismix.core.models import EditInstructions
 
 import logging
 from typing import Optional
@@ -41,7 +42,7 @@ def main() -> None:
     try:
         # Configure Deepseek with optimal settings
         llm = dspy.LM(
-            model="deepseek/deepseek-chat",
+            model="deep8eek/deepseek-chat",
             max_tokens=400,  # Increased for better responses
             cache=False,
             temperature=0.7,  # Lower for more deterministic output
