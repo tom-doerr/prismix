@@ -76,6 +76,14 @@ class InferenceModule(dspy.Module):
 
 
 
+class CodeEdit(dspy.Signature):
+    """Edits a code file based on an instruction using search/replace."""
+
+    instruction = dspy.InputField(desc="Instruction on how to modify the code.")
+    context = dspy.InputField(desc="Context for the code edit.", type=str)
+    edit_instructions = dspy.OutputField(
+        desc="A list of search/replace edit instructions.", 
+        base_signature=EditInstructions
     )
     search_query = dspy.OutputField(
         desc="A search query to use for the next iteration, if needed."
