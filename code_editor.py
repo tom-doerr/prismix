@@ -90,6 +90,7 @@ class CodeEditor:
             ValueError: If the instruction is empty or invalid
             FileNotFoundError: If no valid code files are found
             RuntimeError: If the predictor fails to generate valid edit instructions
+            dspy.AssertionError: If edit instructions fail validation
         """
         if not instruction or not instruction.strip():
             raise ValueError("Instruction cannot be empty")
@@ -112,10 +113,20 @@ class CodeEditor:
                 online_search=""
             )
             
+            # Use assertions to validate the response
             response = self.predictor(instruction=instruction, context=context)
             
             if not response.edit_instructions or not response.edit_instructions.edit_instructions:
                 raise RuntimeError("No valid edit instructions generated")
+
+            # Validate edit instructions format
+            try:
+                import json
+                json.loads(str(response.edit_instructions))
+            except json.JSONDecodeError as e:
+                raise dspy.AssertionError(
+                    f"Invalid edit instructions format: {e}. Must be valid JSON."
+                )
 
             print("--- Output Values ---")
             print(f"Search Query: {response.search_query}")
@@ -156,6 +167,9 @@ class CodeEditor:
 
             return success_count > 0
             
+        except dspy.AssertionError as e:
+            print(f"Validation error: {e}")
+            raise
         except Exception as e:
             print(f"Error processing edit instruction: {e}")
             raise

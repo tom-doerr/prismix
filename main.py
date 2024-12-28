@@ -78,6 +78,8 @@ def main() -> None:
                 logging.error(f"File error: {e}")
             except RuntimeError as e:
                 logging.error(f"Edit generation failed: {e}")
+            except dspy.AssertionError as e:
+                logging.error(f"Validation error: {e}")
             except Exception as e:
                 logging.error(f"Unexpected error processing edit instruction: {e}", exc_info=True)
 
