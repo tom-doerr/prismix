@@ -156,13 +156,32 @@ class QdrantRetriever:
             return self.model.encode(text).tolist()
 
 
-if __name__ == "__main__":
+def test_retriever():
+    """Test function for directly running the retriever."""
     retriever = QdrantRetriever()
-    retriever.add_files(include_glob="*.py", exclude_glob="*test*")
-    print("Added all python files (excluding test files)")
+    retriever.add_files(
+        include_glob="*.py", 
+        exclude_glob="**/{__pycache__,build,dist,.cache,.mypy_cache,.pytest_cache,venv,env,node_modules}/*"
+    )
+    print("Added all python files (excluding cache/build directories)")
 
-    query = "how to add line numbers to a file"
-    results = retriever.retrieve(query)
-    print(f"\nRetrieved results for query: '{query}':")
-    for i, result in enumerate(results):
-        print(f"{i+1}: {result[:200]}...")
+    # Test exact match
+    print("\nTesting exact match for 'start jkl'")
+    results = retriever.retrieve("start jkl")
+    for i, (file_path, text, line_num) in enumerate(results):
+        print(f"{i+1}. {file_path} (line {line_num}): {text[:100]}...")
+
+    # Test function search
+    print("\nTesting function search for 'print_time_in_china'")
+    results = retriever.retrieve("print_time_in_china")
+    for i, (file_path, text, line_num) in enumerate(results):
+        print(f"{i+1}. {file_path} (line {line_num}): {text[:100]}...")
+
+    # Test semantic search
+    print("\nTesting semantic search for 'time in China'")
+    results = retriever.retrieve("time in China")
+    for i, (file_path, text, line_num) in enumerate(results):
+        print(f"{i+1}. {file_path} (line {line_num}): {text[:100]}...")
+
+if __name__ == "__main__":
+    test_retriever()
