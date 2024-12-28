@@ -55,8 +55,8 @@ class QdrantRetriever:
                 file_content = f.read()
                 self.add_code_chunks(file_path, file_content)
 
-    def add_code_chunks(self, file_path: str, file_content: str, batch_size: int = 32):
-        """Adds code chunks to the Qdrant collection in batches."""
+    def add_code_chunks(self, file_path: str, file_content: str):
+        """Collects code chunks from a file to be added to Qdrant."""
         try:
             tree = ast.parse(file_content)
             chunks = []
@@ -66,17 +66,35 @@ class QdrantRetriever:
                     end_line = node.end_lineno if hasattr(node, 'end_lineno') and node.end_lineno else start_line
                     code_chunk = '\n'.join(file_content.splitlines()[start_line - 1:end_line])
                     chunks.append((file_path, code_chunk, start_line))
-                    
-                    # Process in batches
-                    if len(chunks) >= batch_size:
-                        self._add_chunks_batch(chunks)
-                        chunks = []
             
-            # Process remaining chunks
-            if chunks:
-                self._add_chunks_batch(chunks)
+            return chunks
         except SyntaxError:
-            self._add_chunk(file_path, file_content, 1)
+            # Fallback for non-parsable files
+            return [(file_path, file_content, 1)]
+
+    def add_files(self, include_glob: str, exclude_glob: str = None, batch_size: int = 32):
+        """Adds files matching the include glob, excluding those matching the exclude glob."""
+        files = glob.glob(include_glob, recursive=True)
+        if exclude_glob:
+            exclude_files = glob.glob(exclude_glob, recursive=True)
+            files = [f for f in files if f not in exclude_files]
+            
+        print(f"Indexing {len(files)} files:")
+        for file in files:
+            print(f"- {file}")
+
+        # Collect all chunks first
+        all_chunks = []
+        for file_path in files:
+            with open(file_path, 'r') as f:
+                file_content = f.read()
+                chunks = self.add_code_chunks(file_path, file_content)
+                all_chunks.extend(chunks)
+
+        # Process in batches
+        for i in range(0, len(all_chunks), batch_size):
+            batch = all_chunks[i:i + batch_size]
+            self._add_chunks_batch(batch)
 
     def _add_chunk(self, file_path: str, code_chunk: str, start_line: int):
         """Adds a single code chunk to the Qdrant collection."""
