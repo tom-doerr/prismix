@@ -28,10 +28,16 @@ class QdrantRetriever:
             embedding_size = self.model.get_sentence_embedding_dimension()
         else:
             embedding_size = 256
-        self.client.recreate_collection(
-            collection_name=self.collection_name,
-            vectors_config=models.VectorParams(size=embedding_size, distance=models.Distance.COSINE),
-        )
+            
+        # Check if collection exists first
+        collections = self.client.get_collections()
+        collection_names = [c.name for c in collections.collections]
+        
+        if self.collection_name not in collection_names:
+            self.client.create_collection(
+                collection_name=self.collection_name,
+                vectors_config=models.VectorParams(size=embedding_size, distance=models.Distance.COSINE),
+            )
 
     def add_files(self, include_glob: str, exclude_glob: str = None):
         """Adds files matching the include glob, excluding those matching the exclude glob."""
