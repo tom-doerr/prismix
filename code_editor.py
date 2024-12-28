@@ -1,6 +1,8 @@
 from typing import List, Optional, Dict, Any
 import os
 import json
+import functools
+from dspy.primitives.assertions import assert_transform_module, backtrack_handler
 from pathlib import Path
 from prismix.core.models import SearchReplaceEditInstruction, Context, EditInstructions
 from qdrant_retriever import QdrantRetriever
@@ -25,7 +27,11 @@ class CodeEditor:
             predictor: DSPy predictor for generating edit instructions
         """
         self.retriever = retriever
-        self.predictor = predictor
+        # Wrap the predictor with assertion transformation and backtracking
+        self.predictor = assert_transform_module(
+            predictor,
+            functools.partial(backtrack_handler, max_backtracks=10)
+        )
         self.max_retries = 3
 
     def _add_line_numbers(self, content: str) -> str:

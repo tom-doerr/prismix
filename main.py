@@ -1,5 +1,7 @@
 import argparse
 import os
+import functools
+from dspy.primitives.assertions import assert_transform_module, backtrack_handler
 import dspy
 from qdrant_retriever import QdrantRetriever
 from code_edit_signature import CodeEdit
@@ -46,7 +48,12 @@ def main() -> None:
             include_glob="*.py", 
             exclude_glob="**/{__pycache__,build,dist,.cache,.mypy_cache,.pytest_cache,venv,env,node_modules}/*"
         )
-        predictor = dspy.ChainOfThought(CodeEdit)
+        # Create predictor with backtracking
+        base_predictor = dspy.ChainOfThought(CodeEdit)
+        predictor = assert_transform_module(
+            base_predictor,
+            functools.partial(backtrack_handler, max_backtracks=10)
+        )
 
         # Create code editor
         editor = CodeEditor(retriever, predictor)
