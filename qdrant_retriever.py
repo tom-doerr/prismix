@@ -55,30 +55,60 @@ class QdrantRetriever:
                 file_content = f.read()
                 self.add_code_chunks(file_path, file_content)
 
-    def add_code_chunks(self, file_path: str, file_content: str):
-        """Adds code chunks to the Qdrant collection."""
+    def add_code_chunks(self, file_path: str, file_content: str, batch_size: int = 32):
+        """Adds code chunks to the Qdrant collection in batches."""
         try:
             tree = ast.parse(file_content)
+            chunks = []
             for node in ast.walk(tree):
                 if isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)):
                     start_line = node.lineno
                     end_line = node.end_lineno if hasattr(node, 'end_lineno') and node.end_lineno else start_line
                     code_chunk = '\n'.join(file_content.splitlines()[start_line - 1:end_line])
-                    self._add_chunk(file_path, code_chunk, start_line)
+                    chunks.append((file_path, code_chunk, start_line))
+                    
+                    # Process in batches
+                    if len(chunks) >= batch_size:
+                        self._add_chunks_batch(chunks)
+                        chunks = []
+            
+            # Process remaining chunks
+            if chunks:
+                self._add_chunks_batch(chunks)
         except SyntaxError:
             self._add_chunk(file_path, file_content, 1)
 
     def _add_chunk(self, file_path: str, code_chunk: str, start_line: int):
         """Adds a single code chunk to the Qdrant collection."""
-        embedding = self._get_jina_embedding(code_chunk)
-        point_id = hash(f"{file_path}-{start_line}")
+        self._add_chunks_batch([(file_path, code_chunk, start_line)])
+
+    def _add_chunks_batch(self, chunks: List[tuple]):
+        """Adds multiple code chunks to the Qdrant collection in a batch."""
+        if not chunks:
+            return
+            
+        # Get embeddings in batch
+        code_chunks = [chunk[1] for chunk in chunks]
+        embeddings = self._get_jina_embeddings(code_chunks)
+        
+        # Prepare batch data
+        points = []
+        for (file_path, code_chunk, start_line), embedding in zip(chunks, embeddings):
+            point_id = hash(f"{file_path}-{start_line}")
+            points.append(models.PointStruct(
+                id=point_id,
+                vector=embedding,
+                payload={
+                    "file_path": file_path,
+                    "text": code_chunk,
+                    "start_line": start_line
+                }
+            ))
+            
+        # Upsert batch
         self.client.upsert(
             collection_name=self.collection_name,
-            points=Batch(
-                ids=[point_id],
-                vectors=[embedding],
-                payloads=[{"file_path": file_path, "text": code_chunk, "start_line": start_line}]
-            )
+            points=points
         )
 
     def retrieve(self, query: str, top_k: int = 5) -> List[str]:
@@ -156,6 +186,10 @@ class QdrantRetriever:
 
     def _get_jina_embedding(self, text: str) -> List[float]:
         """Gets the Jina embedding for the given text."""
+        return self._get_jina_embeddings([text])[0]
+
+    def _get_jina_embeddings(self, texts: List[str]) -> List[List[float]]:
+        """Gets Jina embeddings for a batch of texts."""
         if self.jina_api_key:
             url = "https://api.jina.ai/v1/embeddings"
             headers = {
@@ -163,7 +197,7 @@ class QdrantRetriever:
                 "Authorization": f"Bearer {self.jina_api_key}",
             }
             data = {
-                "input": [text],
+                "input": texts,
                 "model": self.jina_model,
                 "dimensions": self.embedding_size,
                 "task": "retrieval.passage",
@@ -174,12 +208,11 @@ class QdrantRetriever:
                 raise Exception(f"Jina API request failed with status code: {response.status_code}, response: {response.text}")
             response_json = response.json()
             if "data" in response_json and response_json["data"]:
-                embeddings = response_json["data"][0]["embedding"]
-                return embeddings
+                return [item["embedding"] for item in response_json["data"]]
             else:
                 raise KeyError(f"Unexpected response structure: {response_json}")
         else:
-            return self.model.encode(text).tolist()
+            return self.model.encode(texts).tolist()
 
 
 def test_retriever():
