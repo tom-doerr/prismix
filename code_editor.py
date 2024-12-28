@@ -150,7 +150,7 @@ class CodeEditor:
             
             # Ensure response has required attributes
             if not hasattr(response, 'edit_instructions'):
-                raise RuntimeError("Invalid response format from predictor - missing edit_instructions")
+                raise RuntimeError("Invalid response format from predictor - missing required fields")
                 
             # Parse and validate edit instructions
             try:
