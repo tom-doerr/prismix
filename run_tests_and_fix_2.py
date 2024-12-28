@@ -217,12 +217,14 @@ def call_aider(file_paths, model, combined_output):
                 "--no-detect-urls",
                 "--no-suggest-shell-commands",
                 "--subtree-only",
-                "--verbose",
+                # "--restore-chat-history",
             ]
             + ["--model", model]
             + [item for file_path in file_paths for item in ["--file", file_path]]
             + ["--file", "notes.md"]
             + ["--file", "questions.md"]
+            + ["--chat-history-file", ".rtaf_aider.chat.history.md"]
+            # + ["--max-chat-history-tokens", "10000"]
             + [
                 "--message",
                 (
@@ -231,7 +233,7 @@ def call_aider(file_paths, model, combined_output):
                     "please update notes.md. If you have questions, please write them into questions.md. "
                     "I might update the notes.md with answers to those questions. If you have commands I should run, "
                     "please put them into commands.sh. Refactor notes.md and questions.md when necessary to avoid redundancy "
-                    f"and to reduce length. Output: {combined_output}. What should we do next?"
+                    f"and to reduce length. Output: {combined_output}. What should we do next? Implement your suggestions."
                 ),
             ]
         )
@@ -317,24 +319,27 @@ if __name__ == "__main__":
             run_random_pylint(selected_files) if selected_files else ""
         )
         files_potentially_being_tested = []
-        for file in all_python_files:
-            for test_file in selected_test_files:
-                if test_file.replace(".py", "").split("test_")[1] in file:
-                    files_potentially_being_tested.append(file)
+        if False:
+            for file in all_python_files:
+                for test_file in selected_test_files:
+                    if test_file.replace(".py", "").startswith("test_"):
+                        files_potentially_being_tested.append(file)
+                    if test_file.replace(".py", "").split("test_")[1] in file:
+                        files_potentially_being_tested.append(file)
 
-        radon_cc_output = run_radon_cc(files_potentially_being_tested)
-        radon_mi_output = run_radon_mi(files_potentially_being_tested)
+            radon_cc_output = run_radon_cc(files_potentially_being_tested)
+            radon_mi_output = run_radon_mi(files_potentially_being_tested)
 
-        print("files_potentially_being_tested:", files_potentially_being_tested)
+            print("files_potentially_being_tested:", files_potentially_being_tested)
         combined_output = (
             f"Pylint output:\n{pylint_result_output}\nPytest output:\n{pytest_output}"
         ).strip()
         if "All checks passed" not in ruff_output:
             combined_output += f"\nRuff output:\n{ruff_output}"
-        if radon_cc_output:
-            combined_output += f"\nRadon CC output:\n{radon_cc_output}"
-        if radon_mi_output:
-            combined_output += f"\nRadon MI output:\n{radon_mi_output}"
+        # if radon_cc_output:
+            # combined_output += f"\nRadon CC output:\n{radon_cc_output}"
+        # if radon_mi_output:
+            # combined_output += f"\nRadon MI output:\n{radon_mi_output}"
         files_to_fix = filter_files_by_output(combined_output, all_python_files)
         files_to_fix.extend(files_potentially_being_tested)
         files_to_fix.extend(selected_files)
