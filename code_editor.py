@@ -92,13 +92,16 @@ class CodeEditor:
             
         try:
             # Search for relevant files based on instruction
+            print(f"Searching for files matching: {instruction}")
             search_results = self.retriever.retrieve(query=instruction, top_k=3)
             file_paths = list(set(result[0] for result in search_results))
             
             if not file_paths:
                 raise FileNotFoundError("No relevant files found for the instruction")
                 
-            print(f"Found {len(file_paths)} relevant files: {', '.join(file_paths)}")
+            print(f"Found {len(file_paths)} relevant files:")
+            for i, file_path in enumerate(file_paths):
+                print(f"{i+1}. {file_path}")
             code_files = self.load_code_files(file_paths)
             
             if not code_files:

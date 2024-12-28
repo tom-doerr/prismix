@@ -79,16 +79,42 @@ class QdrantRetriever:
 
     def retrieve(self, query: str, top_k: int = 5) -> List[str]:
         """Retrieves the top_k most relevant documents for a given query."""
+        # First try exact string match across all files
+        all_files = self.client.scroll(
+            collection_name=self.collection_name,
+            limit=1000
+        )[0]
+        
+        # Check for exact matches
+        exact_matches = [
+            (hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"])
+            for hit in all_files
+            if query.lower() in hit.payload["text"].lower()
+        ]
+        
+        if exact_matches:
+            return exact_matches[:top_k]
+            
+        # Fall back to semantic search if no exact matches
         if self.model:
             query_embedding = self.model.encode(query).tolist()
         else:
             query_embedding = self._get_jina_embedding(query)
+            
         search_result = self.client.search(
             collection_name=self.collection_name,
             query_vector=query_embedding,
             limit=top_k,
         )
-        return [(hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]) for hit in search_result]
+        
+        results = [(hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]) for hit in search_result]
+        
+        # Log the search results
+        print(f"Search results for '{query}':")
+        for i, (file_path, text, _) in enumerate(results):
+            print(f"{i+1}. {file_path} - {text[:100]}...")
+            
+        return results
 
     def _get_jina_embedding(self, text: str) -> List[float]:
         """Gets the Jina embedding for the given text."""
