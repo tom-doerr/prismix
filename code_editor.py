@@ -5,22 +5,25 @@ from qdrant_retriever import QdrantRetriever
 import dspy
 
 class CodeEditor:
+    """Handles code editing operations including file loading, editing, and saving."""
+    
     def __init__(self, retriever: QdrantRetriever, predictor: Any):
+        """Initialize CodeEditor with retriever and predictor."""
         self.retriever = retriever
         self.predictor = predictor
 
     def add_line_numbers(self, content: str) -> str:
-        """Add line numbers to code content"""
+        """Add line numbers to code content."""
         lines = content.splitlines()
         return "\n".join(f"{i+1:4} {line}" for i, line in enumerate(lines))
 
     def remove_line_numbers(self, text: str) -> str:
-        """Remove line numbers from code content"""
+        """Remove line numbers from code content."""
         lines = text.splitlines()
         return "\n".join(line[7:] if len(line) > 7 else line for line in lines)
 
     def load_code_files(self, file_paths: List[str]) -> List[CodeFile]:
-        """Load and number code files"""
+        """Load and number code files."""
         code_files = []
         for file_path in file_paths:
             if not os.path.exists(file_path):
@@ -36,12 +39,12 @@ class CodeEditor:
         return code_files
 
     def validate_edit_instruction(self, instruction: Any) -> bool:
-        """Validate that edit instruction has required fields"""
+        """Validate that edit instruction has required fields."""
         return (hasattr(instruction, 'search_text') and 
                 hasattr(instruction, 'replacement_text'))
 
     def apply_edit_instruction(self, file_content: str, instruction: Any) -> Optional[str]:
-        """Apply edit instruction to file content using search/replace"""
+        """Apply edit instruction to file content using search/replace."""
         if not self.validate_edit_instruction(instruction):
             print(f"Error: Invalid edit instruction: {instruction}")
             return None
@@ -52,7 +55,7 @@ class CodeEditor:
         )
 
     def backup_and_write_file(self, file_path: str, original_content: str, new_content: str) -> bool:
-        """Create backup and write new content to file"""
+        """Create backup and write new content to file."""
         backup_path = f"{file_path}.bak"
         try:
             # Create backup
@@ -74,7 +77,7 @@ class CodeEditor:
             return False
 
     def process_edit_instruction(self, instruction: str, dry_run: bool = False) -> bool:
-        """Process a single edit instruction"""
+        """Process a single edit instruction."""
         # Load code files
         file_paths = [f for f in self.retriever.collection.list_points().points if f.endswith('.py')]
         code_files = self.load_code_files(file_paths)

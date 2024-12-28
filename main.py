@@ -6,7 +6,7 @@ from code_edit_signature import CodeEdit
 from code_editor import CodeEditor
 
 def main() -> None:
-    """Main entry point for the code editor"""
+    """Main entry point for the code editor."""
     # Setup the LLM
     llm = dspy.LM(model="gpt-4o-mini", api_key=os.environ.get("OPENAI_API_KEY"))
     dspy.settings.configure(lm=llm)
