@@ -36,6 +36,7 @@ def get_instruction(args) -> Optional[str]:
 def main() -> None:
     """Main entry point for the code editor."""
     setup_logging()
+
     
     try:
         # Configure Deepseek with optimal settings
