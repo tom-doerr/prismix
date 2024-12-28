@@ -90,7 +90,7 @@ class QdrantRetriever:
         )[0]
         
         # Extract specific search text from instruction
-        search_text = None
+        search_text = query
         if " to " in query:
             search_text = query.split(" to ")[0].strip()
             if "change " in search_text:
@@ -99,13 +99,31 @@ class QdrantRetriever:
         # Check for exact matches
         exact_matches = []
         for hit in all_files:
-            if search_text and search_text.lower() in hit.payload["text"].lower():
-                exact_matches.append((hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]))
-            elif query.lower() in hit.payload["text"].lower():
-                exact_matches.append((hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]))
+            # Skip the test_retriever function itself
+            if "test_retriever" in hit.payload["text"]:
+                continue
+                
+            # Look for exact matches of the search text
+            if search_text.lower() in hit.payload["text"].lower():
+                # Prioritize exact matches at the start of lines
+                lines = hit.payload["text"].splitlines()
+                for i, line in enumerate(lines):
+                    if search_text.lower() in line.lower():
+                        # Calculate actual line number
+                        actual_line = hit.payload["start_line"] + i
+                        exact_matches.append((hit.payload["file_path"], line.strip(), actual_line))
+                        break
         
-        if exact_matches:
-            return exact_matches[:top_k]
+        # Deduplicate matches
+        unique_matches = []
+        seen = set()
+        for match in exact_matches:
+            if match[0] not in seen:
+                unique_matches.append(match)
+                seen.add(match[0])
+        
+        if unique_matches:
+            return unique_matches[:top_k]
             
         # Fall back to semantic search if no exact matches
         if self.model:
@@ -119,7 +137,15 @@ class QdrantRetriever:
             limit=top_k,
         )
         
-        results = [(hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]) for hit in search_result]
+        # Filter out test_retriever function and deduplicate
+        results = []
+        seen_files = set()
+        for hit in search_result:
+            if "test_retriever" in hit.payload["text"]:
+                continue
+            if hit.payload["file_path"] not in seen_files:
+                results.append((hit.payload["file_path"], hit.payload["text"], hit.payload["start_line"]))
+                seen_files.add(hit.payload["file_path"])
         
         # Log the search results
         print(f"Search results for '{query}':")
