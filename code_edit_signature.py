@@ -209,7 +209,7 @@ instruction_context_pairs = [
 
 def run_code_edit_example():
     # Create a predictor using the CodeEdit signature
-    module = InferenceModule(CodeEdit)
+    module = CodeEditInference(CodeEdit)
     generate_answer = assert_transform_module(
         module,
         functools.partial(backtrack_handler, max_backtracks=100),  # Increased from 30 to 100
@@ -299,7 +299,7 @@ def custom_metric(reasoning: str, edit_instructions: str, search_query: str = ""
 
 def generate_answer_with_assertions(instruction, context):
 
-    module = InferenceModule(CodeEdit)
+    module = CodeEditInference(CodeEdit)
     prediction = module.forward(instruction=instruction, context=context)
     edit_instructions_format = str(EditInstructions.model_json_schema())
     try:
@@ -350,7 +350,7 @@ def run_mipro_optimization():
             return self.predictor(instruction=instruction, context=context)
 
     # Optimize the module
-    module = InferenceModule(CodeEdit)
+    module = CodeEditInference(CodeEdit)
     optimized_program = teleprompter.compile(
         assert_transform_module(
             module,
@@ -464,7 +464,7 @@ def load_optimized_program(filename: str):
 
     # Load the module
     # module = dspy.Module.from_json(program_json)
-    module = InferenceModule(CodeEdit)
+    module = CodeEditInference(CodeEdit)
 
     # Load the state of the module
     # module.load_state(program_json)
