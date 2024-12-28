@@ -2,7 +2,7 @@ from typing import List, Optional, Dict, Any
 import os
 import json
 from pathlib import Path
-from prismix.core.models import SearchReplaceEditInstruction, Context
+from prismix.core.models import SearchReplaceEditInstruction, Context, EditInstructions
 from qdrant_retriever import QdrantRetriever
 import dspy
 
@@ -194,6 +194,11 @@ class CodeEditor:
                 raise RuntimeError("Invalid response format from predictor - missing edit_instructions")
                 
             try:
+                # Print debug info before parsing
+                print("DEBUG INFO - Raw edit instructions:")
+                print(response.edit_instructions)
+                print("Expected format:", EditInstructions.model_json_schema())
+                
                 # Parse and validate edit instructions
                 edit_data = json.loads(response.edit_instructions)
                 if not isinstance(edit_data, list):
