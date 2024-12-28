@@ -18,8 +18,15 @@ class CodeEditor:
     """Handles code editing operations using search/replace instructions."""
     
     def __init__(self, retriever: QdrantRetriever, predictor: Any):
+        """Initialize the code editor.
+        
+        Args:
+            retriever: QdrantRetriever instance for code search
+            predictor: DSPy predictor for generating edit instructions
+        """
         self.retriever = retriever
         self.predictor = predictor
+        self.max_retries = 3
 
     def _add_line_numbers(self, content: str) -> str:
         """Add line numbers to code content."""
@@ -137,6 +144,169 @@ class CodeEditor:
         except Exception as e:
             raise FileWriteError(f"Error writing file {file_path}: {e}")
 
+    def _validate_input(self, instruction: str, dry_run: bool) -> None:
+        """Validate input parameters.
+        
+        Args:
+            instruction: The edit instruction to validate
+            dry_run: Flag indicating if this is a dry run
+            
+        Raises:
+            ValueError: If input is invalid
+        """
+        if not isinstance(instruction, str) or not instruction.strip():
+            raise ValueError("Instruction must be a non-empty string")
+        if not isinstance(dry_run, bool):
+            raise ValueError("dry_run must be a boolean")
+
+    def _get_relevant_files(self, instruction: str) -> List[Dict[str, str]]:
+        """Get relevant files for the edit instruction.
+        
+        Args:
+            instruction: The edit instruction
+            
+        Returns:
+            List of file dictionaries with path and content
+            
+        Raises:
+            FileNotFoundError: If no relevant files found
+        """
+        search_query = instruction.split(" to ")[0].replace("change ", "").strip()
+        print(f"Searching for files containing: '{search_query}'")
+        
+        search_results = self.retriever.retrieve(query=search_query, top_k=3)
+        file_paths = list(set(result[0] for result in search_results))
+        
+        if not file_paths:
+            raise FileNotFoundError("No relevant files found")
+            
+        print(f"Found {len(file_paths)} relevant files:")
+        for i, path in enumerate(file_paths):
+            print(f"{i+1}. {path}")
+            
+        code_files = [f for f in (self._load_code_file(p) for p in file_paths) if f]
+        if not code_files:
+            raise FileNotFoundError("No valid code files found")
+            
+        return code_files
+
+    def _generate_edit_instructions(self, instruction: str, code_files: List[Dict[str, str]]) -> List[SearchReplaceEditInstruction]:
+        """Generate and validate edit instructions.
+        
+        Args:
+            instruction: The edit instruction
+            code_files: List of relevant files
+            
+        Returns:
+            List of validated edit instructions
+            
+        Raises:
+            RuntimeError: If predictor fails to generate valid edits
+            ValueError: If instructions are invalid
+        """
+        retrieved_results = self.retriever.retrieve(query=instruction, top_k=3)
+        retrieved_context = "\n".join(f"File: {r[0]}\nCode:\n{r[1]}" for r in retrieved_results)
+        context = Context(retrieved_context=retrieved_context, online_search="")
+        
+        response = self.predictor(instruction=instruction, context=context)
+        
+        if not hasattr(response, 'edit_instructions'):
+            raise RuntimeError("Invalid response format from predictor - missing edit_instructions")
+            
+        return self._parse_and_validate_instructions(response.edit_instructions, code_files)
+
+    def _parse_and_validate_instructions(self, instructions: str, code_files: List[Dict[str, str]]) -> List[SearchReplaceEditInstruction]:
+        """Parse and validate edit instructions.
+        
+        Args:
+            instructions: JSON string of edit instructions
+            code_files: List of relevant files
+            
+        Returns:
+            List of validated edit instructions
+            
+        Raises:
+            ValueError: If instructions are invalid
+        """
+        for attempt in range(self.max_retries):
+            try:
+                print(f"DEBUG INFO - Attempt {attempt + 1} - Raw edit instructions:")
+                print(instructions)
+                print("Expected format:", EditInstructions.model_json_schema())
+                
+                edit_data = json.loads(instructions)
+                if not isinstance(edit_data, list):
+                    raise ValueError("Edit instructions must be a list")
+                    
+                edits = []
+                for instr in edit_data:
+                    try:
+                        if not isinstance(instr, dict):
+                            raise ValueError("Each instruction must be a dictionary")
+                            
+                        if not all(k in instr for k in ['filepath', 'search_text', 'replacement_text']):
+                            raise ValueError("Missing required fields in instruction")
+                            
+                        edit = SearchReplaceEditInstruction(**instr)
+                        if edit.filepath not in [f['filepath'] for f in code_files]:
+                            raise ValueError(f"File {edit.filepath} not found in relevant files")
+                            
+                        edits.append(edit)
+                        
+                    except Exception as e:
+                        print(f"Invalid edit instruction: {e}\nInstruction: {instr}")
+                        continue
+                        
+                if not edits:
+                    raise ValueError("No valid edit instructions found after validation")
+                    
+                return edits
+                
+            except json.JSONDecodeError as e:
+                if attempt == self.max_retries - 1:
+                    raise ValueError(f"Invalid JSON in edit instructions after {self.max_retries} attempts: {e}")
+                print(f"JSON parse error on attempt {attempt + 1}, retrying...")
+                continue
+
+    def _apply_edits(self, edits: List[SearchReplaceEditInstruction], code_files: List[Dict[str, str]], dry_run: bool) -> bool:
+        """Apply validated edits to code files.
+        
+        Args:
+            edits: List of validated edit instructions
+            code_files: List of relevant files
+            dry_run: If True, only preview changes without saving
+            
+        Returns:
+            bool: True if any edits were successfully applied
+        """
+        success_count = 0
+        failed_files = []
+        
+        for edit in edits:
+            file = next((f for f in code_files if f['filepath'] == edit.filepath), None)
+            if not file:
+                failed_files.append(edit.filepath)
+                continue
+
+            original = self._remove_line_numbers(file['content'])
+            edited = self._apply_edit(original, edit.dict())
+            
+            print("--- Original content ---")
+            print(original)
+            print("--- Edited content ---")
+            print(edited)
+
+            if not dry_run and self._backup_and_write(edit.filepath, original, edited):
+                success_count += 1
+
+        if failed_files:
+            print(f"Failed to process {len(failed_files)} files: {', '.join(failed_files)}")
+            
+        if success_count == 0:
+            print("Warning: No changes were applied")
+            
+        return success_count > 0
+
     def process_edit_instruction(self, instruction: str, dry_run: bool = False) -> bool:
         """Process an edit instruction.
         
@@ -154,120 +324,12 @@ class CodeEditor:
             EditApplicationError: If edits cannot be applied
             FileWriteError: If file operations fail
         """
-        # Validate input
-        if not isinstance(instruction, str) or not instruction.strip():
-            raise ValueError("Instruction must be a non-empty string")
-            
-        if not isinstance(dry_run, bool):
-            raise ValueError("dry_run must be a boolean")
-        if not instruction or not instruction.strip():
-            raise ValueError("Instruction cannot be empty")
-            
+        self._validate_input(instruction, dry_run)
+        
         try:
-            # Search for relevant files
-            search_query = instruction.split(" to ")[0].replace("change ", "").strip()
-            print(f"Searching for files containing: '{search_query}'")
-            
-            search_results = self.retriever.retrieve(query=search_query, top_k=3)
-            file_paths = list(set(result[0] for result in search_results))
-            
-            if not file_paths:
-                raise FileNotFoundError("No relevant files found")
-                
-            print(f"Found {len(file_paths)} relevant files:")
-            for i, path in enumerate(file_paths):
-                print(f"{i+1}. {path}")
-                
-            # Load files with line numbers
-            code_files = [f for f in (self._load_code_file(p) for p in file_paths) if f]
-            if not code_files:
-                raise FileNotFoundError("No valid code files found")
-
-            # Get context and predict edits
-            retrieved_results = self.retriever.retrieve(query=instruction, top_k=3)
-            retrieved_context = "\n".join(f"File: {r[0]}\nCode:\n{r[1]}" for r in retrieved_results)
-            context = Context(retrieved_context=retrieved_context, online_search="")
-            
-            response = self.predictor(instruction=instruction, context=context)
-            
-            if not hasattr(response, 'edit_instructions'):
-                raise RuntimeError("Invalid response format from predictor - missing edit_instructions")
-                
-            # Retry parsing up to 3 times
-            max_retries = 3
-            for attempt in range(max_retries):
-                try:
-                    # Print debug info before parsing
-                    print(f"DEBUG INFO - Attempt {attempt + 1} - Raw edit instructions:")
-                    print(response.edit_instructions)
-                    print("Expected format:", EditInstructions.model_json_schema())
-                    
-                    # Parse and validate edit instructions
-                    edit_data = json.loads(response.edit_instructions)
-                    if not isinstance(edit_data, list):
-                        raise ValueError("Edit instructions must be a list")
-                        
-                    edits = []
-                    for instr in edit_data:
-                        try:
-                            # Validate each instruction
-                            if not isinstance(instr, dict):
-                                raise ValueError("Each instruction must be a dictionary")
-                                
-                            if not all(k in instr for k in ['filepath', 'search_text', 'replacement_text']):
-                                raise ValueError("Missing required fields in instruction")
-                                
-                            # Create and validate the instruction
-                            edit = SearchReplaceEditInstruction(**instr)
-                            if edit.filepath not in [f['filepath'] for f in code_files]:
-                                raise ValueError(f"File {edit.filepath} not found in relevant files")
-                                
-                            edits.append(edit)
-                            
-                        except Exception as e:
-                            print(f"Invalid edit instruction: {e}\nInstruction: {instr}")
-                            continue
-                            
-                    if not edits:
-                        raise ValueError("No valid edit instructions found after validation")
-                        
-                    # If we get here, parsing succeeded
-                    break
-                    
-                except json.JSONDecodeError as e:
-                    if attempt == max_retries - 1:
-                        raise ValueError(f"Invalid JSON in edit instructions after {max_retries} attempts: {e}")
-                    print(f"JSON parse error on attempt {attempt + 1}, retrying...")
-                    continue
-
-            # Apply edits
-            success_count = 0
-            failed_files = []
-            
-            for edit in edits:
-                file = next((f for f in code_files if f['filepath'] == edit.filepath), None)
-                if not file:
-                    failed_files.append(edit.filepath)
-                    continue
-
-                original = self._remove_line_numbers(file['content'])
-                edited = self._apply_edit(original, edit.dict())
-                
-                print("--- Original content ---")
-                print(original)
-                print("--- Edited content ---")
-                print(edited)
-
-                if not dry_run and self._backup_and_write(edit.filepath, original, edited):
-                    success_count += 1
-
-            if failed_files:
-                print(f"Failed to process {len(failed_files)} files: {', '.join(failed_files)}")
-                
-            if success_count == 0:
-                print("Warning: No changes were applied")
-                
-            return success_count > 0
+            code_files = self._get_relevant_files(instruction)
+            edits = self._generate_edit_instructions(instruction, code_files)
+            return self._apply_edits(edits, code_files, dry_run)
             
         except Exception as e:
             print(f"Error processing edit instruction: {e}")
