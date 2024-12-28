@@ -233,7 +233,6 @@ class CodeEditor:
                     error_msg += "- Unclosed quotes or brackets\n"
                     error_msg += "- Using single quotes instead of double quotes\n"
                     error_msg += "- Truncated JSON\n"
-                    error_msg += f"Received: {edit_text}"
                     # Write the full received text to a file for debugging
                     with open("debug_received_text.txt", "w") as f:
                         f.write(edit_text)
