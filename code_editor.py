@@ -227,12 +227,7 @@ class CodeEditor:
                     edit_instructions_format = str(EditInstructions.model_json_schema())
                     error_msg = f"Error parsing edit_instructions: {str(e)}.\n"
                     error_msg += "edit_instructions must be of the following format:\n"
-                    error_msg += edit_instructions_format + "\n\n"
-                    error_msg += "Common issues:\n"
-                    error_msg += "- Missing or extra commas\n"
-                    error_msg += "- Unclosed quotes or brackets\n"
-                    error_msg += "- Using single quotes instead of double quotes\n"
-                    error_msg += "- Truncated JSON\n"
+                    error_msg += edit_instructions_format + "\n"
                     # Write the full received text to a file for debugging
                     with open("debug_received_text.txt", "w") as f:
                         f.write(edit_text)
