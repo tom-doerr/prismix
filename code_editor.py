@@ -97,7 +97,12 @@ class CodeEditor:
             
         try:
             # Load code files
-            file_paths = [f for f in self.retriever.collection.list_points().points if f.endswith('.py')]
+            # Get all files from Qdrant
+            search_result = self.retriever.client.scroll(
+                collection_name=self.retriever.collection_name,
+                limit=1000
+            )
+            file_paths = list(set(payload["file_path"] for payload in search_result[0]))
             if not file_paths:
                 raise FileNotFoundError("No Python files found in the codebase")
                 
@@ -167,7 +172,7 @@ class CodeEditor:
 
             return success_count > 0
             
-        except dspy.AssertionError as e:
+        except dspy.DSPyAssertionError as e:
             print(f"Validation error: {e}")
             raise
         except Exception as e:

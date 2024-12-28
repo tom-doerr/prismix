@@ -37,7 +37,7 @@ def main() -> None:
     
     try:
         # Setup the LLM
-        llm = dspy.LM(model="gpt-4o-mini", api_key=os.environ.get("OPENAI_API_KEY"))
+        llm = dspy.LM(model="deepseek/deepseek-chat", max_tokens=200, cache=False)
         dspy.settings.configure(lm=llm)
 
         # Initialize the retriever and predictor
@@ -78,7 +78,7 @@ def main() -> None:
                 logging.error(f"File error: {e}")
             except RuntimeError as e:
                 logging.error(f"Edit generation failed: {e}")
-            except dspy.AssertionError as e:
+            except dspy.DSPyAssertionError as e:
                 logging.error(f"Validation error: {e}")
             except Exception as e:
                 logging.error(f"Unexpected error processing edit instruction: {e}", exc_info=True)
