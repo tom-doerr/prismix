@@ -91,16 +91,14 @@ class CodeEditor:
             raise ValueError("Instruction cannot be empty")
             
         try:
-            # Load code files
-            # Get all files from Qdrant
-            search_result = self.retriever.client.scroll(
-                collection_name=self.retriever.collection_name,
-                limit=1000
-            )
-            file_paths = list(set(record.payload["file_path"] for record in search_result[0]))
+            # Search for relevant files based on instruction
+            search_results = self.retriever.retrieve(query=instruction, top_k=3)
+            file_paths = list(set(result[0] for result in search_results))
+            
             if not file_paths:
-                raise FileNotFoundError("No Python files found in the codebase")
+                raise FileNotFoundError("No relevant files found for the instruction")
                 
+            print(f"Found {len(file_paths)} relevant files: {', '.join(file_paths)}")
             code_files = self.load_code_files(file_paths)
             
             if not code_files:
