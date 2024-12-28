@@ -69,8 +69,7 @@ class InferenceModule(dspy.Module):
 class CodeEdit(dspy.Signature):
     """Edits a code file based on an instruction using search/replace.
     
-    The edit_instructions output MUST be valid JSON in the following format:
-    ```json
+    The edit_instructions output MUST be valid JSON in the following EXACT format:
     {
         "edit_instructions": [
             {
@@ -80,7 +79,12 @@ class CodeEdit(dspy.Signature):
             }
         ]
     }
-    ```
+    
+    Important:
+    - Use double quotes for all strings
+    - Do not include any markdown code block markers (```)
+    - Do not include any trailing commas
+    - Ensure all fields are present
     """
 
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")

@@ -157,31 +157,41 @@ class CodeEditor:
                 import json
                 from prismix.core.models import EditInstructions
                 
-                # First try to parse as JSON
+                # Clean and parse the response
+                edit_text = response.edit_instructions.strip()
+                
+                # Remove markdown code block markers if present
+                if edit_text.startswith("```json") and edit_text.endswith("```"):
+                    edit_text = edit_text[7:-3].strip()
+                elif edit_text.startswith("```") and edit_text.endswith("```"):
+                    edit_text = edit_text[3:-3].strip()
+                
+                # Try to parse as JSON
                 try:
-                    edit_data = json.loads(response.edit_instructions)
-                except json.JSONDecodeError:
-                    # If direct JSON parsing fails, try to extract JSON from markdown code block
+                    edit_data = json.loads(edit_text)
+                except json.JSONDecodeError as e:
+                    # Try to fix common JSON issues
                     try:
-                        import re
-                        json_match = re.search(r'```json\n(.*?)\n```', response.edit_instructions, re.DOTALL)
-                        if json_match:
-                            edit_data = json.loads(json_match.group(1))
-                        else:
-                            # Try to find JSON in the response text
-                            json_match = re.search(r'\{.*\}', response.edit_instructions, re.DOTALL)
-                            if json_match:
-                                edit_data = json.loads(json_match.group())
-                            else:
-                                raise ValueError("Could not find valid JSON in response")
-                    except Exception as e:
+                        # Remove trailing commas
+                        edit_text = re.sub(r',\s*}', '}', edit_text)
+                        edit_text = re.sub(r',\s*]', ']', edit_text)
+                        # Fix single quotes
+                        edit_text = edit_text.replace("'", '"')
+                        edit_data = json.loads(edit_text)
+                    except json.JSONDecodeError as e:
                         raise dspy.DSPyAssertionError(
                             id="invalid_json_format",
-                            msg=f"Invalid edit instructions format: {e}. Must be valid JSON matching EditInstructions schema."
+                            msg=f"Invalid edit instructions format: {e}. Must be valid JSON matching EditInstructions schema. Received: {edit_text}"
                         )
                 
                 # Validate using Pydantic model
-                edit_instructions = EditInstructions(**edit_data)
+                try:
+                    edit_instructions = EditInstructions(**edit_data)
+                except Exception as e:
+                    raise dspy.DSPyAssertionError(
+                        id="invalid_edit_schema",
+                        msg=f"Edit instructions do not match required schema: {e}. Must match EditInstructions schema. Received: {edit_data}"
+                    )
                 
             except Exception as e:
                 raise dspy.DSPyAssertionError(
