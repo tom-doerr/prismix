@@ -228,45 +228,57 @@ class CodeEditor:
         Raises:
             ValueError: If instructions are invalid
         """
-        for attempt in range(self.max_retries):
+        # Print debug info
+        print("DEBUG INFO - Raw edit instructions:")
+        print(instructions)
+        print("Expected format:", EditInstructions.model_json_schema())
+            
+        # Use DSPy assertion for JSON validation
+        try:
+            edit_data = json.loads(instructions)
+            dspy.Assert(
+                isinstance(edit_data, list),
+                "Edit instructions must be a JSON array"
+            )
+        except json.JSONDecodeError as e:
+            debug_info = (
+                f"Error parsing edit_instructions: {e}\n"
+                f"Received: {instructions}\n"
+                f"Expected format: {EditInstructions.model_json_schema()}"
+            )
+            dspy.Assert(False, debug_info)
+                
+        # Validate each instruction
+        edits = []
+        for instr in edit_data:
             try:
-                print(f"DEBUG INFO - Attempt {attempt + 1} - Raw edit instructions:")
-                print(instructions)
-                print("Expected format:", EditInstructions.model_json_schema())
-                
-                edit_data = json.loads(instructions)
-                if not isinstance(edit_data, list):
-                    raise ValueError("Edit instructions must be a list")
+                dspy.Assert(
+                    isinstance(instr, dict),
+                    "Each instruction must be a dictionary"
+                )
+                dspy.Assert(
+                    all(k in instr for k in ['filepath', 'search_text', 'replacement_text']),
+                    "Missing required fields in instruction"
+                )
                     
-                edits = []
-                for instr in edit_data:
-                    try:
-                        if not isinstance(instr, dict):
-                            raise ValueError("Each instruction must be a dictionary")
-                            
-                        if not all(k in instr for k in ['filepath', 'search_text', 'replacement_text']):
-                            raise ValueError("Missing required fields in instruction")
-                            
-                        edit = SearchReplaceEditInstruction(**instr)
-                        if edit.filepath not in [f['filepath'] for f in code_files]:
-                            raise ValueError(f"File {edit.filepath} not found in relevant files")
-                            
-                        edits.append(edit)
-                        
-                    except Exception as e:
-                        print(f"Invalid edit instruction: {e}\nInstruction: {instr}")
-                        continue
-                        
-                if not edits:
-                    raise ValueError("No valid edit instructions found after validation")
+                edit = SearchReplaceEditInstruction(**instr)
+                dspy.Assert(
+                    edit.filepath in [f['filepath'] for f in code_files],
+                    f"File {edit.filepath} not found in relevant files"
+                )
                     
-                return edits
-                
-            except json.JSONDecodeError as e:
-                if attempt == self.max_retries - 1:
-                    raise ValueError(f"Invalid JSON in edit instructions after {self.max_retries} attempts: {e}")
-                print(f"JSON parse error on attempt {attempt + 1}, retrying...")
+                edits.append(edit)
+                    
+            except Exception as e:
+                print(f"Invalid edit instruction: {e}\nInstruction: {instr}")
                 continue
+                    
+        dspy.Assert(
+            len(edits) > 0,
+            "No valid edit instructions found after validation"
+        )
+            
+        return edits
 
     def _apply_edits(self, edits: List[SearchReplaceEditInstruction], code_files: List[Dict[str, str]], dry_run: bool) -> bool:
         """Apply validated edits to code files.
