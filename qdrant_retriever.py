@@ -91,27 +91,12 @@ class QdrantRetriever:
                 chunks = self.add_code_chunks(file_path, file_content)
                 all_chunks.extend(chunks)
 
+        # Get all embeddings in memory first
+        all_embeddings = self._get_jina_embeddings([chunk[1] for chunk in all_chunks])
+
         # Process in batches
-        for i in range(0, len(all_chunks), batch_size):
-            batch = all_chunks[i:i + batch_size]
-            self._add_chunks_batch(batch)
-
-    def _add_chunk(self, file_path: str, code_chunk: str, start_line: int):
-        """Adds a single code chunk to the Qdrant collection."""
-        self._add_chunks_batch([(file_path, code_chunk, start_line)])
-
-    def _add_chunks_batch(self, chunks: List[tuple]):
-        """Adds multiple code chunks to the Qdrant collection in a batch."""
-        if not chunks:
-            return
-            
-        # Get embeddings in batch
-        code_chunks = [chunk[1] for chunk in chunks]
-        embeddings = self._get_jina_embeddings(code_chunks)
-        
-        # Prepare batch data
         points = []
-        for (file_path, code_chunk, start_line), embedding in zip(chunks, embeddings):
+        for (file_path, code_chunk, start_line), embedding in zip(all_chunks, all_embeddings):
             point_id = hash(f"{file_path}-{start_line}")
             points.append(models.PointStruct(
                 id=point_id,
@@ -123,11 +108,25 @@ class QdrantRetriever:
                 }
             ))
             
-        # Upsert batch
-        self.client.upsert(
-            collection_name=self.collection_name,
-            points=points
-        )
+            # Upsert in batches
+            if len(points) >= batch_size:
+                self.client.upsert(
+                    collection_name=self.collection_name,
+                    points=points
+                )
+                points = []
+
+        # Upsert remaining points
+        if points:
+            self.client.upsert(
+                collection_name=self.collection_name,
+                points=points
+            )
+
+    def _add_chunk(self, file_path: str, code_chunk: str, start_line: int):
+        """Adds a single code chunk to the Qdrant collection."""
+        self._add_chunks_batch([(file_path, code_chunk, start_line)])
+
 
     def retrieve(self, query: str, top_k: int = 5) -> List[str]:
         """Retrieves the top_k most relevant documents for a given query."""
