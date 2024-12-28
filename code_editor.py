@@ -62,11 +62,6 @@ class CodeEditor:
             with open(backup_path, 'w') as backup:
                 backup.write(original_content)
             
-            # Validate line count
-            if len(new_content.splitlines()) != len(original_content.splitlines()):
-                print("Warning: Line count mismatch. Changes not applied.")
-                return False
-                
             # Write new content
             with open(file_path, 'w') as f:
                 f.write(new_content)
@@ -200,8 +195,13 @@ class CodeEditor:
 
             if failed_files:
                 print(f"Failed to process {len(failed_files)} files: {', '.join(failed_files)}")
-
-            return success_count > 0
+                return False
+                
+            if success_count == 0:
+                print("Warning: No changes were applied")
+                return False
+                
+            return True
             
         except dspy.DSPyAssertionError as e:
             print(f"Validation error: {e}")
