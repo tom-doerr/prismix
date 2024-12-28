@@ -127,37 +127,45 @@ class CodeEditor:
                 raise RuntimeError("Invalid response format from predictor - missing required fields")
                 
             # Parse edit instructions
+            # First try to parse as JSON
             try:
                 import json
-                # First try to parse as JSON
                 edit_instructions = json.loads(response.edit_instructions)
-                
-                # Validate the structure
-                if not isinstance(edit_instructions, dict):
-                    raise ValueError("Edit instructions must be a JSON object")
-                if 'edit_instructions' not in edit_instructions:
-                    raise ValueError("Missing 'edit_instructions' key")
-                if not isinstance(edit_instructions['edit_instructions'], list):
-                    raise ValueError("'edit_instructions' must be a list")
-                    
-            except json.JSONDecodeError as e:
-                # If JSON parsing fails, try to extract the JSON part from the response
+            except json.JSONDecodeError:
+                # If direct JSON parsing fails, try to extract JSON from markdown code block
                 try:
                     import re
-                    json_str = re.search(r'\{.*\}', response.edit_instructions, re.DOTALL)
-                    if json_str:
-                        edit_instructions = json.loads(json_str.group())
+                    json_match = re.search(r'```json\n(.*?)\n```', response.edit_instructions, re.DOTALL)
+                    if json_match:
+                        edit_instructions = json.loads(json_match.group(1))
                     else:
-                        raise ValueError("Could not find valid JSON in response")
-                except Exception as e2:
+                        # Try to find JSON in the response text
+                        json_match = re.search(r'\{.*\}', response.edit_instructions, re.DOTALL)
+                        if json_match:
+                            edit_instructions = json.loads(json_match.group())
+                        else:
+                            raise ValueError("Could not find valid JSON in response")
+                except Exception as e:
                     raise dspy.DSPyAssertionError(
                         id="invalid_json_format",
-                        msg=f"Invalid edit instructions format: {e2}. Must be valid JSON matching EditInstructions schema."
+                        msg=f"Invalid edit instructions format: {e}. Must be valid JSON matching EditInstructions schema."
                     )
-            except ValueError as e:
+            
+            # Validate the structure
+            if not isinstance(edit_instructions, dict):
                 raise dspy.DSPyAssertionError(
-                    id="invalid_json_structure", 
-                    msg=f"Invalid edit instructions structure: {e}. Must be valid JSON matching EditInstructions schema."
+                    id="invalid_json_structure",
+                    msg="Edit instructions must be a JSON object"
+                )
+            if 'edit_instructions' not in edit_instructions:
+                raise dspy.DSPyAssertionError(
+                    id="missing_key",
+                    msg="Missing 'edit_instructions' key in JSON"
+                )
+            if not isinstance(edit_instructions['edit_instructions'], list):
+                raise dspy.DSPyAssertionError(
+                    id="invalid_type",
+                    msg="'edit_instructions' must be a list"
                 )
 
             print("--- Output Values ---")

@@ -77,12 +77,26 @@ class InferenceModule(dspy.Module):
 
 
 class CodeEdit(dspy.Signature):
-    """Edits a code file based on an instruction using search/replace."""
+    """Edits a code file based on an instruction using search/replace.
+    
+    The edit_instructions output MUST be valid JSON in the following format:
+    ```json
+    {
+        "edit_instructions": [
+            {
+                "filepath": "path/to/file.py",
+                "search_text": "text to find",
+                "replacement_text": "text to replace with"
+            }
+        ]
+    }
+    ```
+    """
 
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")
     context = dspy.InputField(desc="Context for the code edit.", type=str)
     edit_instructions = dspy.OutputField(
-        desc="A list of search/replace edit instructions.", 
+        desc="A JSON string containing a list of search/replace edit instructions. MUST be valid JSON in the specified format.",
         base_signature=EditInstructions
     )
     search_query = dspy.OutputField(
