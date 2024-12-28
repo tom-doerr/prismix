@@ -12,6 +12,7 @@ from prismix.core.models import (
     EditInstructions,
     Scorer
 )
+from pydantic import BaseModel, Field
 
 
 class InferenceModule(dspy.Module):
@@ -64,39 +65,21 @@ class InferenceModule(dspy.Module):
         
         return dspy.Prediction(**prediction_dict)
 
+class SearchReplaceEditInstruction2(BaseModel):
+    filepath: str = Field(..., desc="The path to the file that should be edited.")
+    search_text: str = Field(..., desc="The text to search for.")
+    replacement_text: str = Field(..., desc="The text to replace the found text with.")
 
 
 class CodeEdit(dspy.Signature):
     """Edits a code file based on an instruction using search/replace.
-    
-    The edit_instructions output MUST be valid JSON in the following EXACT format:
-    {
-        "edit_instructions": [
-            {
-                "filepath": "path/to/file.py",
-                "search_text": "text to find",
-                "replacement_text": "text to replace with"
-            }
-        ]
-    }
-    
-    Important:
-    - Use double quotes for all strings (not single quotes)
-    - Do not include any markdown code block markers (```)
-    - Do not include any trailing commas after the last item in arrays/objects
-    - Ensure all fields are present (filepath, search_text, replacement_text)
-    - The JSON must be complete and valid
-    - Escape double quotes within strings using backslash (\")
-    - Ensure proper closing of all brackets and braces
-    - Each edit_instruction must be a complete object
-    - The JSON must not be truncated or incomplete
     """
 
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")
     context = dspy.InputField(desc="Context for the code edit.", type=str)
     edit_instructions = dspy.OutputField(
-        desc="A JSON string containing a list of search/replace edit instructions. MUST be valid JSON in the specified format.",
-        base_signature=EditInstructions
+        desc="",
+        base_signature=SearchReplaceEditInstruction2,
     )
 
 
