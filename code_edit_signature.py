@@ -50,10 +50,6 @@ class InferenceModule(dspy.Module):
                         False,
                         f"Error parsing edit_instructions: {e}. edit_instructions must be of the following format: {edit_instructions_format}",
                     )
-                validate_edit_instructions(
-                    parsed_edit_instructions,
-                    target_module=self.forward,
-                )
                 prediction.edit_instructions = (
                     prediction.edit_instructions
                 )
@@ -289,9 +285,6 @@ def generate_answer_with_assertions(instruction, context):
 
         edit_instructions = json.loads(prediction.edit_instructions)
         validated_edit_instructions = EditInstructions(edit_instructions=edit_instructions)
-        validate_edit_instructions(
-            validated_edit_instructions.edit_instructions, prediction, target_module=module.forward
-        )
         prediction.edit_instructions = validated_edit_instructions.edit_instructions
     except Exception as e:
         dspy.Assert(False,
