@@ -15,7 +15,7 @@ from prismix.core.models import (
 from pydantic import BaseModel, Field, ValidationError
 
 # Move instruction context pairs to a separate file
-from .instruction_context_pairs import INSTRUCTION_CONTEXT_PAIRS
+from instruction_context_pairs import INSTRUCTION_CONTEXT_PAIRS
 
 
 class CodeEditInference(dspy.Module):
