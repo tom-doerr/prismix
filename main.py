@@ -1,12 +1,47 @@
 import argparse
 import os
 import sys
+from typing import List, Optional, Dict, Any
 
 import dspy
 
-from code_edit_signature import CodeEdit, Context
+from code_edit_signature import CodeEdit, Context, CodeFile
 from code_edit_utils import apply_code_edit
 from qdrant_retriever import QdrantRetriever
+
+def add_line_numbers(content: str) -> str:
+    """Add line numbers to code content"""
+    lines = content.splitlines()
+    return "\n".join(f"{i+1:4} {line}" for i, line in enumerate(lines))
+
+def remove_line_numbers(text: str) -> str:
+    """Remove line numbers from code content"""
+    lines = text.splitlines()
+    return "\n".join(line[7:] if len(line) > 7 else line for line in lines)
+
+def validate_edit_instruction(instruction: Any) -> bool:
+    """Validate that edit instruction has required fields"""
+    return (hasattr(instruction, 'start_line') and 
+            hasattr(instruction, 'end_line') and 
+            hasattr(instruction, 'replacement_text')) or \
+           (hasattr(instruction, 'search_text') and 
+            hasattr(instruction, 'replacement_text'))
+
+def load_code_files(file_paths: List[str]) -> List[CodeFile]:
+    """Load and number code files"""
+    code_files = []
+    for file_path in file_paths:
+        if not os.path.exists(file_path):
+            print(f"Error: File not found at {file_path}")
+            continue
+        try:
+            with open(file_path, 'r') as f:
+                file_content = f.read()
+            numbered_content = add_line_numbers(file_content)
+            code_files.append(CodeFile(filepath=file_path, filecontent=numbered_content))
+        except Exception as e:
+            print(f"Error reading file {file_path}: {e}")
+    return code_files
 
 # Setup the LLM
 llm = dspy.LM(model="gpt-4o-mini", api_key=os.environ.get("OPENAI_API_KEY"))
@@ -78,28 +113,24 @@ while edit_count < args.max_edits:
                     print(f"Error: File not found in code_files: {file_path}")
                     continue
 
-                if hasattr(edit_instruction, 'start_line') and hasattr(edit_instruction, 'end_line') and hasattr(edit_instruction, 'replacement_text'):
-                    start_line = int(edit_instruction.start_line)
-                    end_line = int(edit_instruction.end_line)
-                    replacement_text = edit_instruction.replacement_text
-
-                    edited_content = apply_code_edit(
-                        file_content=file_content,
-                        start_line=start_line,
-                        end_line=end_line,
-                        replacement_text=replacement_text
-                    )
-                elif hasattr(edit_instruction, 'search_text') and hasattr(edit_instruction, 'replacement_text'):
-                    search_text = edit_instruction.search_text
-                    replacement_text = edit_instruction.replacement_text
-
-                    def replace_text(text: str, search_text: str, replacement_text: str) -> str:
-                        return text.replace(search_text, replacement_text)
-
-                    edited_content = replace_text(file_content, search_text, replacement_text)
-                else:
-                    print(f"Error: Invalid edit instruction: {edit_instruction}")
-                    continue
+def apply_edit_instruction(file_content: str, instruction: Any) -> Optional[str]:
+    """Apply edit instruction to file content"""
+    if not validate_edit_instruction(instruction):
+        print(f"Error: Invalid edit instruction: {instruction}")
+        return None
+        
+    if hasattr(instruction, 'start_line'):
+        return apply_code_edit(
+            file_content=file_content,
+            start_line=int(instruction.start_line),
+            end_line=int(instruction.end_line),
+            replacement_text=instruction.replacement_text
+        )
+    else:
+        return file_content.replace(
+            instruction.search_text,
+            instruction.replacement_text
+        )
 
 
                 def remove_line_numbers(text: str) -> str:
@@ -113,23 +144,27 @@ while edit_count < args.max_edits:
                 print("--- Edited content ---")
                 print(unumbered_edited_content)
 
-                # Create backup
-                backup_path = f"{file_path}.bak"
-                try:
-                    with open(backup_path, 'w') as backup:
-                        backup.write(file_content)
-                    
-                    # Validate line numbers before writing
-                    if len(unumbered_edited_content.splitlines()) != len(file_content.splitlines()):
-                        print("Warning: Line count mismatch. Changes not applied.")
-                        continue
-                        
-                    with open(file_path, 'w') as f:
-                        f.write(unumbered_edited_content)
-                    print(f"File {file_path} updated. Backup saved to {backup_path}")
-                except Exception as e:
-                    print(f"Error writing file {file_path}: {e}")
-                    continue
+def backup_and_write_file(file_path: str, original_content: str, new_content: str) -> bool:
+    """Create backup and write new content to file"""
+    backup_path = f"{file_path}.bak"
+    try:
+        # Create backup
+        with open(backup_path, 'w') as backup:
+            backup.write(original_content)
+        
+        # Validate line count
+        if len(new_content.splitlines()) != len(original_content.splitlines()):
+            print("Warning: Line count mismatch. Changes not applied.")
+            return False
+            
+        # Write new content
+        with open(file_path, 'w') as f:
+            f.write(new_content)
+        print(f"File {file_path} updated. Backup saved to {backup_path}")
+        return True
+    except Exception as e:
+        print(f"Error writing file {file_path}: {e}")
+        return False
 
 
         except Exception as e:
