@@ -90,37 +90,21 @@ def validate_edit_instructions(edit_instructions, target_module):
             "Each edit instruction must have a filepath",
             target_module=target_module,
         )
-        if "start_line" in item:
-            dspy.Suggest(
-                "end_line" in item,
-                "LineNumberEditInstruction must have an end_line",
-                target_module=target_module,
-            )
-            dspy.Suggest(
-                "replacement_text" in item,
-                "LineNumberEditInstruction must have a replacement_text",
-                target_module=target_module,
-            )
-        elif "search_text" in item:
-            dspy.Suggest(
-                "replacement_text" in item,
-                "SearchReplaceEditInstruction must have a replacement_text",
-                target_module=target_module,
-            )
+        dspy.Suggest(
+            "search_text" in item,
+            "SearchReplaceEditInstruction must have a search_text",
+            target_module=target_module,
+        )
+        dspy.Suggest(
+            "replacement_text" in item,
+            "SearchReplaceEditInstruction must have a replacement_text",
+            target_module=target_module,
+        )
 
 
 class CodeFile(BaseModel):
     filepath: str
     filecontent: str
-
-
-class LineNumberEditInstruction(BaseModel):
-    start_line: int = Field(..., desc="The line number where the edit should start.")
-    end_line: int = Field(..., desc="The line number where the edit should end.")
-    replacement_text: str = Field(
-        ..., desc="The text that should replace the lines from start_line to end_line."
-    )
-    filepath: str = Field(..., desc="The path to the file that should be edited.")
 
 
 class SearchReplaceEditInstruction(BaseModel):
@@ -130,9 +114,9 @@ class SearchReplaceEditInstruction(BaseModel):
 
 
 class EditInstructions(BaseModel):
-    edit_instructions: list[
-        Union[LineNumberEditInstruction, SearchReplaceEditInstruction]
-    ] = Field(..., desc="A list of edit instructions.")
+    edit_instructions: list[SearchReplaceEditInstruction] = Field(
+        ..., desc="A list of search/replace edit instructions."
+    )
 
 
 class CodeEdit(dspy.Signature):
