@@ -24,20 +24,32 @@ class QdrantRetriever:
 
     def _create_collection(self):
         """Creates the Qdrant collection if it doesn't exist."""
-        if self.model:
-            embedding_size = self.model.get_sentence_embedding_dimension()
-        else:
-            embedding_size = 256
+        try:
+            if self.model:
+                embedding_size = self.model.get_sentence_embedding_dimension()
+            else:
+                embedding_size = 256
+                
+            # Check if collection exists first
+            collections = self.client.get_collections()
+            if not collections:
+                raise RuntimeError("Failed to get collections from Qdrant")
+                
+            collection_names = [c.name for c in collections.collections]
             
-        # Check if collection exists first
-        collections = self.client.get_collections()
-        collection_names = [c.name for c in collections.collections]
-        
-        if self.collection_name not in collection_names:
-            self.client.create_collection(
-                collection_name=self.collection_name,
-                vectors_config=models.VectorParams(size=embedding_size, distance=models.Distance.COSINE),
-            )
+            if self.collection_name not in collection_names:
+                print(f"Creating new collection: {self.collection_name}")
+                self.client.create_collection(
+                    collection_name=self.collection_name,
+                    vectors_config=models.VectorParams(
+                        size=embedding_size, 
+                        distance=models.Distance.COSINE
+                    ),
+                )
+                print(f"Created collection {self.collection_name} with embedding size {embedding_size}")
+        except Exception as e:
+            print(f"Error creating collection: {e}")
+            raise
 
     def add_files(self, include_glob: str, exclude_glob: str = None):
         """Adds files matching the include glob, excluding those matching the exclude glob."""
@@ -83,45 +95,72 @@ class QdrantRetriever:
         for file in files:
             print(f"- {file}")
 
-        # Collect all chunks first
+        # Collect all chunks first with progress tracking
         all_chunks = []
-        for file_path in files:
-            with open(file_path, 'r') as f:
-                file_content = f.read()
-                chunks = self.add_code_chunks(file_path, file_content)
-                all_chunks.extend(chunks)
+        total_files = len(files)
+        for i, file_path in enumerate(files):
+            try:
+                with open(file_path, 'r') as f:
+                    file_content = f.read()
+                    chunks = self.add_code_chunks(file_path, file_content)
+                    all_chunks.extend(chunks)
+                    
+                # Print progress every 10 files
+                if (i + 1) % 10 == 0 or (i + 1) == total_files:
+                    print(f"Processed {i+1}/{total_files} files ({len(all_chunks)} chunks)")
+            except Exception as e:
+                print(f"Error processing file {file_path}: {e}")
+                continue
 
         # Get all embeddings in memory first
         all_embeddings = self._get_jina_embeddings([chunk[1] for chunk in all_chunks])
 
-        # Process in batches
+        # Process in batches with statistics
         points = []
-        for (file_path, code_chunk, start_line), embedding in zip(all_chunks, all_embeddings):
-            point_id = hash(f"{file_path}-{start_line}")
-            points.append(models.PointStruct(
-                id=point_id,
-                vector=embedding,
-                payload={
-                    "file_path": file_path,
-                    "text": code_chunk,
-                    "start_line": start_line
-                }
-            ))
-            
-            # Upsert in batches
-            if len(points) >= batch_size:
+        total_chunks = len(all_chunks)
+        start_time = time.time()
+        
+        for i, ((file_path, code_chunk, start_line), embedding) in enumerate(zip(all_chunks, all_embeddings)):
+            try:
+                point_id = hash(f"{file_path}-{start_line}")
+                points.append(models.PointStruct(
+                    id=point_id,
+                    vector=embedding,
+                    payload={
+                        "file_path": file_path,
+                        "text": code_chunk,
+                        "start_line": start_line
+                    }
+                ))
+                
+                # Upsert in batches
+                if len(points) >= batch_size:
+                    self.client.upsert(
+                        collection_name=self.collection_name,
+                        points=points
+                    )
+                    points = []
+                    
+                    # Print progress every 100 chunks
+                    if (i + 1) % 100 == 0 or (i + 1) == total_chunks:
+                        elapsed = time.time() - start_time
+                        rate = (i + 1) / elapsed if elapsed > 0 else 0
+                        print(f"Processed {i+1}/{total_chunks} chunks ({rate:.1f} chunks/sec)")
+                        
+            except Exception as e:
+                print(f"Error processing chunk {i+1}: {e}")
+                continue
+
+        # Upsert remaining points
+        if points:
+            try:
                 self.client.upsert(
                     collection_name=self.collection_name,
                     points=points
                 )
-                points = []
-
-        # Upsert remaining points
-        if points:
-            self.client.upsert(
-                collection_name=self.collection_name,
-                points=points
-            )
+                print(f"Processed final batch of {len(points)} chunks")
+            except Exception as e:
+                print(f"Error processing final batch: {e}")
 
     def _add_chunk(self, file_path: str, code_chunk: str, start_line: int):
         """Adds a single code chunk to the Qdrant collection."""
@@ -204,6 +243,28 @@ class QdrantRetriever:
     def _get_jina_embedding(self, text: str) -> List[float]:
         """Gets the Jina embedding for the given text."""
         return self._get_jina_embeddings([text])[0]
+
+    def cleanup_old_collections(self, keep_last_n: int = 3):
+        """Cleans up old collections, keeping only the most recent ones."""
+        try:
+            collections = self.client.get_collections()
+            if not collections:
+                return
+                
+            # Sort collections by creation date
+            sorted_collections = sorted(
+                collections.collections,
+                key=lambda c: c.creation_time,
+                reverse=True
+            )
+            
+            # Delete old collections
+            for collection in sorted_collections[keep_last_n:]:
+                print(f"Deleting old collection: {collection.name}")
+                self.client.delete_collection(collection.name)
+                
+        except Exception as e:
+            print(f"Error cleaning up collections: {e}")
 
     def _get_jina_embeddings(self, texts: List[str]) -> List[List[float]]:
         """Gets Jina embeddings for a batch of texts."""
