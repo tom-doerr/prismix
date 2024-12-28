@@ -202,14 +202,6 @@ def run_code_edit_example():
         print(f"Generated Answer: {prediction.edit_instructions}")
 
 
-from pydantic import BaseModel, Field
-
-class Scorer(BaseModel):
-    score: float = Field(
-        ..., ge=0, le=10, desc="The score of the edit, value between 0 and 10."
-    )
-
-
 # new signature for rating the output
 class CodeEditRating(dspy.Signature):
     """Rates how close the edit_instruction conforms to the edit_format."""
