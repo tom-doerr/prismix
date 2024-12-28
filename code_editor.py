@@ -19,7 +19,7 @@ class FileWriteError(Exception):
 class CodeEditor:
     """Handles code editing operations using search/replace instructions."""
     
-    def __init__(self, retriever: QdrantRetriever, predictor: Any):
+    def __init__(self, retriever: QdrantRetriever, predictor: Any, search_results: int = 5):
         """Initialize the code editor.
         
         Args:
@@ -30,6 +30,7 @@ class CodeEditor:
         # Use the predictor directly since it's already transformed
         self.predictor = predictor
         self.max_retries = 3
+        self.search_results = search_results
 
     def _add_line_numbers(self, content: str) -> str:
         """Add line numbers to code content."""
@@ -177,7 +178,8 @@ class CodeEditor:
         search_query = instruction.split(" to ")[0].replace("change ", "").strip()
         print(f"Searching for files containing: '{search_query}'")
         
-        search_results = self.retriever.retrieve(query=search_query, top_k=3)
+        # Get more results initially to ensure we find relevant files
+        search_results = self.retriever.retrieve(query=search_query, top_k=5)
         file_paths = list(set(result[0] for result in search_results))
         
         if not file_paths:
@@ -207,7 +209,8 @@ class CodeEditor:
             RuntimeError: If predictor fails to generate valid edits
             ValueError: If instructions are invalid
         """
-        retrieved_results = self.retriever.retrieve(query=instruction, top_k=3)
+        # Get more context for the edit generation
+        retrieved_results = self.retriever.retrieve(query=instruction, top_k=5) 
         retrieved_context = "\n".join(f"File: {r[0]}\nCode:\n{r[1]}" for r in retrieved_results)
         context = Context(retrieved_context=retrieved_context, online_search="")
         

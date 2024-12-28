@@ -80,8 +80,10 @@ def main() -> None:
                           help="Instruction for code modification.")
         parser.add_argument("--dry-run", action="store_true", 
                           help="Preview changes without saving")
-        parser.add_argument("--max-edits", type=int, default=10, 
+        parser.add_argument("--max-edits", type=int, default=10,
                           help="Maximum number of edits to perform")
+        parser.add_argument("--search-results", type=int, default=5,
+                          help="Number of search results to consider (default: 5)")
         args = parser.parse_args()
 
         # Main edit loop

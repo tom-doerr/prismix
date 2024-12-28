@@ -168,7 +168,7 @@ class QdrantRetriever:
         self._add_chunks_batch([(file_path, code_chunk, start_line)])
 
 
-    def retrieve(self, query: str, top_k: int = 5) -> List[str]:
+    def retrieve(self, query: str, top_k: int = 3) -> List[str]:
         """Retrieves the top_k most relevant documents for a given query.
         
         Args:
