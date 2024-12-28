@@ -94,6 +94,15 @@ class CodeEditor:
             print(f"Error writing file {file_path}: {e}")
             return False
 
+    def _is_valid_json(self, text: str) -> bool:
+        """Helper method to validate JSON format."""
+        try:
+            import json
+            json.loads(text)
+            return True
+        except json.JSONDecodeError:
+            return False
+
     def process_edit_instruction(self, instruction: str, dry_run: bool = False) -> bool:
         """Process a single edit instruction.
         
@@ -167,23 +176,14 @@ class CodeEditor:
                 elif edit_text.startswith("```") and edit_text.endswith("```"):
                     edit_text = edit_text[3:-3].strip()
                 
-                # Try to parse as JSON
-                try:
-                    edit_data = json.loads(edit_text)
-                except json.JSONDecodeError as e:
-                    # Try to fix common JSON issues
-                    try:
-                        # Remove trailing commas
-                        edit_text = re.sub(r',\s*}', '}', edit_text)
-                        edit_text = re.sub(r',\s*]', ']', edit_text)
-                        # Fix single quotes
-                        edit_text = edit_text.replace("'", '"')
-                        edit_data = json.loads(edit_text)
-                    except json.JSONDecodeError as e:
-                        raise dspy.DSPyAssertionError(
-                            id="invalid_json_format",
-                            msg=f"Invalid edit instructions format: {e}. Must be valid JSON matching EditInstructions schema. Received: {edit_text}"
-                        )
+                # Validate JSON format with dspy.Assert
+                dspy.Assert(
+                    self._is_valid_json(edit_text),
+                    f"Invalid edit instructions format. Must be valid JSON matching EditInstructions schema. Received: {edit_text}"
+                )
+                
+                # Parse the validated JSON
+                edit_data = json.loads(edit_text)
                 
                 # Validate using Pydantic model
                 try:

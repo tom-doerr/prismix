@@ -85,6 +85,8 @@ class CodeEdit(dspy.Signature):
     - Do not include any markdown code block markers (```)
     - Do not include any trailing commas
     - Ensure all fields are present
+    - The JSON must be complete and valid
+    - Escape double quotes within strings using backslash (\")
     """
 
     instruction = dspy.InputField(desc="Instruction on how to modify the code.")
