@@ -45,6 +45,10 @@ class QdrantRetriever:
         if exclude_glob:
             exclude_files = glob.glob(exclude_glob, recursive=True)
             files = [f for f in files if f not in exclude_files]
+            
+        print(f"Indexing {len(files)} files:")
+        for file in files:
+            print(f"- {file}")
 
         for file_path in files:
             with open(file_path, 'r') as f:
