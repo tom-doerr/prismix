@@ -12,7 +12,7 @@ from prismix.core.models import (
     EditInstructions,
     Scorer
 )
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 
 class InferenceModule(dspy.Module):
