@@ -1,10 +1,10 @@
 import functools
 import json
-from typing import Union, List
+from typing import Union, List, Optional
 
 import dspy
 from dspy.primitives.assertions import assert_transform_module, backtrack_handler
-from dspy.teleprompt import BootstrapFewShot
+from dspy.teleprompt import BootstrapFewShot, MIPROv2
 from prismix.core.models import (
     Context,
     CodeFile,
@@ -14,11 +14,19 @@ from prismix.core.models import (
 )
 from pydantic import BaseModel, Field, ValidationError
 
+# Move instruction context pairs to a separate file
+from .instruction_context_pairs import INSTRUCTION_CONTEXT_PAIRS
 
-class InferenceModule(dspy.Module):
+
+class CodeEditInference(dspy.Module):
     """Handles code edit inference using search/replace instructions."""
     
-    def __init__(self, signature):
+    def __init__(self, signature: dspy.Signature):
+        """Initialize the code edit inference module.
+        
+        Args:
+            signature: The DSPy signature to use for predictions
+        """
         super().__init__()
         self.predictor = dspy.ChainOfThought(signature)
         self.signature = signature
@@ -366,44 +374,83 @@ def run_mipro_optimization():
 
 
 
-def run_bootstrap_fewshot_optimization() -> dspy.Module:
-    """Optimize the code edit module using BootstrapFewShot.
+class CodeEditOptimizer:
+    """Handles optimization of code edit modules using different strategies."""
     
-    Returns:
-        dspy.Module: Optimized program
-    """
-    # Create training dataset
-    trainset = [
-        dspy.Example(
-            instruction=item["instruction"], 
-            context=item["context"]
-        ).with_inputs("instruction", "context")
-        for item in instruction_context_pairs
-    ]
+    def __init__(self):
+        self.trainset = self._create_trainset()
+        
+    def _create_trainset(self) -> List[dspy.Example]:
+        """Create training dataset from instruction-context pairs."""
+        return [
+            dspy.Example(
+                instruction=item["instruction"], 
+                context=item["context"]
+            ).with_inputs("instruction", "context")
+            for item in INSTRUCTION_CONTEXT_PAIRS
+        ]
+    
+    def optimize_with_bootstrap(self) -> dspy.Module:
+        """Optimize using BootstrapFewShot strategy.
+        
+        Returns:
+            dspy.Module: Optimized program
+        """
+        teleprompter = BootstrapFewShot(
+            metric=custom_metric,
+            max_bootstrapped_demos=8,
+            max_labeled_demos=4,
+            max_rounds=10,
+            num_threads=10
+        )
 
-    # Configure optimizer
-    teleprompter = BootstrapFewShot(
-        metric=custom_metric,
-        max_bootstrapped_demos=8,
-        max_labeled_demos=4,
-        max_rounds=10,
-        num_threads=10
-    )
+        module = CodeEditInference(CodeEdit)
+        optimized_program = teleprompter.compile(
+            assert_transform_module(
+                module,
+                functools.partial(backtrack_handler, max_backtracks=10)
+            ),
+            trainset=self.trainset,
+        )
 
-    # Create and optimize module
-    module = InferenceModule(CodeEdit)
-    optimized_program = teleprompter.compile(
-        assert_transform_module(
-            module,
-            functools.partial(backtrack_handler, max_backtracks=10)
-        ),
-        trainset=trainset,
-    )
+        optimized_program.save("bootstrap_optimized.json")
+        print("BootstrapFewShot optimization complete.")
+        return optimized_program
+        
+    def optimize_with_mipro(self) -> dspy.Module:
+        """Optimize using MIPRO strategy.
+        
+        Returns:
+            dspy.Module: Optimized program
+        """
+        teleprompter = MIPROv2(
+            metric=custom_metric,
+            auto="heavy",
+            num_candidates=7,
+            init_temperature=0.5,
+            max_bootstrapped_demos=3,
+            max_labeled_demos=4,
+            verbose=False,
+            num_threads=10,
+        )
 
-    # Save optimized program
-    optimized_program.save("bootstrap_optimized.json")
-    print("BootstrapFewShot optimization complete.")
-    return optimized_program
+        module = CodeEditInference(CodeEdit)
+        optimized_program = teleprompter.compile(
+            assert_transform_module(
+                module,
+                functools.partial(backtrack_handler, max_backtracks=10)
+            ),
+            trainset=self.trainset,
+            num_trials=15,
+            minibatch_size=25,
+            minibatch_full_eval_steps=100,
+            minibatch=True,
+            requires_permission_to_run=False,
+        )
+
+        optimized_program.save("mipro_optimized.json")
+        print("MIPRO optimization complete.")
+        return optimized_program
 
 
 def load_optimized_program(filename: str):
@@ -462,7 +509,21 @@ def run_code_edit_example():
         print(f"Generated Answer: {prediction.edit_instructions}")
 
 
+def main():
+    """Main execution function for code edit signature."""
+    optimizer = CodeEditOptimizer()
+    
+    # Choose optimization strategy
+    # optimized_program = optimizer.optimize_with_bootstrap()
+    optimized_program = optimizer.optimize_with_mipro()
+    
+    # Example usage
+    example = INSTRUCTION_CONTEXT_PAIRS[0]
+    prediction = optimized_program(
+        instruction=example["instruction"],
+        context=example["context"]
+    )
+    print("Generated edit instructions:", prediction.edit_instructions)
+
 if __name__ == "__main__":
-    # run_bootstrap_fewshot_optimization()
-    # run_code_edit_example()
-    run_mipro_optimization()
+    main()
