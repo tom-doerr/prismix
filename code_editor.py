@@ -176,18 +176,40 @@ class CodeEditor:
             response = self.predictor(instruction=instruction, context=context)
             
             if not hasattr(response, 'edit_instructions'):
-                raise RuntimeError("Invalid response format from predictor")
+                raise RuntimeError("Invalid response format from predictor - missing edit_instructions")
                 
-            # Process edit instructions
-            edits = [
-                SearchReplaceEditInstruction(**instr)
-                for instr in response.edit_instructions
-                if isinstance(instr, dict) and 
-                   all(k in instr for k in ['filepath', 'search_text', 'replacement_text'])
-            ]
-            
-            if not edits:
-                raise ValueError("No valid edit instructions found")
+            try:
+                # Parse and validate edit instructions
+                edit_data = json.loads(response.edit_instructions)
+                if not isinstance(edit_data, list):
+                    raise ValueError("Edit instructions must be a list")
+                    
+                edits = []
+                for instr in edit_data:
+                    try:
+                        # Validate each instruction
+                        if not isinstance(instr, dict):
+                            raise ValueError("Each instruction must be a dictionary")
+                            
+                        if not all(k in instr for k in ['filepath', 'search_text', 'replacement_text']):
+                            raise ValueError("Missing required fields in instruction")
+                            
+                        # Create and validate the instruction
+                        edit = SearchReplaceEditInstruction(**instr)
+                        if edit.filepath not in [f['filepath'] for f in code_files]:
+                            raise ValueError(f"File {edit.filepath} not found in relevant files")
+                            
+                        edits.append(edit)
+                        
+                    except Exception as e:
+                        print(f"Invalid edit instruction: {e}\nInstruction: {instr}")
+                        continue
+                        
+                if not edits:
+                    raise ValueError("No valid edit instructions found after validation")
+                    
+            except json.JSONDecodeError as e:
+                raise ValueError(f"Invalid JSON in edit instructions: {e}")
 
             # Apply edits
             success_count = 0

@@ -81,13 +81,20 @@ class SearchReplaceEditInstruction2(BaseModel):
 
 class CodeEdit(dspy.Signature):
     """Edits a code file based on an instruction using search/replace.
-    """
+    Returns a JSON array of edit instructions with filepath, search_text, and replacement_text."""
 
-    instruction = dspy.InputField(desc="Instruction on how to modify the code.")
-    context = dspy.InputField(desc="Context for the code edit.", type=str)
+    instruction = dspy.InputField(
+        desc="Specific instruction on how to modify the code. Be precise about what to change."
+    )
+    context = dspy.InputField(
+        desc="Context for the code edit including relevant code snippets.", 
+        type=str
+    )
     edit_instructions = dspy.OutputField(
-        desc="",
-        base_signature=SearchReplaceEditInstruction2,
+        desc="JSON array of edit instructions. Each instruction must have: "
+             "filepath (string), search_text (string), replacement_text (string). "
+             "Example: [{'filepath': 'test.py', 'search_text': 'print()', 'replacement_text': 'print(time_in_china)'}]",
+        type=str
     )
 
 
