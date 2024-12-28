@@ -176,11 +176,53 @@ class CodeEditor:
                 elif edit_text.startswith("```") and edit_text.endswith("```"):
                     edit_text = edit_text[3:-3].strip()
                 
-                # Validate JSON format with dspy.Assert
-                dspy.Assert(
-                    self._is_valid_json(edit_text),
-                    f"Invalid edit instructions format. Must be valid JSON matching EditInstructions schema. Received: {edit_text}"
-                )
+                # Validate JSON format with detailed feedback
+                try:
+                    import json
+                    parsed = json.loads(edit_text)
+                    
+                    # Check basic structure
+                    dspy.Assert(
+                        isinstance(parsed, dict),
+                        "Top level must be a JSON object with 'edit_instructions' array"
+                    )
+                    dspy.Assert(
+                        'edit_instructions' in parsed,
+                        "Missing 'edit_instructions' array in JSON"
+                    )
+                    dspy.Assert(
+                        isinstance(parsed['edit_instructions'], list),
+                        "'edit_instructions' must be an array of edit objects"
+                    )
+                    
+                    # Validate each edit instruction
+                    for i, instr in enumerate(parsed['edit_instructions']):
+                        dspy.Assert(
+                            isinstance(instr, dict),
+                            f"Edit instruction {i+1} must be a JSON object"
+                        )
+                        dspy.Assert(
+                            'filepath' in instr,
+                            f"Edit instruction {i+1} missing 'filepath' field"
+                        )
+                        dspy.Assert(
+                            'search_text' in instr,
+                            f"Edit instruction {i+1} missing 'search_text' field"
+                        )
+                        dspy.Assert(
+                            'replacement_text' in instr,
+                            f"Edit instruction {i+1} missing 'replacement_text' field"
+                        )
+                        
+                except json.JSONDecodeError as e:
+                    error_msg = f"Invalid JSON format: {str(e)}. "
+                    error_msg += "Common issues:\n"
+                    error_msg += "- Missing or extra commas\n"
+                    error_msg += "- Unclosed quotes or brackets\n"
+                    error_msg += "- Using single quotes instead of double quotes\n"
+                    error_msg += "- Truncated JSON\n"
+                    error_msg += f"Received: {edit_text[:200]}..." if len(edit_text) > 200 else f"Received: {edit_text}"
+                    dspy.Assert(False, error_msg)
                 
                 # Parse the validated JSON
                 edit_data = json.loads(edit_text)
