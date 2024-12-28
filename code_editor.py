@@ -223,7 +223,18 @@ class CodeEditor:
                         )
                         
                 except json.JSONDecodeError as e:
-                    error_msg = f"Invalid JSON format: {str(e)}. "
+                    edit_instructions_format = """{
+    "edit_instructions": [
+        {
+            "filepath": "path/to/file.py",
+            "search_text": "text to search for",
+            "replacement_text": "text to replace with"
+        }
+    ]
+}"""
+                    error_msg = f"Error parsing edit_instructions: {str(e)}.\n"
+                    error_msg += "edit_instructions must be of the following format:\n"
+                    error_msg += edit_instructions_format + "\n\n"
                     error_msg += "Common issues:\n"
                     error_msg += "- Missing or extra commas\n"
                     error_msg += "- Unclosed quotes or brackets\n"
