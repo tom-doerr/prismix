@@ -178,23 +178,24 @@ class CodeEditor:
                     failed_files.append(file_path)
                     continue
 
-                # Apply edit and remove line numbers
-                edited_content = self.apply_edit_instruction(file_content, edit_instruction)
+                # Remove line numbers before applying edit
+                original_unumbered = self.remove_line_numbers(file_content)
+                
+                # Apply edit to unnumbered content
+                edited_content = self.apply_edit_instruction(original_unumbered, edit_instruction)
                 if edited_content is None:
                     failed_files.append(file_path)
                     continue
                     
-                unumbered_edited_content = self.remove_line_numbers(edited_content)
-                
                 # Show changes
                 print("--- Original content ---")
-                print(file_content)
+                print(original_unumbered)
                 print("--- Edited content ---")
-                print(unumbered_edited_content)
+                print(edited_content)
 
                 # Apply changes if not in dry-run mode
                 if not dry_run:
-                    if self.backup_and_write_file(file_path, file_content, unumbered_edited_content):
+                    if self.backup_and_write_file(file_path, original_unumbered, edited_content):
                         success_count += 1
 
             if failed_files:
