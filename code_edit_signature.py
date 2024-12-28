@@ -120,7 +120,13 @@ class CodeEdit(dspy.Signature):
     edit_instructions = dspy.OutputField(
         desc="JSON array of edit instructions. Each instruction must have: "
              "filepath (string), search_text (string), replacement_text (string). "
-             "Example: [{'filepath': 'test.py', 'search_text': 'print()', 'replacement_text': 'print(time_in_china)'}]",
+             "Return only valid JSON in this format: "
+             "```json\n"
+             "[{\n"
+             "  \"filepath\": \"test.py\",\n" 
+             "  \"search_text\": \"print()\",\n"
+             "  \"replacement_text\": \"print(time_in_china)\"\n"
+             "}]```",
         type=str
     )
 

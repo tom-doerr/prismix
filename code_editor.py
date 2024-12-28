@@ -236,13 +236,51 @@ class CodeEditor:
         print(instructions)
         print("Expected format:", EditInstructions.model_json_schema())
             
-        # Use DSPy assertion for JSON validation
+        # First try to parse as JSON string
         try:
+            # Handle case where LLM returns JSON wrapped in markdown code block
+            if instructions.startswith("```") and instructions.endswith("```"):
+                instructions = instructions[3:-3].strip()
+                if instructions.startswith("json"):
+                    instructions = instructions[4:].strip()
+            
+            # Parse JSON
             edit_data = json.loads(instructions)
+            
+            # Validate basic structure
             dspy.Assert(
                 isinstance(edit_data, list),
                 "Edit instructions must be a JSON array"
             )
+            
+            # Convert to proper model instances
+            edits = []
+            for instr in edit_data:
+                try:
+                    # Validate required fields
+                    dspy.Assert(
+                        isinstance(instr, dict),
+                        "Each instruction must be a dictionary"
+                    )
+                    dspy.Assert(
+                        all(k in instr for k in ['filepath', 'search_text', 'replacement_text']),
+                        "Missing required fields in instruction"
+                    )
+                    
+                    # Create model instance
+                    edit = SearchReplaceEditInstruction(**instr)
+                    edits.append(edit)
+                    
+                except Exception as e:
+                    print(f"Invalid edit instruction: {e}\nInstruction: {instr}")
+                    continue
+                    
+            dspy.Assert(
+                len(edits) > 0,
+                "No valid edit instructions found after validation"
+            )
+            
+            return edits
         except json.JSONDecodeError as e:
             debug_info = (
                 f"Error parsing edit_instructions: {e}\n"

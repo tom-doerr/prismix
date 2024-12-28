@@ -38,9 +38,23 @@ def main() -> None:
     setup_logging()
     
     try:
-        # Setup the LLM
-        llm = dspy.LM(model="deepseek/deepseek-chat", max_tokens=200, cache=False, temperature=1.0)
+        # Configure Deepseek with optimal settings
+        llm = dspy.LM(
+            model="deepseek/deepseek-chat",
+            max_tokens=400,  # Increased for better responses
+            cache=False,
+            temperature=0.7,  # Lower for more deterministic output
+            top_p=0.9,
+            frequency_penalty=0.1,
+            presence_penalty=0.1
+        )
         dspy.settings.configure(lm=llm)
+        
+        # Add JSON output formatting instruction
+        dspy.settings.configure(
+            json_output=True,
+            json_schema=EditInstructions.model_json_schema()
+        )
 
         # Initialize the retriever and predictor
         retriever = QdrantRetriever()
