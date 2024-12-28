@@ -129,12 +129,33 @@ class CodeEditor:
             # Parse edit instructions
             try:
                 import json
+                # First try to parse as JSON
                 edit_instructions = json.loads(response.edit_instructions)
-                if not isinstance(edit_instructions, dict) or 'edit_instructions' not in edit_instructions:
-                    raise ValueError("Invalid edit instructions format")
-            except (json.JSONDecodeError, ValueError) as e:
+                
+                # Validate the structure
+                if not isinstance(edit_instructions, dict):
+                    raise ValueError("Edit instructions must be a JSON object")
+                if 'edit_instructions' not in edit_instructions:
+                    raise ValueError("Missing 'edit_instructions' key")
+                if not isinstance(edit_instructions['edit_instructions'], list):
+                    raise ValueError("'edit_instructions' must be a list")
+                    
+            except json.JSONDecodeError as e:
+                # If JSON parsing fails, try to extract the JSON part from the response
+                try:
+                    import re
+                    json_str = re.search(r'\{.*\}', response.edit_instructions, re.DOTALL)
+                    if json_str:
+                        edit_instructions = json.loads(json_str.group())
+                    else:
+                        raise ValueError("Could not find valid JSON in response")
+                except Exception as e2:
+                    raise dspy.DSPyAssertionError(
+                        msg=f"Invalid edit instructions format: {e2}. Must be valid JSON matching EditInstructions schema."
+                    )
+            except ValueError as e:
                 raise dspy.DSPyAssertionError(
-                    f"Invalid edit instructions format: {e}. Must be valid JSON matching EditInstructions schema."
+                    msg=f"Invalid edit instructions structure: {e}. Must be valid JSON matching EditInstructions schema."
                 )
 
             print("--- Output Values ---")
