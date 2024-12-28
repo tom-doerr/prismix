@@ -6,7 +6,6 @@ from typing import List, Optional, Dict, Any
 import dspy
 
 from code_edit_signature import CodeEdit, Context, CodeFile
-from code_edit_utils import apply_code_edit
 from qdrant_retriever import QdrantRetriever
 
 def add_line_numbers(content: str) -> str:
