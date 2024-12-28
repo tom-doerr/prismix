@@ -189,7 +189,7 @@ def run_code_edit_example():
     module = InferenceModule(CodeEdit)
     generate_answer = assert_transform_module(
         module,
-        functools.partial(backtrack_handler, max_backtracks=30),
+        functools.partial(backtrack_handler, max_backtracks=100),  # Increased from 30 to 100
     )
 
     # Example usage
@@ -384,7 +384,7 @@ def run_bootstrap_fewshot_optimization():
     optimized_program = teleprompter.compile(
         assert_transform_module(
             module,
-            functools.partial(backtrack_handler, max_backtracks=3),
+            functools.partial(backtrack_handler, max_backtracks=10),  # Increased from 3 to 10
         ),
         trainset=trainset,
     )
