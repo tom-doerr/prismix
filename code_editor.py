@@ -102,7 +102,7 @@ class CodeEditor:
                 collection_name=self.retriever.collection_name,
                 limit=1000
             )
-            file_paths = list(set(payload["file_path"] for payload in search_result[0]))
+            file_paths = list(set(record.payload["file_path"] for record in search_result[0]))
             if not file_paths:
                 raise FileNotFoundError("No Python files found in the codebase")
                 
