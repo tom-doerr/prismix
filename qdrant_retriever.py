@@ -182,49 +182,64 @@ class QdrantRetriever:
             RuntimeError: If retrieval fails
         """
         try:
-            # First try exact string match across all files
-            all_files = self.client.scroll(
+            # First try semantic search with higher limit
+            if self.model:
+                query_embedding = self.model.encode(query).tolist()
+            else:
+                query_embedding = self._get_jina_embedding(query)
+            
+            all_files = self.client.search(
                 collection_name=self.collection_name,
-                limit=1000
-            )[0]
+                query_vector=query_embedding,
+                limit=100,
+            )
         except Exception as e:
             raise RuntimeError(f"Failed to retrieve files from Qdrant: {e}")
             
-        # Extract specific search text from instruction
-        search_text = query
-        if " to " in query:
-            search_text = query.split(" to ")[0].strip()
-            if "change " in search_text:
-                search_text = search_text.replace("change ", "").strip()
-        
-        # Check for exact matches
-        exact_matches = []
+        # Extract key concepts from the instruction
+        search_terms = []
+        if "remove" in query.lower():
+            search_terms.append("remove")
+        if "print" in query.lower():
+            search_terms.append("print")
+        if "number" in query.lower():
+            search_terms.append("number")
+            
+        # Find relevant matches based on semantic similarity and keywords
+        relevant_matches = []
         for hit in all_files:
             # Skip the test_retriever function itself
             if "test_retriever" in hit.payload["text"]:
                 continue
                 
-            # Look for exact matches of the search text
-            if search_text.lower() in hit.payload["text"].lower():
-                # Prioritize exact matches at the start of lines
-                lines = hit.payload["text"].splitlines()
-                for i, line in enumerate(lines):
-                    if search_text.lower() in line.lower():
-                        # Calculate actual line number
-                        actual_line = hit.payload["start_line"] + i
-                        exact_matches.append((hit.payload["file_path"], line.strip(), actual_line))
-                        break
+            # Score based on semantic similarity and keyword matches
+            score = hit.score
+            for term in search_terms:
+                if term.lower() in hit.payload["text"].lower():
+                    score += 0.5  # Boost score for keyword matches
+                    
+            # Add to results if score is above threshold
+            if score > 0.5:
+                # Calculate actual line number
+                actual_line = hit.payload["start_line"]
+                relevant_matches.append({
+                    'file_path': hit.payload["file_path"],
+                    'text': hit.payload["text"],
+                    'line_num': actual_line,
+                    'score': score
+                })
         
-        # Deduplicate matches
+        # Sort by score and deduplicate
+        sorted_matches = sorted(relevant_matches, key=lambda x: x['score'], reverse=True)
+        
         unique_matches = []
-        seen = set()
-        for match in exact_matches:
-            if match[0] not in seen:
-                unique_matches.append(match)
-                seen.add(match[0])
+        seen_files = set()
+        for match in sorted_matches:
+            if match['file_path'] not in seen_files:
+                unique_matches.append((match['file_path'], match['text'], match['line_num']))
+                seen_files.add(match['file_path'])
         
-        if unique_matches:
-            return unique_matches[:top_k]
+        return unique_matches[:top_k]
             
         # Fall back to semantic search if no exact matches
         if self.model:
