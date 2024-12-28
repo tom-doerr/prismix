@@ -86,29 +86,19 @@ class CodeEditInference(dspy.Module):
         """
         prediction = self.predictor(instruction=instruction, context=context)
         
-        try:
-            validated_instructions = self._validate_edit_instructions(prediction.edit_instructions)
-            return dspy.Prediction(
-                reasoning=prediction.reasoning,
-                edit_instructions=validated_instructions.json()
-            )
-        except ValueError as e:
-            # Create variable with all debug info
-            debug_info = (
-                f"Error parsing edit_instructions: {e}\n"
-                f"Received: {prediction.edit_instructions}\n"
-                f"Expected format: {EditInstructions.model_json_schema()}\n"
-                f"Full prediction: {prediction}"
-            )
-            
-            # Print debug info
-            print("DEBUG INFO:\n", debug_info)
-            
-            # Send in assert
-            dspy.Assert(
-                False,
-                debug_info
-            )
+        # Validate that edit_instructions exists
+        dspy.Assert(
+            hasattr(prediction, 'edit_instructions'),
+            "Invalid response format from predictor - missing edit_instructions"
+        )
+        
+        # Validate the edit instructions
+        validated_instructions = self._validate_edit_instructions(prediction.edit_instructions)
+        
+        return dspy.Prediction(
+            reasoning=prediction.reasoning,
+            edit_instructions=validated_instructions.json()
+        )
 
 class SearchReplaceEditInstruction2(BaseModel):
     filepath: str = Field(..., desc="The path to the file that should be edited.")
